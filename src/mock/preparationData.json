@@ -1,0 +1,64 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "name": "设备数据集处理任务",
+      "createTime": "2023-06-15 14:30:22",
+      "fileCount": 12,
+      "dataCount": 5834,
+      "status": "completed"
+    },
+    {
+      "id": 2,
+      "name": "用户行为数据集处理",
+      "createTime": "2023-06-18 09:15:37",
+      "fileCount": 8,
+      "dataCount": 3421,
+      "status": "running"
+    },
+    {
+      "id": 3,
+      "name": "智能家居数据预处理",
+      "createTime": "2023-06-20 16:45:12",
+      "fileCount": 15,
+      "dataCount": 7612,
+      "status": "completed"
+    },
+    {
+      "id": 4,
+      "name": "气象传感器数据集成",
+      "createTime": "2023-06-22 11:20:45",
+      "fileCount": 6,
+      "dataCount": 2180,
+      "status": "unconfigured"
+    },
+    {
+      "id": 5,
+      "name": "工业设备监控数据分析",
+      "createTime": "2023-06-24 08:55:30",
+      "fileCount": 10,
+      "dataCount": 4905,
+      "status": "running"
+    }
+  ],
+  "monitorData": {
+    "storageNodes": {
+      "online": 16,
+      "offline": 2
+    },
+    "storageObjects": 13579,
+    "objectTypeDistribution": [
+      { "value": 45, "name": "结构化数据" },
+      { "value": 25, "name": "非结构化数据" },
+      { "value": 20, "name": "图像数据" },
+      { "value": 10, "name": "视频数据" }
+    ],
+    "storageCapacity": [
+      { "name": "节点1", "value": 850, "max": 1000 },
+      { "name": "节点2", "value": 210, "max": 500 },
+      { "name": "节点3", "value": 1300, "max": 2000 },
+      { "name": "节点4", "value": 140, "max": 500 },
+      { "name": "节点5", "value": 2920, "max": 4000 }
+    ]
+  }
+}
