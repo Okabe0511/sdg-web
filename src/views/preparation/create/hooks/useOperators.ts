@@ -47,7 +47,6 @@ export const useOperators = () => {
       operators.push(...response.data);
       operatorsTotal.value = response.total;
     } catch (error) {
-      console.error("加载算子库失败", error);
       message.error("加载算子库失败");
     } finally {
       loading.value = false;
@@ -207,5 +206,6 @@ export const useOperators = () => {
     addOperatorToWorkflow,
     prepareAddOperator,
     saveAndAddToWorkflow,
+    parseParameters,
   };
 };

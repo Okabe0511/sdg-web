@@ -15,7 +15,7 @@ export const useProgressSteps = () => {
     {
       title: "配置数据集",
       subtitle: "多源异构数据\n原料高效召回",
-      status: "wait",
+      status: "process",
     },
     {
       title: "数据质量评估",

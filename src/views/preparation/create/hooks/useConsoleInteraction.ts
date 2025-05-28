@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { getFullTaskLog } from "/@/serve/api/aiConsole";
+import { getFullTaskLog, getDataPreparationLog } from "/@/serve/api/aiConsole";
 import { SSEEvent, parseSSEContent } from "/@/utils/sse";
 
 export interface ConsoleMessage {
@@ -66,11 +66,32 @@ export const useConsoleInteraction = () => {
     }
   };
 
+  // 启动数据准备流程（一次性获取整个数据准备的流式输出）
+  const startDataPreparationStream = async () => {
+    isLoading.value = true;
+
+    try {
+      await getDataPreparationLog((event: any) => {
+        const content = event.data;
+        if (event.type === "REQUEST") {
+          addUserMessage(content);
+        } else if (event.type === "RESPONSE" || event.type === "REASONING") {
+          addSystemMessage(content, event.type);
+        }
+      });
+    } catch (error) {
+      console.error("获取数据准备日志失败", error);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   return {
     consoleMessages,
     isLoading,
     addSystemMessage,
     addUserMessage,
     startTaskStream,
+    startDataPreparationStream,
   };
 };

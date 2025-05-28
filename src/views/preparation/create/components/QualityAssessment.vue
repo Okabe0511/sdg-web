@@ -19,116 +19,110 @@
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
-              <span class="metric-label">数据样本数量：</span>
+              <span class="metric-label">数据量：</span>
               <span class="metric-value">{{
                 formatValue(secondaryMetrics.sampleCount)
               }}</span>
             </div>
-            <div class="secondary-metric-item">
-              <span class="metric-label">训练集覆盖率：</span>
-              <span class="metric-value"
-                >{{ formatPercent(secondaryMetrics.sampleCount / 2) }}%</span
-              >
-            </div>
           </div>
         </div>
 
-        <!-- 数据对齐详情 -->
+        <!-- 数据表示质量详情 -->
         <div
           v-if="selectedQualityMetric === 'dataAlignment'"
           class="tip-item active-tip"
         >
-          <div class="tip-title">数据对齐</div>
+          <div class="tip-title">数据表示质量</div>
           <div class="tip-content">
             {{ qualityExplanations.dataAlignment }}
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
               <span class="metric-label">图像与渲染截图匹配度：</span>
-              <span class="metric-value"
-                >{{ formatPercent(secondaryMetrics.imageRenderMatch) }}%</span
-              >
+              <span class="metric-value">{{
+                formatPercent(secondaryMetrics.imageRenderMatch)
+              }}</span>
             </div>
             <div class="secondary-metric-item">
               <span class="metric-label">缺失率：</span>
-              <span class="metric-value"
-                >{{ formatPercent(secondaryMetrics.missingRate) }}%</span
-              >
+              <span class="metric-value">{{
+                formatPercent(secondaryMetrics.missingRate)
+              }}</span>
             </div>
           </div>
         </div>
 
-        <!-- 数据重复性详情 -->
+        <!-- 数据冗余详情 -->
         <div
           v-if="selectedQualityMetric === 'dataRedundancy'"
           class="tip-item active-tip"
         >
-          <div class="tip-title">数据重复性</div>
+          <div class="tip-title">数据冗余</div>
           <div class="tip-content">
             {{ qualityExplanations.dataRedundancy }}
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
               <span class="metric-label">代码重复性：</span>
-              <span class="metric-value"
-                >{{ formatPercent(secondaryMetrics.codeRedundancy) }}%</span
-              >
+              <span class="metric-value">{{
+                formatPercent(secondaryMetrics.codeRedundancy)
+              }}</span>
             </div>
             <div class="secondary-metric-item">
               <span class="metric-label">图像重复性：</span>
-              <span class="metric-value"
-                >{{ formatPercent(secondaryMetrics.imageRedundancy) }}%</span
-              >
+              <span class="metric-value">{{
+                formatPercent(secondaryMetrics.imageRedundancy)
+              }}</span>
             </div>
           </div>
         </div>
 
-        <!-- 多样均衡性详情 -->
+        <!-- 数据上下文质量详情 -->
         <div
           v-if="selectedQualityMetric === 'diversityBalance'"
           class="tip-item active-tip"
         >
-          <div class="tip-title">多样均衡性</div>
+          <div class="tip-title">数据上下文质量</div>
           <div class="tip-content">
             {{ qualityExplanations.diversityBalance }}
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
               <span class="metric-label">图表类型均衡性：</span>
-              <span class="metric-value"
-                >{{ formatPercent(secondaryMetrics.chartTypeBalance) }}%</span
-              >
+              <span class="metric-value">{{
+                formatPercent(secondaryMetrics.chartTypeBalance)
+              }}</span>
             </div>
             <div class="secondary-metric-item">
               <span class="metric-label">配置项多样性：</span>
-              <span class="metric-value"
-                >{{ formatPercent(secondaryMetrics.configDiversity) }}%</span
-              >
+              <span class="metric-value">{{
+                formatPercent(secondaryMetrics.configDiversity)
+              }}</span>
             </div>
           </div>
         </div>
 
-        <!-- 代码质量详情 -->
+        <!-- 数据内在质量详情 -->
         <div
           v-if="selectedQualityMetric === 'codeQuality'"
           class="tip-item active-tip"
         >
-          <div class="tip-title">代码质量</div>
+          <div class="tip-title">数据内在质量</div>
           <div class="tip-content">
             {{ qualityExplanations.codeQuality }}
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
               <span class="metric-label">语法检测通过率：</span>
-              <span class="metric-value"
-                >{{ formatPercent(secondaryMetrics.syntaxDetection) }}%</span
-              >
+              <span class="metric-value">{{
+                formatPercent(secondaryMetrics.syntaxDetection)
+              }}</span>
             </div>
             <div class="secondary-metric-item">
               <span class="metric-label">配置项完整性：</span>
-              <span class="metric-value"
-                >{{ formatPercent(secondaryMetrics.configCompleteness) }}%</span
-              >
+              <span class="metric-value">{{
+                formatPercent(secondaryMetrics.configCompleteness)
+              }}</span>
             </div>
           </div>
         </div>
@@ -179,15 +173,13 @@ export default defineComponent({
 
     // 格式化百分比
     const formatPercent = (value: number) => {
-      console.log(props.secondaryMetrics);
-
       return value ? value.toFixed(1) : "0.0";
     };
 
     // 格式化值，对数字添加千分位分隔符
     const formatValue = (value: number) => {
       if (!value) return "0";
-      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "条";
+      return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
     const initRadarChart = () => {
@@ -209,10 +201,10 @@ export default defineComponent({
         radar: {
           indicator: [
             { name: "数据量", max: 100 },
-            { name: "数据对齐", max: 100 },
-            { name: "数据重复性", max: 100 },
-            { name: "多样均衡性", max: 100 },
-            { name: "代码质量", max: 100 },
+            { name: "数据表示质量", max: 100 },
+            { name: "数据冗余", max: 100 },
+            { name: "数据上下文质量", max: 100 },
+            { name: "数据内在质量", max: 100 },
           ],
           triggerEvent: true,
           axisName: {
@@ -267,10 +259,10 @@ export default defineComponent({
       radarChart.on("click", (params) => {
         const indicatorNames = [
           "数据量",
-          "数据对齐",
-          "数据重复性",
-          "多样均衡性",
-          "代码质量",
+          "数据表示质量",
+          "数据冗余",
+          "数据上下文质量",
+          "数据内在质量",
         ];
         const indicatorKeys = [
           "dataVolume",

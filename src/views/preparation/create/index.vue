@@ -56,8 +56,12 @@ export default defineComponent({
     } = useQualityAssessment();
     const { analysisInProgress, startAnalysis, stopAnalysis } =
       useDataAnalysis();
-    const { consoleMessages, isLoading, startTaskStream } =
-      useConsoleInteraction();
+    const {
+      consoleMessages,
+      isLoading,
+      startTaskStream,
+      startDataPreparationStream,
+    } = useConsoleInteraction();
 
     // 模块显示控制
     const modulesVisible = reactive({
@@ -211,6 +215,7 @@ export default defineComponent({
       selectedQualityMetric,
       isLoading,
       showDataPreparation,
+      startDataPreparationStream,
 
       // 新增返回值
       isDetailMode,
@@ -267,6 +272,7 @@ export default defineComponent({
           v-if="currentStep === 3 && showDataPreparation"
           :visible="modulesVisible.dataPreparation"
           :loading="!modulesVisible.dataPreparation"
+          @start-data-preparation="startDataPreparationStream"
         />
       </div>
 
@@ -330,7 +336,6 @@ export default defineComponent({
     flex: 1;
     height: 100%;
   }
-
 
   .middle-area {
     display: flex;

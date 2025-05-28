@@ -76,19 +76,22 @@
                 <div class="step-header">
                   <div class="step-index">{{ index + 1 }}</div>
                   <div class="step-name">{{ step.name }}</div>
-                  <div class="step-preview" v-if="step.isCompleted">
-                    <a-button
-                      type="link"
-                      size="small"
-                      @click="previewStep(step)"
-                    >
-                      预览
-                    </a-button>
-                  </div>
                 </div>
-
                 <div
-                  v-if="isExecuting && !step.isCompleted"
+                  class="step-preview"
+                  v-if="isExecuting || isWorkflowCompleted"
+                >
+                  <a-button
+                    type="text"
+                    size="small"
+                    @click="previewStep(step)"
+                    :disabled="!step.isCompleted"
+                  >
+                    预览
+                  </a-button>
+                </div>
+                <div
+                  v-if="isExecuting || isWorkflowCompleted"
                   class="step-status"
                 >
                   <div
@@ -176,16 +179,29 @@
                 <div class="target-circle circle-1"></div>
                 <div class="target-circle circle-2"></div>
                 <div class="target-circle circle-3"></div>
-                <div class="target-circle circle-4"></div>
-                <div class="target-circle circle-5"></div>
 
                 <!-- 三个指标点 -->
+                <!-- 原始指标点 -->
                 <div
-                  class="target-indicator"
-                  v-for="(item, key) in targetData"
-                  :key="key"
-                  :class="{ active: selectedTargetKey === key }"
-                  :style="getIndicatorStyle(key, item)"
+                  class="target-indicator original"
+                  v-for="key in Object.keys(targetData.original)"
+                  :key="`original-${key}`"
+                  :style="getIndicatorStyle(key, targetData.original[key])"
+                >
+                  <div class="indicator-marker">
+                    <div class="line-top"></div>
+                    <div class="line-right"></div>
+                    <div class="line-bottom"></div>
+                    <div class="line-left"></div>
+                    <div class="circle-ring"></div>
+                  </div>
+                </div>
+                <!-- 当前指标点 -->
+                <div
+                  class="target-indicator current"
+                  v-for="key in Object.keys(targetData.current)"
+                  :key="`current-${key}`"
+                  :style="getIndicatorStyle(key, targetData.current[key])"
                   @click="selectTarget(key)"
                 >
                   <div class="indicator-marker">
@@ -194,6 +210,24 @@
                     <div class="line-bottom"></div>
                     <div class="line-left"></div>
                     <div class="circle-ring"></div>
+                  </div>
+                  <!-- 添加悬浮提示框 -->
+                  <div class="tooltip">
+                    <div class="tooltip-title">
+                      {{ targetExplanations[key].title }}
+                    </div>
+                    <div class="tooltip-value">
+                      <span class="label">原始得分:</span>
+                      <span class="value">{{
+                        formatScore(targetData.original[key])
+                      }}</span>
+                    </div>
+                    <div class="tooltip-value">
+                      <span class="label">当前得分:</span>
+                      <span class="value">{{
+                        formatScore(targetData.current[key])
+                      }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -218,7 +252,7 @@
       :cancelText="'取消'"
     >
       <!-- 算子编辑表单 -->
-      <a-form :model="currentOperator" layout="vertical">
+      <a-form :model="currentOperator">
         <!-- 参数编辑 -->
         <div v-for="(param, index) in parsedParams" :key="index">
           <a-form-item :label="param.name">
@@ -293,11 +327,44 @@
         <a-button @click="previewModalVisible = false">关闭</a-button>
       </div>
     </a-modal>
+
+    <!-- 步骤编辑弹窗 -->
+    <a-modal
+      v-model:visible="stepEditModalVisible"
+      title="编辑算子"
+      @ok="saveEditedStep"
+      @cancel="stepEditModalVisible = false"
+      :okText="'保存'"
+      :cancelText="'取消'"
+    >
+      <!-- 步骤编辑表单 -->
+      <a-form :model="currentOperator">
+        <!-- 参数编辑 -->
+        <div v-for="(param, index) in parsedParams" :key="index">
+          <a-form-item :label="param.name">
+            <!-- 根据参数类型渲染不同控件 -->
+            <a-input-number
+              v-if="param.type === 'number'"
+              v-model:value="param.value"
+            />
+            <a-switch
+              v-else-if="param.type === 'bool'"
+              v-model:checked="param.value"
+            />
+            <a-input v-else v-model:value="param.value" />
+          </a-form-item>
+        </div>
+        <!-- 算子参数为空时 -->
+        <div v-if="parsedParams.length === 0" class="empty-params">
+          <p>此算子无可配置参数</p>
+        </div>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { defineComponent, onMounted, reactive, ref, watch } from "vue";
 import {
   UpOutlined,
   DownOutlined,
@@ -307,6 +374,7 @@ import {
   LoadingOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue"; // 引入 message
 import Icon from "/@/components/Icon/index.vue";
 import { useOperators } from "/@/views/preparation/create/hooks/useOperators";
 import { useTargetAnalysis } from "/@/views/preparation/create/hooks/useTargetAnalysis";
@@ -320,6 +388,12 @@ import Operator5 from "/@/assets/images/operators/operator-5.png";
 import Operator6 from "/@/assets/images/operators/operator-6.png";
 import Operator7 from "/@/assets/images/operators/operator-7.png";
 import { Operator } from "/@/serve/api/operators";
+
+interface TargetExplanation {
+  title: string;
+  score: number;
+  content: string;
+}
 
 export default defineComponent({
   components: {
@@ -338,7 +412,10 @@ export default defineComponent({
       default: false,
     },
   },
-  setup(props) {
+
+  // 添加emit定义
+  emits: ["start-data-preparation"],
+  setup(props, { emit }) {
     // 使用算子钩子
     const {
       operators,
@@ -355,6 +432,8 @@ export default defineComponent({
       prepareAddOperator,
       saveAndAddToWorkflow,
       addOperatorToWorkflow,
+      parseParameters, // 确保引入parseParameters
+      updateParameterString, // 确保引入updateParameterString
     } = useOperators();
 
     // 使用靶点分析钩子，添加addOperatorData
@@ -365,8 +444,9 @@ export default defineComponent({
       selectTarget,
       getIndicatorStyle,
       initRadarChart,
-      addOperatorData, // 新增
-      radarDataSeries, // 新增
+      addOperatorData,
+      radarDataSeries,
+      updateFinalTargetData,
     } = useTargetAnalysis();
 
     // 使用工作流钩子
@@ -383,10 +463,14 @@ export default defineComponent({
       generateWorkflow,
       moveStep,
       removeStep,
-      executeWorkflow: originalExecuteWorkflow, // 重命名原始方法
+      executeWorkflow: originalExecuteWorkflow,
       previewStep,
       isWorkflowCompleted,
     } = useWorkflow();
+
+    // 添加步骤编辑相关状态
+    const stepEditModalVisible = ref(false);
+    const currentEditingStepIndex = ref(-1);
 
     // 注册将算子添加到工作流的回调函数
     addOperatorToWorkflow.value = (operator: Operator) => {
@@ -394,6 +478,18 @@ export default defineComponent({
         ...operator,
         isCompleted: false,
       });
+    };
+
+    // 靶点解释数据
+    const targetExplanations = reactive<Record<string, TargetExplanation>>({
+      configDiversity: { title: "配置项多样性", score: 0, content: "" },
+      dataVolume: { title: "数据量", score: 0, content: "" },
+      chartTypeBalance: { title: "图表类型均衡性", score: 0, content: "" },
+    });
+
+    // 格式化分数
+    const formatScore = (score: number) => {
+      return score.toFixed(2);
     };
 
     // 添加一个已完成算子的跟踪数组
@@ -405,6 +501,7 @@ export default defineComponent({
       completedSteps.value = [];
       // 调用原始执行方法
       originalExecuteWorkflow();
+      emit("start-data-preparation");
     };
 
     // 监听currentExecutingStep的变化
@@ -423,17 +520,60 @@ export default defineComponent({
               workflow.steps[completedStepIndex]?.name ||
               `算子${completedStepIndex + 1}`;
             // 添加算子数据到雷达图
-            addOperatorData(operatorName);
+            addOperatorData(operatorName, completedStepIndex);
           }
         }
       }
     );
 
-    // 编辑步骤 - 适配钩子函数接口
+    watch(
+      () => isWorkflowCompleted.value,
+      (newVal, oldVal) => {
+        if (isWorkflowCompleted.value) {
+          updateFinalTargetData();
+        }
+      }
+    );
+
+    // 修改编辑步骤函数，打开编辑弹窗
     const editStep = (index: number) => {
       if (index >= 0 && index < workflow.steps.length) {
         const step = workflow.steps[index];
-        editOperator(step);
+        currentOperator.value = { ...step };
+        parsedParams.value = parseParameters(step.parameters || "");
+        stepEditModalVisible.value = true;
+        currentEditingStepIndex.value = index;
+      }
+    };
+
+    // 添加保存编辑后的步骤函数
+    const saveEditedStep = async () => {
+      try {
+        // 更新参数字符串
+        updateParameterString();
+
+        // 如果索引有效，更新工作流步骤
+        if (
+          currentEditingStepIndex.value >= 0 &&
+          currentEditingStepIndex.value < workflow.steps.length
+        ) {
+          // 更新工作流中的步骤
+          workflow.steps[currentEditingStepIndex.value] = {
+            ...currentOperator.value,
+            isCompleted:
+              workflow.steps[currentEditingStepIndex.value].isCompleted,
+          };
+
+          // 关闭弹窗
+          stepEditModalVisible.value = false;
+          currentEditingStepIndex.value = -1;
+
+          // 显示成功消息
+          message.success("算子更新成功");
+        }
+      } catch (error) {
+        console.error("保存步骤失败", error);
+        message.error("保存步骤失败");
       }
     };
 
@@ -475,8 +615,10 @@ export default defineComponent({
       radarChartRef,
       targetData,
       selectedTargetKey,
+      targetExplanations,
       selectTarget,
       getIndicatorStyle,
+      formatScore,
 
       // 工作流相关
       workflow,
@@ -496,6 +638,10 @@ export default defineComponent({
       previewStep,
       radarDataSeries,
       isWorkflowCompleted,
+
+      // 添加步骤编辑相关
+      stepEditModalVisible,
+      saveEditedStep,
 
       prepareAddOperator,
       saveAndAddToWorkflow,
@@ -712,6 +858,7 @@ export default defineComponent({
             flex-direction: column;
             border: 1px solid #eaeaea;
             border-radius: 8px;
+            overflow: hidden;
             background-color: #fff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
@@ -769,17 +916,6 @@ export default defineComponent({
                 color: #333;
                 flex: 1;
               }
-
-              .step-preview {
-                margin-left: auto;
-
-                .ant-btn {
-                  padding: 0;
-                  &:hover {
-                    background-color: #f0f7ff;
-                  }
-                }
-              }
             }
 
             .step-description {
@@ -789,12 +925,26 @@ export default defineComponent({
               margin-bottom: 10px;
               line-height: 1.5;
             }
+            .step-preview {
+              display: flex;
+              width: 100%;
+              height: 40px;
+              justify-content: space-between;
+              align-items: center;
+              background-color: #ccc;
 
+              .ant-btn {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+                cursor: pointer;
+                border: 1px solid #aaa;
+              }
+            }
             .step-status {
               position: absolute;
-              top: 50%;
-              right: 0;
-              transform: translateY(-50%);
+              top: 16px;
+              right: 10px;
               padding: 5px 5px;
               font-size: 12px;
               display: flex;
@@ -925,20 +1075,20 @@ export default defineComponent({
             top: 50%;
 
             &.circle-1 {
-              width: 90%;
-              height: 90%;
+              width: 100%;
+              height: 100%;
               background-color: rgb(148, 211, 174);
               border: 1px solid #000;
             }
 
             &.circle-2 {
-              width: 66%;
-              height: 66%;
+              width: 70%;
+              height: 70%;
               background-color: rgb(234, 234, 71); // 红色背景
               border: 1px solid #000;
             }
 
-            &.circle-5 {
+            &.circle-3 {
               width: 40%;
               height: 40%;
               background-color: rgb(252, 33, 33);
@@ -1116,6 +1266,51 @@ export default defineComponent({
                 }
               }
             }
+
+            &.original {
+              .indicator-marker {
+                opacity: 0.6;
+                transform: scale(0.8);
+
+                .line-top,
+                .line-right,
+                .line-bottom,
+                .line-left {
+                  background-color: #aaa; // 灰色表示原始数据
+                }
+
+                .circle-ring {
+                  border-color: #aaa; // 灰色表示原始数据
+                }
+              }
+
+              &:hover {
+                .tooltip {
+                  display: none; // 原始点不显示悬浮信息，避免混淆
+                }
+              }
+            }
+
+            &.current {
+              z-index: 6; // 确保当前点在原始点上面
+
+              .indicator-marker {
+                &.active {
+                  transform: scale(1.1);
+
+                  .line-top,
+                  .line-right,
+                  .line-bottom,
+                  .line-left {
+                    background-color: #13c2c2; // 选中为青绿色
+                  }
+
+                  .circle-ring {
+                    border-color: #13c2c2; // 选中为青绿色边框
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1157,7 +1352,6 @@ export default defineComponent({
 .empty-params {
   text-align: center;
   color: #999;
-  padding: 10px 0;
-  padding-bottom: 20px;
+  padding: 30px 0 10px;
 }
 </style>

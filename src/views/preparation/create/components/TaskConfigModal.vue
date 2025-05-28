@@ -34,6 +34,7 @@
           <a-form-item label="数据集类型" name="basicDatasetType" required>
             <a-select
               v-model:value="formState.basicDatasetType"
+              :getPopupContainer="(node) => node.parentNode"
               placeholder="请选择数据集类型"
               style="width: 100%"
             >
@@ -84,6 +85,7 @@
             <a-form-item label="数据集类型" name="crossModalTypeA" required>
               <a-select
                 v-model:value="formState.crossModalTypeA"
+                :getPopupContainer="(node) => node.parentNode"
                 placeholder="请选择数据集类型"
                 style="width: 100%"
               >
@@ -129,6 +131,7 @@
             <a-form-item label="数据集类型" name="crossModalTypeB" required>
               <a-select
                 v-model:value="formState.crossModalTypeB"
+                :getPopupContainer="(node) => node.parentNode"
                 placeholder="请选择数据集类型"
                 style="width: 100%"
               >
@@ -484,6 +487,12 @@ export default defineComponent({
         font-size: 16px;
       }
     }
+  }
+
+  :global(.ant-select-dropdown) {
+    position: absolute !important;
+    top: 40px !important;
+    left: 0 !important;
   }
 
   /* 添加上传提示样式 */

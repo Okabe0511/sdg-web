@@ -132,5 +132,111 @@
       "event": "RESPONSE",
       "data": "完成数据洞察，发现数据靶点【配置项多样性、数据量、图表类型均衡性】,耗时5.4秒"
     }
+  ],
+  "preparation": [
+    {
+      "event": "REQUEST",
+      "data": "开始执行任务流程"
+    },
+    {
+      "event": "REASONING",
+      "data": "执行制备算子 配置项修复算子"
+    },
+    {
+      "event": "REASONING",
+      "data": "算子 配置项修复算子 执行完成! 耗时: 0.16秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估完成, 耗时: 117.24秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "执行制备算子 语法修复算子"
+    },
+    {
+      "event": "REASONING",
+      "data": "算子 语法修复算子 执行完成! 耗时: 557.41秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估完成, 耗时: 144.54秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "执行制备算子 配置项多样性增强算子"
+    },
+    {
+      "event": "REASONING",
+      "data": "算子 配置项多样性增强算子 执行完成! 耗时: 117.36秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估完成, 耗时: 434.48秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "执行制备算子 基于图像生成代码算子"
+    },
+    {
+      "event": "REASONING",
+      "data": "算子 基于图像生成代码算子 执行完成! 耗时: 295.69秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估完成, 耗时: 184.71秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "执行制备算子 代码扰动算子"
+    },
+    {
+      "event": "REASONING",
+      "data": "算子 代码扰动算子 执行完成! 耗时: 0.29秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估完成, 耗时: 380.08秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "执行制备算子 基于代码生成图像算子"
+    },
+    {
+      "event": "REASONING",
+      "data": "算子 基于代码生成图像算子 执行完成! 耗时: 828.03秒"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估"
+    },
+    {
+      "event": "REASONING",
+      "data": "数据质量评估完成, 耗时: 678.96秒"
+    },
+    {
+      "event": "RESPONSE",
+      "data": "任务流程执行完成, 耗时: 3738.96秒"
+    }
   ]
 }

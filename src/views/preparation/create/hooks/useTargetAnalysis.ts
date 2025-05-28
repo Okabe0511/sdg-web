@@ -1,23 +1,56 @@
 import { reactive, ref, onMounted, onBeforeUnmount, watch } from "vue";
 import * as echarts from "echarts";
 
+// 基于日志文件中的实际评估数据更新雷达图数据
+const radarDataList = [
+  // 初始评估数据
+  [40.44, 83.53, 75.17, 31.98, 92.31], // [数据量, 数据对齐, 数据重复性, 多样均衡性, 代码质量]
+  // 配置项修复算子后的评估数据
+  [40.44, 83.53, 75.14, 57.25, 92.75],
+  // 语法修复算子后的评估数据
+  [50.26, 82.03, 75.46, 59.72, 91.11],
+  // 配置项多样性增强算子后的评估数据
+  [50.26, 82.88, 76.1, 61.41, 90.3],
+  // 代码扰动算子后的评估数据
+  [100.0, 62.94, 64.5, 61.68, 93.77],
+  // 基于代码生成图像算子后的评估数据
+  [100.0, 65.11, 71.28, 61.68, 93.77],
+];
+
 export const useTargetAnalysis = () => {
   // 雷达图相关
   const radarChartRef = ref<HTMLElement | null>(null);
   let radarChart: echarts.ECharts | null = null;
 
   // 靶点相关
-  const targetData = reactive({
-    configDiversity: 60,
-    dataVolume: 45,
-    chartTypeBalance: 75,
-  });
+  const targetData: {
+    original: Record<string, number>;
+    current: Record<string, number>;
+  } = // 使用Record类型来定义靶点数据的结构
+    reactive({
+      original: {
+        configDiversity: 70.02,
+        dataVolume: 64.63,
+        chartTypeBalance: 53.23,
+      },
+      current: {
+        configDiversity: 70.02,
+        dataVolume: 64.63,
+        chartTypeBalance: 53.23,
+      },
+    });
 
   const selectedTargetKey = ref("configDiversity");
 
   // 选择靶点
   const selectTarget = (key: string) => {
     selectedTargetKey.value = key;
+  };
+
+  // 更新靶点数据
+  const updateTargetData = (key: string, value: number) => {
+    // 确保不超过100
+    targetData.current[key] = Math.min(100, value);
   };
 
   // 获取指标点在靶图上的位置
@@ -57,7 +90,7 @@ export const useTargetAnalysis = () => {
   >([
     {
       name: "原始数据",
-      value: [40, 75, 70, 30, 85],
+      value: [40.44, 78.8, 70, 33.55, 89.13],
       itemStyle: {
         color: "rgba(0, 155, 164, 1)",
       },
@@ -70,25 +103,21 @@ export const useTargetAnalysis = () => {
     },
   ]);
 
-  // 修改算子数据到雷达图，更新优化数据而不添加新记录
-  const addOperatorData = (operatorName: string) => {
-    // 随机生成5个指标数据，在原有基础上有所改善
-    const baseData = radarDataSeries[0].value;
-    const newData = baseData.map((val) => {
-      // 在原有基础上随机增加0-15的值，最高不超过100
-      const improvement = Math.floor(Math.random() * 15);
-      return Math.min(100, val + improvement);
-    });
+  // 修改算子数据到雷达图，同时也更新靶点数据
+  const addOperatorData = (operatorName: string, stepIndex: number = 0) => {
+    // 使用预定义的评估数据，而不是随机生成
+    const currentStepIndex = Math.min(stepIndex, radarDataList.length - 1);
+    const newData = radarDataList[currentStepIndex];
 
     // 生成一个随机颜色
-    const hue = Math.floor(Math.random() * 360);
+    const hue = 275;
     const color = `hsla(${hue}, 70%, 50%, 1)`;
     const areaColor = `hsla(${hue}, 70%, 50%, 0.2)`;
 
     // 如果已经有优化后的数据，则更新它；否则，添加新数据
     if (radarDataSeries.length > 1) {
       // 更新现有的优化数据
-      radarDataSeries[1].name = `${operatorName}优化后`;
+      radarDataSeries[1].name = `当前数据`;
       radarDataSeries[1].value = newData;
       radarDataSeries[1].itemStyle.color = color;
       radarDataSeries[1].lineStyle.color = color;
@@ -96,7 +125,7 @@ export const useTargetAnalysis = () => {
     } else {
       // 添加新的优化数据
       radarDataSeries.push({
-        name: `${operatorName}优化后`,
+        name: `当前数据`,
         value: newData,
         itemStyle: {
           color: color,
@@ -109,6 +138,19 @@ export const useTargetAnalysis = () => {
         },
       });
     }
+
+    // 更新图表
+    if (radarChart) {
+      updateRadarChart();
+    }
+  };
+
+  // 新增一个方法用于工作流完成后一次性更新靶点数据
+  const updateFinalTargetData = () => {
+    // 一次性更新为指定的固定值
+    updateTargetData("configDiversity", 20);
+    updateTargetData("dataVolume", 0);
+    updateTargetData("chartTypeBalance", 30);
 
     // 更新图表
     if (radarChart) {
@@ -134,10 +176,10 @@ export const useTargetAnalysis = () => {
       radar: {
         indicator: [
           { name: "数据量", max: 100 },
-          { name: "数据对齐", max: 100 },
-          { name: "数据重复性", max: 100 },
-          { name: "多样均衡性", max: 100 },
-          { name: "代码质量", max: 100 },
+          { name: "数据表示质量", max: 100 },
+          { name: "数据冗余", max: 100 },
+          { name: "数据上下文质量", max: 100 },
+          { name: "数据内在质量", max: 100 },
         ],
         triggerEvent: true,
         axisName: {
@@ -203,5 +245,6 @@ export const useTargetAnalysis = () => {
     cleanupChart,
     addOperatorData, // 导出新添加的方法
     radarDataSeries, // 导出数据系列
+    updateFinalTargetData, // 导出新增的方法
   };
 };

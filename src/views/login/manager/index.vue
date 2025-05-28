@@ -136,11 +136,10 @@ export default defineComponent({
 <style lang="less" scoped>
 .login-holder {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   box-sizing: border-box;
   margin: 0;
-  background: url(https://azalea-official.oss-cn-hangzhou.aliyuncs.com/yunzugong-web-background.png)
-    no-repeat;
+  background: #1fd5c9;
   background-size: cover;
   overflow: auto;
   display: flex;

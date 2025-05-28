@@ -123,7 +123,7 @@ export const useWorkflow = () => {
       setTimeout(() => {
         workflow.steps[index].isCompleted = true;
         executeStep(index + 1);
-      }, 5000 + Math.random() * 5000);
+      }, 4500);
     };
 
     executeStep(0);

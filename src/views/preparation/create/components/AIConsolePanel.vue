@@ -9,6 +9,7 @@
           :data="formattedMessages"
           :isStreamLoad="isStreamLoad"
           :reverse="false"
+          layout="single"
           ref="chatRef"
         >
           <template #content="{ item, index }">
@@ -40,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed } from "vue";
+import { defineComponent, ref, watch, computed, nextTick } from "vue";
 
 import { CheckCircleOutlined } from "@ant-design/icons-vue";
 export default defineComponent({
@@ -57,7 +58,7 @@ export default defineComponent({
   },
   setup(props) {
     const chatRef = ref(null) as any;
-
+    const chatContainerRef = ref(null);
     const isStreamLoad = ref(false);
 
     // 格式化消息以符合 TDesign Chat 组件的要求
@@ -142,10 +143,40 @@ export default defineComponent({
       return mergedMessages;
     });
 
+    // 滚动到底部的方法
+    const scrollToBottom = () => {
+      nextTick(() => {
+        chatRef.value.scrollToBottom({
+          behavior: "smooth",
+        });
+      });
+    };
+
+    // 监听消息变化，自动滚动到底部
+    watch(
+      () => formattedMessages.value,
+      () => {
+        scrollToBottom();
+      },
+      { deep: true }
+    );
+
+    // 监听流式加载状态变化，在开始流式加载时也滚动到底部
+    watch(
+      () => isStreamLoad.value,
+      (newVal) => {
+        if (newVal) {
+          scrollToBottom();
+        }
+      }
+    );
+
     return {
       formattedMessages,
       chatRef,
       isStreamLoad,
+      chatContainerRef,
+      scrollToBottom,
     };
   },
 });
@@ -219,5 +250,9 @@ export default defineComponent({
   p {
     white-space: pre-wrap;
   }
+}
+
+:deep(.t-chat__detail) {
+  width: 100%;
 }
 </style>
