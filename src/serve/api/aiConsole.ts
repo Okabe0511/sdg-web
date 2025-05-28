@@ -31,15 +31,33 @@ const simulateStream = (
     const sendNextMessage = () => {
       if (index < mockMessages.length) {
         const message = mockMessages[index];
+        // let wordIndex = 0;
+        // const typedWord = (word: string) => {
+        //   if (wordIndex < word.length) {
+        //     streamHandler({
+        //       type: message.event,
+        //       data: word[wordIndex],
+        //     });
+        //     wordIndex++;
+        //     setTimeout(() => typedWord(word), 50); // 模拟打字延迟
+        //   } else {
+        //     // 发送完整消息
+        //     streamHandler({
+        //       type: message.event,
+        //       data: "\n", // 换行符表示消息结束
+        //     });
+        //   }
+        // };
+        // typedWord(message.data);
         streamHandler({
           type: message.event,
-          data: message.data,
+          data: `${message.data}\n`,
         });
 
         index++;
 
-        // 模拟延迟，每个消息之间间隔100-300ms
-        const delay = Math.floor(Math.random() * 200) + 1000;
+        // 模拟延迟
+        const delay = 1000;
         setTimeout(sendNextMessage, delay);
       } else {
         // 所有消息发送完成

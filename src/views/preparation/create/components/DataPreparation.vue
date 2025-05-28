@@ -12,27 +12,37 @@
                 v-model:current="currentPage"
                 :pageSize="operatorPageSize"
                 :total="operatorsTotal"
+                class="operator-pagination"
                 size="small"
               />
             </div>
             <div class="operators-list">
               <div
-                v-for="operator in operators"
+                v-for="(operator, index) in operators"
                 :key="operator.id"
                 class="operator-card"
               >
-                <div class="operator-info">
-                  <div class="operator-name">{{ operator.name }}</div>
-                  <div class="operator-desc">{{ operator.description }}</div>
+                <div class="operator-content">
+                  <div class="operator-desc">
+                    <div class="operator-name">{{ operator.name }}</div>
+                    {{ operator.description }}
+                  </div>
+                  <div class="operator-image">
+                    <img v-if="index === 0" :src="Operator1" alt="算子图示" />
+                    <img v-if="index === 1" :src="Operator2" alt="算子图示" />
+                    <img v-if="index === 2" :src="Operator3" alt="算子图示" />
+                    <img v-if="index === 3" :src="Operator4" alt="算子图示" />
+                    <img v-if="index === 4" :src="Operator5" alt="算子图示" />
+                    <img v-if="index === 5" :src="Operator6" alt="算子图示" />
+                    <img v-if="index === 6" :src="Operator7" alt="算子图示" />
+                  </div>
                 </div>
-                <div class="operator-actions">
-                  <a-button
-                    type="primary"
-                    size="small"
-                    @click="editOperator(operator)"
-                  >
-                    编辑
-                  </a-button>
+                <div
+                  class="operator-actions"
+                  @click="!isWorkflowCompleted && prepareAddOperator(operator)"
+                  :class="{ disabled: isWorkflowCompleted }"
+                >
+                  添加
                 </div>
               </div>
             </div>
@@ -77,23 +87,26 @@
                   </div>
                 </div>
 
-                <div class="step-status">
+                <div
+                  v-if="isExecuting && !step.isCompleted"
+                  class="step-status"
+                >
                   <div
-                    class="status-dot"
+                    class="status-icon"
                     :class="{
                       completed: step.isCompleted,
                       executing: currentExecutingStep === index,
                       pending:
                         !step.isCompleted && currentExecutingStep < index,
                     }"
-                  ></div>
-                  <span>{{
-                    step.isCompleted
-                      ? "已完成"
-                      : currentExecutingStep === index
-                      ? "执行中..."
-                      : "待执行"
-                  }}</span>
+                  >
+                    <check-circle-filled v-if="step.isCompleted" />
+                    <loading-outlined
+                      v-else-if="currentExecutingStep === index"
+                      spin
+                    />
+                    <clock-circle-outlined v-else />
+                  </div>
                 </div>
 
                 <!-- 只在非执行状态下显示操作按钮 -->
@@ -107,7 +120,7 @@
                     @click="moveStep(index, 'up')"
                     :disabled="index === 0"
                   >
-                    <template #icon><UpOutlined /></template>
+                    上移
                   </a-button>
                   <a-button
                     type="text"
@@ -115,13 +128,13 @@
                     @click="moveStep(index, 'down')"
                     :disabled="index === workflow.steps.length - 1"
                   >
-                    <template #icon><DownOutlined /></template>
+                    下移
                   </a-button>
                   <a-button type="text" size="small" @click="editStep(index)">
-                    <template #icon><EditOutlined /></template>
+                    编辑
                   </a-button>
                   <a-button type="text" size="small" @click="removeStep(index)">
-                    <template #icon><DeleteOutlined /></template>
+                    删除
                   </a-button>
                 </div>
               </div>
@@ -198,40 +211,21 @@
     <!-- 算子编辑弹窗 -->
     <a-modal
       v-model:visible="operatorEditModalVisible"
-      title="编辑算子"
-      :footer="null"
-      width="600px"
+      title="算子配置"
+      @ok="saveAndAddToWorkflow"
+      @cancel="operatorEditModalVisible = false"
+      :okText="'添加到工作流'"
+      :cancelText="'取消'"
     >
+      <!-- 算子编辑表单 -->
       <a-form :model="currentOperator" layout="vertical">
-        <a-form-item label="算子名称" name="name">
-          <a-input v-model:value="currentOperator.name" :disabled="true" />
-        </a-form-item>
-        <a-form-item label="算子描述" name="description">
-          <a-textarea
-            v-model:value="currentOperator.description"
-            :rows="4"
-            :disabled="true"
-          />
-        </a-form-item>
-
-        <!-- 算子配置参数 - 动态生成 -->
-        <a-divider>算子配置参数</a-divider>
-
-        <div v-if="parsedParams.length === 0" class="empty-params">
-          此算子没有可配置参数
-        </div>
-
-        <div
-          v-for="(param, index) in parsedParams"
-          :key="index"
-          class="param-item"
-        >
+        <!-- 参数编辑 -->
+        <div v-for="(param, index) in parsedParams" :key="index">
           <a-form-item :label="param.name">
-            <!-- 根据参数类型渲染不同的输入控件 -->
+            <!-- 根据参数类型渲染不同控件 -->
             <a-input-number
               v-if="param.type === 'number'"
               v-model:value="param.value"
-              :step="0.1"
             />
             <a-switch
               v-else-if="param.type === 'bool'"
@@ -240,13 +234,10 @@
             <a-input v-else v-model:value="param.value" />
           </a-form-item>
         </div>
-
-        <a-form-item>
-          <a-space>
-            <a-button type="primary" @click="saveOperator">保存</a-button>
-            <a-button @click="operatorEditModalVisible = false">取消</a-button>
-          </a-space>
-        </a-form-item>
+        <!-- 算子参数为空时 -->
+        <div v-if="parsedParams.length === 0" class="empty-params">
+          <p>此算子无可配置参数</p>
+        </div>
       </a-form>
     </a-modal>
 
@@ -312,11 +303,23 @@ import {
   DownOutlined,
   EditOutlined,
   DeleteOutlined,
+  CheckCircleFilled,
+  LoadingOutlined,
+  ClockCircleOutlined,
 } from "@ant-design/icons-vue";
 import Icon from "/@/components/Icon/index.vue";
 import { useOperators } from "/@/views/preparation/create/hooks/useOperators";
 import { useTargetAnalysis } from "/@/views/preparation/create/hooks/useTargetAnalysis";
 import { useWorkflow } from "/@/views/preparation/create/hooks/useWorkflow";
+
+import Operator1 from "/@/assets/images/operators/operator-1.png";
+import Operator2 from "/@/assets/images/operators/operator-2.png";
+import Operator3 from "/@/assets/images/operators/operator-3.png";
+import Operator4 from "/@/assets/images/operators/operator-4.png";
+import Operator5 from "/@/assets/images/operators/operator-5.png";
+import Operator6 from "/@/assets/images/operators/operator-6.png";
+import Operator7 from "/@/assets/images/operators/operator-7.png";
+import { Operator } from "/@/serve/api/operators";
 
 export default defineComponent({
   components: {
@@ -325,6 +328,9 @@ export default defineComponent({
     DownOutlined,
     EditOutlined,
     DeleteOutlined,
+    CheckCircleFilled,
+    LoadingOutlined,
+    ClockCircleOutlined,
   },
   props: {
     visible: {
@@ -346,6 +352,9 @@ export default defineComponent({
       loadOperators,
       editOperator,
       saveOperator,
+      prepareAddOperator,
+      saveAndAddToWorkflow,
+      addOperatorToWorkflow,
     } = useOperators();
 
     // 使用靶点分析钩子，添加addOperatorData
@@ -378,6 +387,14 @@ export default defineComponent({
       previewStep,
       isWorkflowCompleted,
     } = useWorkflow();
+
+    // 注册将算子添加到工作流的回调函数
+    addOperatorToWorkflow.value = (operator: Operator) => {
+      workflow.steps.push({
+        ...operator,
+        isCompleted: false,
+      });
+    };
 
     // 添加一个已完成算子的跟踪数组
     const completedSteps = ref<number[]>([]);
@@ -479,6 +496,17 @@ export default defineComponent({
       previewStep,
       radarDataSeries,
       isWorkflowCompleted,
+
+      prepareAddOperator,
+      saveAndAddToWorkflow,
+
+      Operator1,
+      Operator2,
+      Operator3,
+      Operator4,
+      Operator5,
+      Operator6,
+      Operator7,
     };
   },
 });
@@ -487,7 +515,7 @@ export default defineComponent({
 <style lang="less" scoped>
 .preparation-section {
   border-radius: 8px;
-  height: 100%;
+  height: 84%;
   display: flex;
   flex-direction: column;
 
@@ -504,6 +532,7 @@ export default defineComponent({
   .preparation-content {
     flex: 1;
     display: flex;
+    height: 100%;
     flex-direction: column;
   }
 
@@ -513,10 +542,6 @@ export default defineComponent({
     gap: 20px;
     height: 100%;
 
-    @media (max-width: 1200px) {
-      flex-direction: column;
-    }
-
     .left-section {
       flex: 3;
       display: flex;
@@ -524,12 +549,20 @@ export default defineComponent({
 
       .operator-library {
         flex: 2;
+        position: relative;
         display: flex;
         flex-direction: column;
         border: 1px solid #f0f0f0;
         border-radius: 8px;
         padding: 15px;
         background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        .operator-pagination {
+          position: absolute;
+          bottom: 15px;
+          right: 15px;
+        }
 
         .section-header {
           display: flex;
@@ -548,48 +581,72 @@ export default defineComponent({
           flex: 1;
           display: flex;
           flex-direction: column;
-          gap: 15px;
+          gap: 22px;
           overflow-y: auto;
+          margin-top: 10px;
 
           .operator-card {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #eaeaea;
+            flex-direction: column;
+            border: 1px solid @primary-color;
             border-radius: 8px;
-            padding: 15px;
+            overflow: hidden;
             transition: all 0.3s ease;
 
-            &:hover {
-              border-color: @primary-color;
-              box-shadow: 0 2px 8px rgba(0, 155, 164, 0.1);
+            .operator-name {
+              font-weight: 500;
+              font-size: 16px;
+              margin-top: 30px;
+              margin-bottom: 15px;
+              color: #333;
             }
 
-            .operator-info {
-              flex: 1;
-
-              .operator-name {
-                font-weight: 500;
-                font-size: 16px;
-                margin-bottom: 5px;
-                color: #333;
-              }
+            .operator-content {
+              display: flex;
+              margin-bottom: 12px;
+              margin-left: 15px;
+              min-height: 80px;
 
               .operator-desc {
+                flex: 1;
                 color: #666;
                 font-size: 14px;
-                margin-bottom: 10px;
+                padding-right: 10px;
               }
 
-              .operator-tags {
+              .operator-image {
+                width: 160px;
+                height: 160px;
+                border-radius: 4px;
+                overflow: hidden;
+                background-color: #f5f5f5;
                 display: flex;
-                flex-wrap: wrap;
-                gap: 5px;
+                align-items: center;
+                justify-content: center;
+
+                img {
+                  max-width: 100%;
+                  max-height: 100%;
+                  object-fit: cover;
+                }
               }
             }
 
             .operator-actions {
-              margin-left: 15px;
+              width: 100%;
+              height: 40px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background-color: #ccc;
+              margin-top: auto;
+              cursor: pointer;
+
+              &.disabled {
+                background-color: #e0e0e0;
+                color: #999;
+                cursor: not-allowed;
+              }
             }
           }
         }
@@ -603,6 +660,7 @@ export default defineComponent({
         border-radius: 8px;
         padding: 15px;
         background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
         .section-header {
           display: flex;
@@ -639,17 +697,21 @@ export default defineComponent({
         .workflow-steps {
           flex: 1;
           display: flex;
+          height: 84%;
           flex-direction: column;
           gap: 20px;
           overflow-y: auto;
           padding: 5px 3px;
+          // 隐藏滚动条
+          &::-webkit-scrollbar {
+            display: none;
+          }
 
           .workflow-step {
             display: flex;
             flex-direction: column;
             border: 1px solid #eaeaea;
             border-radius: 8px;
-            padding: 15px;
             background-color: #fff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
@@ -676,11 +738,6 @@ export default defineComponent({
               display: none;
             }
 
-            &:hover {
-              box-shadow: 0 4px 12px rgba(0, 155, 164, 0.15);
-              border-color: @primary-color;
-            }
-
             &.completed {
               border-left: 4px solid #52c41a;
             }
@@ -689,7 +746,7 @@ export default defineComponent({
               display: flex;
               align-items: center;
               width: 100%;
-              margin-bottom: 8px;
+              padding: 15px;
 
               .step-index {
                 width: 28px;
@@ -717,6 +774,7 @@ export default defineComponent({
                 margin-left: auto;
 
                 .ant-btn {
+                  padding: 0;
                   &:hover {
                     background-color: #f0f7ff;
                   }
@@ -734,48 +792,58 @@ export default defineComponent({
 
             .step-status {
               position: absolute;
-              top: 0;
+              top: 50%;
               right: 0;
-              padding: 5px 10px;
+              transform: translateY(-50%);
+              padding: 5px 5px;
               font-size: 12px;
               display: flex;
               align-items: center;
               margin-bottom: 8px;
 
-              .status-dot {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
+              .status-icon {
                 margin-right: 6px;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
                 &.completed {
-                  background-color: #52c41a;
+                  color: #52c41a;
+                }
+
+                &.executing {
+                  color: #1890ff;
                 }
 
                 &.pending {
-                  background-color: #faad14;
+                  color: #faad14;
                 }
               }
             }
 
             .step-actions {
               display: flex;
-              gap: 5px;
-              margin-left: 40px;
+              width: 100%;
+              height: 40px;
+              justify-content: space-between;
+              align-items: center;
+              background-color: #ccc;
 
               .ant-btn {
-                border-radius: 4px;
-                transition: all 0.2s;
-
-                &:hover {
-                  background-color: #f5f5f5;
-
-                  &.ant-btn-danger {
-                    background-color: #fff1f0;
-                  }
-                }
+                width: 25%;
+                height: 100%;
+                border-radius: 0;
+                cursor: pointer;
+                border: 1px solid #aaa;
               }
             }
+          }
+          .workflow-actions {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
           }
 
           .workflow-execute {
@@ -814,6 +882,7 @@ export default defineComponent({
         display: flex;
         flex-direction: column;
         background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
         .section-header {
           margin-bottom: 15px;
@@ -840,12 +909,11 @@ export default defineComponent({
 
         .target-board {
           position: relative;
-          width: 200px;
-          height: 200px;
+          width: 270px;
+          height: 270px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #f5f5dc;
           border-radius: 50%;
 
           // 靶心圆环
@@ -859,32 +927,22 @@ export default defineComponent({
             &.circle-1 {
               width: 90%;
               height: 90%;
-              background-color: #f5f5dc;
-              border: 2px solid rgba(0, 0, 0, 0.8);
+              background-color: rgb(148, 211, 174);
+              border: 1px solid #000;
             }
 
             &.circle-2 {
-              width: 70%;
-              height: 70%;
-              background-color: rgb(196, 37, 52);
-            }
-
-            &.circle-3 {
-              width: 50%;
-              height: 50%;
-              background-color: rgba(52, 58, 64, 1);
-            }
-
-            &.circle-4 {
-              width: 30%;
-              height: 30%;
-              background-color: rgb(223, 169, 8);
+              width: 66%;
+              height: 66%;
+              background-color: rgb(234, 234, 71); // 红色背景
+              border: 1px solid #000;
             }
 
             &.circle-5 {
-              width: 10%;
-              height: 10%;
-              background-color: rgb(223, 169, 8);
+              width: 40%;
+              height: 40%;
+              background-color: rgb(252, 33, 33);
+              border: 1px solid #000;
             }
           }
 
@@ -896,75 +954,151 @@ export default defineComponent({
             cursor: pointer;
             transition: all 0.3s ease;
 
+            // 添加悬浮提示框
+            .tooltip {
+              position: absolute;
+              visibility: hidden;
+              opacity: 0;
+              width: 160px;
+              background-color: rgba(0, 0, 0, 0.75);
+              color: #fff;
+              text-align: left;
+              border-radius: 6px;
+              padding: 8px 10px;
+              z-index: 100;
+              transition: opacity 0.3s;
+              bottom: 120%;
+              left: 50%;
+              transform: translateX(-50%);
+              pointer-events: none;
+
+              &:after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: rgba(0, 0, 0, 0.75) transparent transparent
+                  transparent;
+              }
+
+              .tooltip-title {
+                font-weight: bold;
+                margin-bottom: 5px;
+                font-size: 14px;
+              }
+
+              .tooltip-value {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 3px;
+                font-size: 12px;
+
+                .label {
+                  color: #ccc;
+                }
+
+                .value {
+                  font-weight: bold;
+                }
+              }
+            }
+
             .indicator-marker {
               position: relative;
-              width: 30px;
-              height: 30px;
+              width: 36px;
+              height: 36px;
               border-radius: 50%;
+              margin-bottom: 5px;
               transition: all 0.3s ease;
               display: flex;
               align-items: center;
               justify-content: center;
 
               // 四条边线样式
-              .line-top,
-              .line-right,
-              .line-bottom,
-              .line-left {
-                position: absolute;
-                background-color: #1890ff;
-                transition: background-color 0.3s ease;
-              }
-
-              .line-top,
-              .line-bottom {
-                width: 2px;
-                height: 6px;
-              }
-
-              .line-right,
-              .line-left {
-                width: 6px;
-                height: 2px;
-              }
-
               .line-top {
+                position: absolute;
+                width: 2px;
+                height: 7px;
+                background-color: #fff; // 改为蓝色，与靶图颜色区分
+                transition: background-color 0.3s ease;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -150%);
               }
 
               .line-right {
+                position: absolute;
+                width: 7px;
+                height: 2px;
+                background-color: #fff; // 改为蓝色
+                transition: background-color 0.3s ease;
                 right: 50%;
                 top: 50%;
                 transform: translate(150%, -50%);
               }
 
               .line-bottom {
+                position: absolute;
+                width: 2px;
+                height: 7px;
+                background-color: #fff; // 改为蓝色
+                transition: background-color 0.3s ease;
                 bottom: 50%;
                 left: 50%;
                 transform: translate(-50%, 150%);
               }
 
               .line-left {
+                position: absolute;
+                width: 7px;
+                height: 2px;
+                background-color: #fff; // 改为蓝色
+                transition: background-color 0.3s ease;
                 left: 50%;
                 top: 50%;
                 transform: translate(-150%, -50%);
               }
 
+              // 给镂空圆环添加白色背景，以确保十字被圆环遮挡
               .circle-ring {
                 position: absolute;
-                width: 12px;
-                height: 12px;
-                border: 4px solid #1890ff;
+                width: 14px;
+                height: 14px;
+                border: 3px solid #fff; // 改为蓝色边框
                 border-radius: 50%;
                 transition: border-color 0.3s ease;
-                z-index: 1;
+                z-index: 1; // 确保圆环在十字前面
               }
             }
 
-            &.active,
             &:hover {
+              z-index: 10;
+
+              .tooltip {
+                visibility: visible;
+                opacity: 1;
+              }
+
+              .indicator-marker {
+                transform: scale(1.1);
+
+                .line-top,
+                .line-right,
+                .line-bottom,
+                .line-left {
+                  background-color: #13c2c2; // 选中为青绿色
+                }
+
+                .circle-ring {
+                  border-color: #13c2c2; // 选中为青绿色边框
+                }
+              }
+            }
+
+            &.active {
               z-index: 10;
 
               .indicator-marker {
@@ -974,11 +1108,11 @@ export default defineComponent({
                 .line-right,
                 .line-bottom,
                 .line-left {
-                  background-color: #13c2c2;
+                  background-color: #13c2c2; // 选中为青绿色
                 }
 
                 .circle-ring {
-                  border-color: #13c2c2;
+                  border-color: #13c2c2; // 选中为青绿色边框
                 }
               }
             }

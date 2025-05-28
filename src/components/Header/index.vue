@@ -1,33 +1,9 @@
 <template>
   <div class="header">
     <div class="crumbs">
-      <template v-if="paths.length > 1">
-        <div class="crumbs-back" @click="handleBack">
-          <img src="../../assets/images/header/left-arrow.png" />
-          <div>返回</div>
-        </div>
-        <div class="crumbs-title">
-          <template v-for="(pathItem, index) in paths" :key="index">
-            <div class="crumbs-title-item" @click="handleNavigate(index)">
-              {{ getRouteName(pathItem) }}
-            </div>
-            <img
-              v-if="getRouteName(pathItem) && index !== paths.length - 1"
-              src="../../assets/images/header/right-arrow.png"
-            />
-          </template>
-        </div>
-      </template>
-      <template v-else-if="paths.length === 1">
-        <div class="crumbs-single-title">
-          {{ getRouteName(paths[0]) }}
-        </div>
-      </template>
-      <template v-else>
-        <div class="crumbs-single-title">
-          {{ router.currentRoute.value.name }}
-        </div>
-      </template>
+      <div class="crumbs-single-title clickable" @click="handleGoToHome">
+        领域数据制备系统
+      </div>
     </div>
     <div class="operation">
       <a-dropdown>
@@ -107,6 +83,10 @@ export default defineComponent({
       router.push("/projectManager/project/list");
     };
 
+    const handleGoToHome = () => {
+      router.push("/home/list"); // 或者使用具体的列表页路径
+    };
+
     return {
       showTooltip,
       paths,
@@ -118,6 +98,7 @@ export default defineComponent({
       isShowButton,
       router,
       getRouteName,
+      handleGoToHome,
     };
   },
 });
@@ -199,6 +180,10 @@ export default defineComponent({
   &-single-title {
     color: @primary-color;
     font-size: 18px;
+
+    &.clickable {
+      cursor: pointer;
+    }
   }
 }
 

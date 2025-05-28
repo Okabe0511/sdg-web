@@ -152,6 +152,7 @@ export default defineComponent({
     // 新增处理下一步的函数
     const handleNextStep = () => {
       if (currentStep.value === 3) {
+        setCurrentStep(3, "process");
         showDataPreparation.value = true;
         modulesVisible.dataPreparation = true;
       }
@@ -169,14 +170,12 @@ export default defineComponent({
     const handleStartDataAnalysis = () => {
       modulesVisible.dataAnalysis = true;
       startAnalysis();
-      setCurrentStep(3);
+      setCurrentStep(3, "wait");
     };
     // 监听路由变化
     watch(
       () => consoleMessages,
       () => {
-        console.log("Console messages updated:", consoleMessages.value);
-
         consoleMessages.value.forEach((msg) => {
           if (msg.type === "system") {
             if (msg.content.includes("完成数据原料召回")) {
@@ -226,18 +225,6 @@ export default defineComponent({
 
 <template>
   <div class="task-create-page">
-    <div class="page-header">
-      <div class="page-title">
-        <a-button type="primary" @click="goBackToList">
-          <template #icon><left-outlined /></template>
-          返回列表
-        </a-button>
-        <!-- 根据模式显示不同标题 -->
-        <h1 v-if="isDetailMode">任务详情</h1>
-        <h1 v-else>创建任务</h1>
-      </div>
-    </div>
-
     <!-- 调整为左右布局 -->
     <div class="task-content">
       <!-- 左侧四个模块整体 -->
@@ -266,7 +253,7 @@ export default defineComponent({
             />
           </div>
 
-          <!-- 4. 数据制备分析部分 -->
+          <!-- 4. 数据靶点发现部分 -->
           <div class="right-middle-area">
             <DataAnalysis
               :visible="modulesVisible.dataAnalysis"
@@ -302,7 +289,8 @@ export default defineComponent({
 .task-create-page {
   padding: 20px;
   background-color: #f5f5f5;
-  min-height: calc(100vh - 150px);
+  height: 100%;
+  overflow: hidden;
 }
 
 .page-header {
@@ -326,6 +314,7 @@ export default defineComponent({
 .task-content {
   display: flex;
   gap: 20px;
+  height: 100%;
 
   /* 左侧容器包含四个模块 */
   .left-container {
@@ -333,31 +322,20 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     gap: 20px;
+    height: 100%;
   }
 
   /* 右侧容器包含控制台 */
   .right-container {
     flex: 1;
-    min-width: 350px;
-    max-width: 450px;
-    height: 85vh;
+    height: 100%;
   }
 
-  @media (max-width: 1400px) {
-    flex-direction: column;
-
-    .right-container {
-      max-width: none;
-    }
-  }
 
   .middle-area {
     display: flex;
     gap: 20px;
-
-    @media (max-width: 1200px) {
-      flex-direction: column;
-    }
+    height: 84%;
 
     .left-middle-area {
       flex: 1;
@@ -368,10 +346,6 @@ export default defineComponent({
 
     .right-middle-area {
       flex: 2;
-
-      @media (max-width: 1200px) {
-        width: 100%;
-      }
     }
   }
 }

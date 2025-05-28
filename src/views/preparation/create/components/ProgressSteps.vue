@@ -6,6 +6,7 @@
           v-for="(step, index) in steps"
           :key="index"
           :title="step.title"
+          :status="step.status"
           :description="step.subtitle"
         />
       </a-steps>

@@ -19,7 +19,7 @@ export const useOperators = () => {
   const operators = reactive<Operator[]>([]);
   const loading = ref(false);
   const operatorsTotal = ref(0);
-  const operatorPageSize = ref(5);
+  const operatorPageSize = ref(3);
   const currentPage = ref(1);
 
   // 算子编辑相关
@@ -147,6 +147,45 @@ export const useOperators = () => {
     }
   };
 
+  // 添加算子到工作流
+  const addOperatorToWorkflow = ref<((operator: Operator) => void) | null>(
+    null
+  );
+
+  // 编辑并准备添加算子到工作流
+  const prepareAddOperator = (operator: Operator) => {
+    currentOperator.value = { ...operator };
+    parsedParams.value = parseParameters(operator.parameters);
+    operatorEditModalVisible.value = true;
+  };
+
+  // 保存算子并添加到工作流
+  const saveAndAddToWorkflow = async () => {
+    try {
+      updateParameterString();
+      await updateOperator(currentOperator.value);
+
+      // 更新本地算子列表
+      const index = operators.findIndex(
+        (o) => o.id === currentOperator.value.id
+      );
+      if (index !== -1) {
+        operators[index] = { ...currentOperator.value };
+      }
+
+      // 如果有注册添加到工作流的回调，则调用它
+      if (addOperatorToWorkflow.value) {
+        addOperatorToWorkflow.value({ ...currentOperator.value });
+      }
+
+      operatorEditModalVisible.value = false;
+      message.success("算子已添加到工作流");
+    } catch (error) {
+      console.error("保存算子失败", error);
+      message.error("保存算子失败");
+    }
+  };
+
   // 监听分页变化
   watch(currentPage, () => {
     loadOperators();
@@ -165,5 +204,8 @@ export const useOperators = () => {
     editOperator,
     saveOperator,
     updateParameterString,
+    addOperatorToWorkflow,
+    prepareAddOperator,
+    saveAndAddToWorkflow,
   };
 };

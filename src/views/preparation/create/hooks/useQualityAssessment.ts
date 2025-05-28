@@ -49,7 +49,7 @@ export const useQualityAssessment = () => {
   });
 
   // 当前选中的质量指标
-  const selectedQualityMetric = ref("dataAlignment"); // 默认显示数据对齐指标
+  const selectedQualityMetric = ref("dataVolume"); // 默认显示数据对齐指标
 
   // 质量评估说明
   const qualityExplanations = reactive<Record<string, string>>({

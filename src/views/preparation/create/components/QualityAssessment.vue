@@ -4,10 +4,10 @@
     <div v-if="visible" class="quality-content">
       <div ref="radarChartRef" class="radar-chart"></div>
       <div class="quality-tips">
-        <h3>
+        <!-- <h3>
           评估指标说明
           <span class="tip-hint">(点击图表指标查看详情)</span>
-        </h3>
+        </h3> -->
         <!-- 数据量详情 -->
         <div
           v-if="selectedQualityMetric === 'dataVolume'"
@@ -337,6 +337,7 @@ export default defineComponent({
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: calc(100% - 40px);
 
   h2 {
     margin-top: 0;

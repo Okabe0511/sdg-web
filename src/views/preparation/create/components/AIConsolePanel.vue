@@ -1,6 +1,6 @@
 <template>
   <div class="ai-console-section">
-    <h2>任务进度日志</h2>
+    <h2>控制台</h2>
     <div class="ai-console">
       <!-- 使用 TDesign Chat 组件展示日志 -->
       <div class="chat-container">
@@ -8,8 +8,32 @@
           :clear-history="false"
           :data="formattedMessages"
           :isStreamLoad="isStreamLoad"
+          :reverse="false"
           ref="chatRef"
-        />
+        >
+          <template #content="{ item, index }">
+            <t-chat-reasoning
+              v-if="item?.reasoning?.length > 0"
+              expand-icon-placement="right"
+            >
+              <template #header>
+                <t-chat-loading
+                  v-if="isStreamLoad && index === formattedMessages.length - 1"
+                  text="指令执行中..."
+                />
+                <div
+                  v-else
+                  style="display: flex; align-items: center; gap: 8px"
+                >
+                  <CheckCircleOutlined :style="{ color: 'green' }" />
+                  <span>指令执行完成</span>
+                </div>
+              </template>
+              <t-chat-content :content="item.reasoning" />
+            </t-chat-reasoning>
+            <t-chat-content :content="item.content" />
+          </template>
+        </t-chat>
       </div>
     </div>
   </div>
@@ -18,7 +42,9 @@
 <script lang="ts">
 import { defineComponent, ref, watch, computed } from "vue";
 
+import { CheckCircleOutlined } from "@ant-design/icons-vue";
 export default defineComponent({
+  components: { CheckCircleOutlined },
   props: {
     messages: {
       type: Array,
@@ -81,7 +107,7 @@ export default defineComponent({
               mergedMessages.push(currentSystemMessage);
             } else {
               // 有当前消息，追加 reasoning
-              currentSystemMessage.reasoning += "\n" + (msg.reasoning || "");
+              currentSystemMessage.reasoning += msg.reasoning || "";
               mergedMessages[mergedMessages.length - 1] = currentSystemMessage;
             }
           }
@@ -113,7 +139,7 @@ export default defineComponent({
       });
 
       // 反转消息顺序，最新的消息显示在底部
-      return mergedMessages.reverse();
+      return mergedMessages;
     });
 
     return {
@@ -127,10 +153,6 @@ export default defineComponent({
 
 <style lang="less" scoped>
 .ai-console-section {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -148,15 +170,17 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
 
     .chat-container {
       flex-grow: 1;
       overflow-y: auto;
-      max-height: calc(100vh - 250px);
+      max-height: 100%;
       border: 1px solid #eee;
       border-radius: 4px;
       padding: 10px;
-      background-color: #f9f9f9;
+      background-color: #fff;
     }
 
     :deep(.t-chat) {
@@ -192,6 +216,8 @@ export default defineComponent({
 
 :deep(.t-chat__text__content) {
   // 检测换行符号
-  white-space: pre-wrap;
+  p {
+    white-space: pre-wrap;
+  }
 }
 </style>

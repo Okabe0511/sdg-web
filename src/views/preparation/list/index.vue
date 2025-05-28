@@ -91,14 +91,10 @@ export default defineComponent({
         </div>
 
         <div class="tasks-list">
-          <!-- 添加新任务卡片 -->
+          <!-- 添加新任务卡片 - 图标改为加号 -->
           <div class="task-card add-task" @click="addNewTask">
             <div class="add-task-content">
-              <Icon
-                name="delete_line"
-                :size="40"
-                color="rgba(0, 155, 164, 1)"
-              />
+              <div class="add-task-icon">+</div>
               <div class="add-task-text">新增任务</div>
             </div>
           </div>
@@ -119,11 +115,11 @@ export default defineComponent({
               }}
             </div>
             <h3 class="task-name">{{ task.name }}</h3>
+            <!-- 时间作为副标题 -->
+            <div class="task-subtitle">{{ task.createTime }}</div>
+
             <div class="task-info">
-              <div class="info-item">
-                <span class="label">创建时间：</span>
-                <span class="value">{{ task.createTime }}</span>
-              </div>
+              <!-- 移除了时间字段 -->
               <div class="info-item">
                 <span class="label">原始数据文件：</span>
                 <span class="value">{{ task.fileCount }} 个</span>
@@ -195,6 +191,7 @@ export default defineComponent({
   padding: 20px;
   background-color: #f5f5f5;
   min-height: calc(100vh - 150px);
+  height: 100%;
 }
 
 .preparation-content {
@@ -252,6 +249,8 @@ export default defineComponent({
       padding: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
 
       &:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
@@ -259,8 +258,8 @@ export default defineComponent({
 
       .task-status {
         position: absolute;
-        top: 12px;
-        right: 12px;
+        top: 16px;
+        right: 16px;
         padding: 2px 8px;
         border-radius: 10px;
         font-size: 12px;
@@ -280,19 +279,27 @@ export default defineComponent({
       }
 
       .task-name {
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         padding-right: 60px;
         font-size: 16px;
         font-weight: 600;
         color: #333;
       }
 
+      /* 新增的副标题样式 */
+      .task-subtitle {
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 14px;
+      }
+
       .task-info {
-        margin-bottom: 16px;
+        margin-bottom: 12px;
+        flex-grow: 1; /* 让信息区域占据剩余空间 */
 
         .info-item {
           display: flex;
-          margin-bottom: 4px;
+          margin-bottom: 6px;
           font-size: 14px;
 
           .label {
@@ -307,10 +314,12 @@ export default defineComponent({
         }
       }
 
+      /* 修改按钮对齐方式为右对齐 */
       .task-actions {
         display: flex;
-        justify-content: flex-start;
+        justify-content: flex-end; /* 修改为右对齐 */
         gap: 8px;
+        margin-top: auto; /* 确保按钮在底部 */
       }
 
       &.add-task {
@@ -337,6 +346,12 @@ export default defineComponent({
             color: @primary-color;
             font-weight: 500;
           }
+
+          .add-task-icon {
+            font-size: 32px;
+            color: @primary-color;
+            font-weight: bold;
+          }
         }
       }
     }
@@ -360,6 +375,10 @@ export default defineComponent({
       padding: 16px;
       margin-bottom: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
 
       .card-title {
         font-size: 16px;
@@ -411,16 +430,6 @@ export default defineComponent({
         height: 200px;
         width: 100%;
       }
-    }
-  }
-}
-
-@media screen and (max-width: 992px) {
-  .preparation-content {
-    flex-direction: column;
-
-    .monitor-section {
-      max-width: none;
     }
   }
 }

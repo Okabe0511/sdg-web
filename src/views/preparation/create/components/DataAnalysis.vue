@@ -1,6 +1,6 @@
 <template>
   <div class="analysis-section">
-    <h2>数据制备分析</h2>
+    <h2>数据靶点发现</h2>
     <div v-if="visible" class="analysis-content">
       <div class="target-analysis">
         <div class="target-chart-container">
@@ -80,7 +80,7 @@
       <!-- 添加下一步按钮 -->
       <div class="next-step-action" v-if="isAnalysisEnd && visible">
         <a-button type="primary" @click="handleNextStep">
-          进入数据制备配置
+          下一步
           <template #icon><right-outlined /></template>
         </a-button>
       </div>
@@ -257,6 +257,7 @@ export default defineComponent({
 
 <style lang="less" scoped>
 .analysis-section {
+  height: 100%;
   background-color: #fff;
   border-radius: 8px;
   padding: 20px;
@@ -308,14 +309,9 @@ export default defineComponent({
       display: flex;
       align-items: flex-start;
 
-      @media (max-width: 768px) {
-        flex-direction: column;
-      }
-
       .target-chart-container {
         width: 250px;
         position: relative;
-        background-color: #f5f5dc;
 
         .target-board {
           position: relative;
@@ -324,7 +320,6 @@ export default defineComponent({
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #f5f5dc;
           border-radius: 50%;
 
           // 靶心圆环
@@ -338,32 +333,22 @@ export default defineComponent({
             &.circle-1 {
               width: 90%;
               height: 90%;
-              background-color: #f5f5dc; // 改为米黄色背景
-              border: 2px solid rgba(0, 0, 0, 0.8);
+              background-color: rgb(148, 211, 174);
+              border: 1px solid #000;
             }
 
             &.circle-2 {
-              width: 70%;
-              height: 70%;
-              background-color: rgb(196, 37, 52); // 红色背景
-            }
-
-            &.circle-3 {
-              width: 50%;
-              height: 50%;
-              background-color: rgba(52, 58, 64, 1); // 灰黑色背景
-            }
-
-            &.circle-4 {
-              width: 30%;
-              height: 30%;
-              background-color: rgb(223, 169, 8); // 黄色背景
+              width: 66%;
+              height: 66%;
+              background-color: rgb(234, 234, 71); // 红色背景
+              border: 1px solid #000;
             }
 
             &.circle-5 {
-              width: 10%;
-              height: 10%;
-              background-color: rgb(223, 169, 8);
+              width: 40%;
+              height: 40%;
+              background-color: rgb(252, 33, 33);
+              border: 1px solid #000;
             }
           }
 
@@ -443,7 +428,7 @@ export default defineComponent({
                 position: absolute;
                 width: 2px;
                 height: 7px;
-                background-color: #1890ff; // 改为蓝色，与靶图颜色区分
+                background-color: #fff; // 改为蓝色，与靶图颜色区分
                 transition: background-color 0.3s ease;
                 top: 50%;
                 left: 50%;
@@ -454,7 +439,7 @@ export default defineComponent({
                 position: absolute;
                 width: 7px;
                 height: 2px;
-                background-color: #1890ff; // 改为蓝色
+                background-color: #fff; // 改为蓝色
                 transition: background-color 0.3s ease;
                 right: 50%;
                 top: 50%;
@@ -465,7 +450,7 @@ export default defineComponent({
                 position: absolute;
                 width: 2px;
                 height: 7px;
-                background-color: #1890ff; // 改为蓝色
+                background-color: #fff; // 改为蓝色
                 transition: background-color 0.3s ease;
                 bottom: 50%;
                 left: 50%;
@@ -476,7 +461,7 @@ export default defineComponent({
                 position: absolute;
                 width: 7px;
                 height: 2px;
-                background-color: #1890ff; // 改为蓝色
+                background-color: #fff; // 改为蓝色
                 transition: background-color 0.3s ease;
                 left: 50%;
                 top: 50%;
@@ -488,7 +473,7 @@ export default defineComponent({
                 position: absolute;
                 width: 14px;
                 height: 14px;
-                border: 5px solid #1890ff; // 改为蓝色边框
+                border: 3px solid #fff; // 改为蓝色边框
                 border-radius: 50%;
                 transition: border-color 0.3s ease;
                 z-index: 1; // 确保圆环在十字前面

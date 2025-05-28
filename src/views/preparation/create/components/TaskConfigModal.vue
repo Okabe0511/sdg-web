@@ -69,11 +69,6 @@
                 <upload-outlined />
                 选择文件
               </a-button>
-              <template v-else>
-                <div class="upload-hint">
-                  已选择 {{ fileList.basic[0]?.name }}
-                </div>
-              </template>
             </a-upload>
           </a-form-item>
         </div>
@@ -207,7 +202,7 @@
         <a-form-item>
           <a-space>
             <a-button type="primary" @click="onSubmit" :loading="loading"
-              >开始任务</a-button
+              >完成</a-button
             >
             <a-button @click="onCancel">取消</a-button>
           </a-space>

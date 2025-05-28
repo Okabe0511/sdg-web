@@ -121,24 +121,7 @@ export default defineComponent({
   <!-- filepath: d:\project\web\domain-data-preparation-system\src\views\layout\index.vue -->
   <a-config-provider :locale="locale">
     <section class="layout-container">
-      <a-layout-sider
-        :trigger="null"
-        collapsible
-        :collapsed="siderCollapsed"
-        :width="siderCollapsed ? 64 : 218"
-      >
-        <div class="logo" :class="{ 'logo-collapsed': siderCollapsed }">
-          <!-- 动态显示文字内容 -->
-          <h1 class="logo-text" v-if="!siderCollapsed">领域数据制备系统</h1>
-          <!-- 窄侧边栏显示图标 -->
-          <Icon v-else name="data-panel_line" color="#fff" :size="28" />
-        </div>
-        <Aside v-if="showAside" @collapse-change="handleCollapseChange" />
-      </a-layout-sider>
-      <section
-        class="content-box"
-        :style="{ width: `calc(100% - ${siderCollapsed ? '64px' : '218px'})` }"
-      >
+      <section class="content-box">
         <a-layout-header class="header-container">
           <Header @logout="handleLogout" />
         </a-layout-header>
@@ -151,61 +134,12 @@ export default defineComponent({
 </template>
 
 <style lang="less" scoped>
-/* 添加全局CSS变量来控制侧边栏宽度 */
-:root {
-  --aside-width: 218px;
-}
-
 .layout-container {
-  height: 100%;
+  width: 1920px;
+  height: 1080px;
   display: flex;
   flex: auto;
   flex-direction: row;
-
-  .trigger {
-    font-size: 18px;
-    line-height: 64px;
-    padding: 0 24px;
-    cursor: pointer;
-    transition: color 0.3s;
-
-    &:hover {
-      color: rgba(24, 144, 255, 1);
-    }
-  }
-
-  .logo {
-    padding: 22px 15px 0;
-    margin-bottom: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s;
-
-    // 新增logo文本样式
-    .logo-text {
-      color: @white-color;
-      font-size: 18px;
-      font-weight: 600;
-      text-align: center;
-      line-height: 24px;
-      letter-spacing: 1px;
-      white-space: nowrap;
-      // 添加文本渐变效果
-      background: rgb(240, 254, 255, 1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      // 添加文本阴影效果增强可读性
-      text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s;
-    }
-
-    &-collapsed {
-      padding: 22px 10px 0;
-      margin-bottom: 20px;
-    }
-  }
 }
 
 .content-box {
@@ -214,9 +148,7 @@ export default defineComponent({
   flex: auto;
   flex-direction: column;
   min-height: 0;
-  /* 将固定宽度改为动态计算 */
-  width: calc(100% - var(--aside-width));
-  transition: all 0.3s;
+  width: 100%;
 
   .header-container {
     line-height: 64px;
@@ -226,12 +158,9 @@ export default defineComponent({
   }
 
   .content {
-    overflow: auto;
+    overflow: hidden;
+    height: 100%;
   }
-}
-
-.ant-layout-sider {
-  background-color: rgba(40, 49, 67, 1);
 }
 
 .title {
