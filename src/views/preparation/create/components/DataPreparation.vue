@@ -77,6 +77,15 @@
                   <div class="step-index">{{ index + 1 }}</div>
                   <div class="step-name">{{ step.name }}</div>
                 </div>
+
+                <!-- 添加参数配置显示区域 -->
+                <div class="step-params" v-if="step.parameters">
+                  <div class="params-title">参数配置：</div>
+                  <div class="params-content">
+                    {{ formatParameters(step.parameters) }}
+                  </div>
+                </div>
+
                 <div
                   class="step-preview"
                   v-if="isExecuting || isWorkflowCompleted"
@@ -313,14 +322,14 @@
       v-model:visible="previewModalVisible"
       title="步骤执行结果预览"
       :footer="null"
-      width="700px"
+      width="800px"
+      :bodyStyle="{ padding: '16px', maxHeight: '600px' }"
     >
       <div class="preview-content">
-        <h4>{{ currentPreviewStep?.name }}</h4>
-        <p>{{ currentPreviewStep?.description }}</p>
-        <div class="preview-placeholder">
-          <p>此处展示步骤执行结果的预览效果</p>
-          <p>（实际效果暂未实现）</p>
+        <div v-if="diffHtml" class="preview-diff" v-html="diffHtml"></div>
+        <div v-else class="preview-placeholder">
+          <p>此步骤执行结果预览暂不可用</p>
+          <p>（实际效果需要后端数据支持）</p>
         </div>
       </div>
       <div class="preview-footer">
@@ -379,6 +388,8 @@ import Icon from "/@/components/Icon/index.vue";
 import { useOperators } from "/@/views/preparation/create/hooks/useOperators";
 import { useTargetAnalysis } from "/@/views/preparation/create/hooks/useTargetAnalysis";
 import { useWorkflow } from "/@/views/preparation/create/hooks/useWorkflow";
+// 引入新的钩子函数
+import { useCodePreview } from "/@/views/preparation/create/hooks/useCodePreview";
 
 import Operator1 from "/@/assets/images/operators/operator-1.png";
 import Operator2 from "/@/assets/images/operators/operator-2.png";
@@ -432,11 +443,11 @@ export default defineComponent({
       prepareAddOperator,
       saveAndAddToWorkflow,
       addOperatorToWorkflow,
-      parseParameters, // 确保引入parseParameters
-      updateParameterString, // 确保引入updateParameterString
+      parseParameters,
+      updateParameterString,
     } = useOperators();
 
-    // 使用靶点分析钩子，添加addOperatorData
+    // 使用靶点分析钩子
     const {
       radarChartRef,
       targetData,
@@ -468,7 +479,10 @@ export default defineComponent({
       isWorkflowCompleted,
     } = useWorkflow();
 
-    // 添加步骤编辑相关状态
+    // 使用代码预览钩子 - 新增
+    const { diffHtml, generateCodeDiff } = useCodePreview();
+
+    // 步骤编辑相关
     const stepEditModalVisible = ref(false);
     const currentEditingStepIndex = ref(-1);
 
@@ -577,6 +591,19 @@ export default defineComponent({
       }
     };
 
+    // 格式化参数字符串，使其更易读
+    const formatParameters = (paramStr: string) => {
+      if (!paramStr || paramStr.trim() === "") return "无参数";
+
+      return paramStr
+        .split(",")
+        .map((pair) => {
+          const [key, value] = pair.split(":").map((item) => item.trim());
+          return `${key}: ${value}`;
+        })
+        .join(" ");
+    };
+
     // 组件挂载时初始化
     onMounted(() => {
       if (props.visible) {
@@ -598,6 +625,16 @@ export default defineComponent({
       }
     );
 
+    // 修改预览步骤方法，使用新的钩子函数
+    const previewStepWithDiff = (step: any) => {
+      // 首先调用原有的预览方法
+      previewStep(step);
+
+      // 使用新的钩子函数生成差异
+      generateCodeDiff(step);
+    };
+
+    // 替换原有的previewStep引用
     return {
       // 算子库相关
       operators,
@@ -635,7 +672,8 @@ export default defineComponent({
       editStep,
       removeStep,
       executeWorkflow,
-      previewStep,
+      previewStep: previewStepWithDiff, // 用新的预览方法替换原有方法
+      formatParameters,
       radarDataSeries,
       isWorkflowCompleted,
 
@@ -653,6 +691,7 @@ export default defineComponent({
       Operator5,
       Operator6,
       Operator7,
+      diffHtml, // 替换为钩子函数中的 diffHtml
     };
   },
 });
@@ -858,23 +897,22 @@ export default defineComponent({
             flex-direction: column;
             border: 1px solid #eaeaea;
             border-radius: 8px;
-            overflow: hidden;
             background-color: #fff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
             position: relative;
 
-            &::after {
-              content: "";
-              position: absolute;
-              bottom: -20px;
-              left: 50%;
-              transform: translateX(-50%);
-              width: 2px;
-              height: 20px;
-              background-color: #d9d9d9;
-              z-index: 1;
-            }
+            // &::after {
+            //   content: "";
+            //   position: absolute;
+            //   bottom: -20px;
+            //   left: 50%;
+            //   transform: translateX(-50%);
+            //   width: 1px;
+            //   height: 20px;
+            //   background-color: #d9d9d9;
+            //   z-index: 1;
+            // }
 
             &:last-child::after {
               display: none;
@@ -932,13 +970,13 @@ export default defineComponent({
               justify-content: space-between;
               align-items: center;
               background-color: #ccc;
+              border-radius: 0 0 8px 8px;
 
               .ant-btn {
                 width: 100%;
                 height: 100%;
                 border-radius: 0;
                 cursor: pointer;
-                border: 1px solid #aaa;
               }
             }
             .step-status {
@@ -973,19 +1011,24 @@ export default defineComponent({
             }
 
             .step-actions {
+              flex-shrink: 0;
               display: flex;
               width: 100%;
               height: 40px;
               justify-content: space-between;
               align-items: center;
               background-color: #ccc;
+              border-radius: 0 0 8px 8px;
 
               .ant-btn {
                 width: 25%;
                 height: 100%;
                 border-radius: 0;
                 cursor: pointer;
-                border: 1px solid #aaa;
+                border-right: 1px solid #aaa;
+                &:last-child {
+                  border-right: 0;
+                }
               }
             }
           }
@@ -1077,21 +1120,21 @@ export default defineComponent({
             &.circle-1 {
               width: 100%;
               height: 100%;
-              background-color: rgb(148, 211, 174);
+              background-color: rgb(169, 209, 142);
               border: 1px solid #000;
             }
 
             &.circle-2 {
               width: 70%;
               height: 70%;
-              background-color: rgb(234, 234, 71); // 红色背景
+              background-color: rgb(255, 217, 102); // 红色背景
               border: 1px solid #000;
             }
 
             &.circle-3 {
               width: 40%;
               height: 40%;
-              background-color: rgb(252, 33, 33);
+              background-color: rgb(192, 0, 0);
               border: 1px solid #000;
             }
           }
@@ -1347,11 +1390,56 @@ export default defineComponent({
     margin-top: 20px;
     text-align: right;
   }
+
+  .step-params {
+    padding: 0 15px 10px;
+    font-size: 13px;
+    color: #666;
+
+    .params-title {
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .params-content {
+      background-color: #f5f5f5;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-family: "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+  }
+
+  .preview-diff {
+    :deep(.preview-image) {
+      margin: 10px auto;
+      display: block;
+      max-width: 100%;
+    }
+
+    :deep(.image-preview-container) {
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+  }
 }
 
 .empty-params {
   text-align: center;
   color: #999;
   padding: 30px 0 10px;
+}
+
+:global(.preview-diff) {
+  margin-top: 15px;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  overflow: auto;
+  max-height: 500px;
+
+  .d2h-code-side-linenumber {
+    position: relative;
+  }
 }
 </style>

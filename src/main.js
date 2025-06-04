@@ -20,19 +20,19 @@ setupGlobDirectives(app);
 
 //动态获取屏幕宽度，自适应缩放 - jh
 window.addEventListener("load", function () {
-  const isWideMode = localStorage.getItem("isWide") === "true";
-  const width = isWideMode ? 3200 : 1920;
+  const width = 1920;
   this.document.getElementsByTagName("body")[0].style.transform = `scale(${
     window.innerWidth / width
-  },${window.innerWidth / 1920})`;
+  })`;
 });
 
 window.addEventListener("resize", function () {
-  const isWideMode = localStorage.getItem("isWide") === "true";
-  const width = isWideMode ? 3200 : 1920;
+  console.log("resize", window.innerWidth, window.innerWidth / 1920);
+
+  const width = 1920;
   this.document.getElementsByTagName("body")[0].style.transform = `scale(${
     window.innerWidth / width
-  },${window.innerWidth / 1920})`;
+  })`;
 });
 
 app.use(router).use(store).use(ant).use(TDesignChat).mount("#app");

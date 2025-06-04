@@ -57,28 +57,6 @@ export default defineComponent({
       rect.scrollTop = scrollRootRef.value?.scrollTop;
     };
 
-    onMounted(() => {
-      document
-        .querySelector(".layout-container")
-        ?.setAttribute(
-          "style",
-          `min-width: ${window.screen.width}px;overflow-x: hidden`
-        );
-
-      window.addEventListener("resize", () => {
-        document
-          .querySelector(".layout-container")
-          ?.setAttribute(
-            "style",
-            `min-width: ${window.screen.width}px;overflow-x: hidden`
-          );
-      });
-    });
-
-    onUnmounted(() => {
-      window.removeEventListener("resize", () => {});
-    });
-
     watch(
       () => store.state.extraRoute,
       (val) => {
