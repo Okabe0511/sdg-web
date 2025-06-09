@@ -4,6 +4,8 @@ import {
   getAllOperators,
   updateOperator,
   Operator,
+  createOperator,
+  deleteOperator,
 } from "/@/serve/api/operators";
 
 // 定义参数接口
@@ -22,6 +24,13 @@ export const useOperators = () => {
   const operatorPageSize = ref(3);
   const currentPage = ref(1);
 
+  // 添加搜索关键词状态
+  const searchKeyword = ref("");
+  // 添加原始算子数据，用于搜索过滤
+  const originalOperators = reactive<Operator[]>([]);
+  // 添加管理模式状态
+  const isManageMode = ref(false);
+
   // 算子编辑相关
   const operatorEditModalVisible = ref(false);
   const currentOperator = ref<Operator>({
@@ -34,6 +43,14 @@ export const useOperators = () => {
   // 解析后的参数
   const parsedParams = ref<OperatorParam[]>([]);
 
+  // 添加新增算子相关状态
+  const addOperatorModalVisible = ref(false);
+  const uploadFileList = ref<any[]>([]);
+  const newOperator = ref<Partial<Operator>>({
+    name: "",
+    description: "",
+  });
+
   // 加载算子库数据
   const loadOperators = async () => {
     try {
@@ -43,14 +60,60 @@ export const useOperators = () => {
         page: currentPage.value,
       });
 
-      operators.length = 0;
-      operators.push(...response.data);
+      // 保存原始算子列表用于搜索
+      originalOperators.length = 0;
+      originalOperators.push(...response.data);
+
+      // 如果有搜索关键词，过滤算子列表
+      if (searchKeyword.value) {
+        filterOperators();
+      } else {
+        operators.length = 0;
+        operators.push(...response.data);
+      }
+
       operatorsTotal.value = response.total;
     } catch (error) {
       message.error("加载算子库失败");
     } finally {
       loading.value = false;
     }
+  };
+
+  // 添加搜索处理方法
+  const handleSearch = (value: string) => {
+    searchKeyword.value = value;
+    currentPage.value = 1; // 重置到第一页
+    filterOperators();
+  };
+
+  // 添加过滤算子方法
+  const filterOperators = () => {
+    if (!searchKeyword.value) {
+      // 如果没有搜索关键词，恢复原始列表
+      operators.length = 0;
+      operators.push(...originalOperators);
+      return;
+    }
+
+    // 基于关键词过滤算子
+    const keyword = searchKeyword.value.toLowerCase();
+    const filtered = originalOperators.filter(
+      (operator) =>
+        operator.name.toLowerCase().includes(keyword) ||
+        operator.description.toLowerCase().includes(keyword)
+    );
+
+    operators.length = 0;
+    operators.push(...filtered);
+
+    // 更新总数
+    operatorsTotal.value = filtered.length;
+  };
+
+  // 添加切换管理模式的方法
+  const toggleManageMode = () => {
+    isManageMode.value = !isManageMode.value;
   };
 
   // 解析参数字符串为结构化数据
@@ -120,7 +183,7 @@ export const useOperators = () => {
   // 编辑算子
   const editOperator = (operator: Operator) => {
     currentOperator.value = { ...operator };
-    parsedParams.value = parseParameters(operator.parameters);
+    parsedParams.value = parseParameters(operator.parameters || "");
     operatorEditModalVisible.value = true;
   };
 
@@ -154,7 +217,7 @@ export const useOperators = () => {
   // 编辑并准备添加算子到工作流
   const prepareAddOperator = (operator: Operator) => {
     currentOperator.value = { ...operator };
-    parsedParams.value = parseParameters(operator.parameters);
+    parsedParams.value = parseParameters(operator.parameters || "");
     operatorEditModalVisible.value = true;
   };
 
@@ -185,8 +248,139 @@ export const useOperators = () => {
     }
   };
 
-  // 监听分页变化
-  watch(currentPage, () => {
+  // 删除算子
+  const removeOperator = async (operatorId: number) => {
+    try {
+      await deleteOperator(operatorId);
+
+      // 从本地列表中移除
+      const index = operators.findIndex((op) => op.id === operatorId);
+      if (index !== -1) {
+        operators.splice(index, 1);
+      }
+
+      // 同样从原始列表中移除
+      const originalIndex = originalOperators.findIndex(
+        (op) => op.id === operatorId
+      );
+      if (originalIndex !== -1) {
+        originalOperators.splice(originalIndex, 1);
+      }
+
+      // 更新总数
+      operatorsTotal.value--;
+
+      // 检查当前页是否还有数据，如果没有且不是第一页，则跳转到上一页
+      const totalPages = Math.ceil(
+        operatorsTotal.value / operatorPageSize.value
+      );
+      if (currentPage.value > totalPages && currentPage.value > 1) {
+        currentPage.value--;
+      }
+
+      // 重新加载算子列表，确保页面上显示正确数量的算子
+      await loadOperators();
+
+      message.success("算子删除成功");
+    } catch (error) {
+      console.error("删除算子失败", error);
+      message.error("删除算子失败");
+    }
+  };
+
+  // 显示添加算子弹窗
+  const showAddOperatorModal = () => {
+    addOperatorModalVisible.value = true;
+    newOperator.value = {
+      name: "",
+      description: "",
+    };
+    uploadFileList.value = [];
+  };
+
+  // 关闭添加算子弹窗
+  const closeAddOperatorModal = () => {
+    addOperatorModalVisible.value = false;
+  };
+
+  // 处理文件上传前的验证
+  const beforeUpload = (file: File) => {
+    const isJSON = file.type === "application/json";
+    if (!isJSON) {
+      message.error("只能上传JSON文件!");
+    }
+    return false; // 阻止自动上传
+  };
+
+  // 创建新算子
+  const createNewOperator = async () => {
+    try {
+      if (!newOperator.value.name || !newOperator.value.description) {
+        message.error("请填写算子名称和描述");
+        return;
+      }
+
+      // 如果有上传文件，解析文件内容
+      if (uploadFileList.value.length > 0) {
+        const file = uploadFileList.value[0].originFileObj;
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+          try {
+            const content = e.target?.result as string;
+            const parsedData = JSON.parse(content);
+
+            // 合并文件内容和表单内容
+            const operatorData = {
+              ...newOperator.value,
+              ...parsedData,
+              name: newOperator.value.name || parsedData.name,
+              description:
+                newOperator.value.description || parsedData.description,
+            };
+
+            await submitCreateOperator(operatorData);
+          } catch (error) {
+            console.error("解析JSON文件失败", error);
+            message.error("解析JSON文件失败，请确保文件格式正确");
+          }
+        };
+
+        reader.readAsText(file);
+      } else {
+        // 没有文件，直接提交表单数据
+        await submitCreateOperator(newOperator.value);
+      }
+    } catch (error) {
+      console.error("创建算子失败", error);
+      message.error("创建算子失败");
+    }
+  };
+
+  // 提交创建算子请求
+  const submitCreateOperator = async (operatorData: Partial<Operator>) => {
+    const response = await createOperator(operatorData);
+    const newOperatorData = response.data;
+
+    // 不再直接添加到列表
+    // operators.unshift(newOperatorData);
+    // originalOperators.unshift(newOperatorData);
+
+    // 重置页码
+    currentPage.value = 1;
+
+    // 清除搜索关键词
+    searchKeyword.value = "";
+
+    // 重新加载算子列表
+    await loadOperators();
+
+    message.success("算子创建成功");
+    addOperatorModalVisible.value = false;
+  };
+
+  // 监听分页变化（移除对searchKeyword的监听）
+  watch([currentPage], () => {
     loadOperators();
   });
 
@@ -207,5 +401,20 @@ export const useOperators = () => {
     prepareAddOperator,
     saveAndAddToWorkflow,
     parseParameters,
+    // 添加新的返回值
+    searchKeyword,
+    handleSearch,
+    isManageMode,
+    toggleManageMode,
+
+    // 添加算子管理相关
+    addOperatorModalVisible,
+    uploadFileList,
+    newOperator,
+    removeOperator,
+    showAddOperatorModal,
+    closeAddOperatorModal,
+    beforeUpload,
+    createNewOperator,
   };
 };

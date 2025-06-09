@@ -26,8 +26,8 @@ export const useWorkflow = () => {
   // 智能推荐相关
   const recommendModalVisible = ref(false);
   const recommendConfig = reactive({
-    strategy: "balanced",
-    targets: ["configDiversity"],
+    timeLimit: 30, // 默认时间限制为30分钟
+    costLimit: 500, // 默认资源成本限制为500
   });
 
   // 步骤预览相关
@@ -41,11 +41,12 @@ export const useWorkflow = () => {
 
   // 生成工作流
   const generateWorkflow = async () => {
-    if (
-      recommendConfig.targets.length < 1 ||
-      recommendConfig.targets.length > 3
-    ) {
-      return message.warning("请选择1-3个优化靶点");
+    if (!recommendConfig.timeLimit || recommendConfig.timeLimit <= 0) {
+      return message.warning("请输入有效的时间限制");
+    }
+
+    if (!recommendConfig.costLimit || recommendConfig.costLimit <= 0) {
+      return message.warning("请输入有效的资源成本限制");
     }
 
     try {

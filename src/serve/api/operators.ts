@@ -6,6 +6,16 @@ export interface Operator {
   name: string;
   description: string;
   parameters: string;
+  costEvaluation?: {
+    resourceCost: number;
+    timeCost: number;
+    qualityContribution: number;
+  };
+  datasetSize?: {
+    dataPairs: number;
+    imageCount: number;
+    codeCount: number;
+  };
 }
 
 /**
@@ -94,4 +104,61 @@ export const getRecommendWorkflow = async (
 
   // 实际环境中调用真实接口
   return http.post("/operators/recommend", config);
+};
+
+// 添加创建算子和删除算子的API方法
+
+/**
+ * 创建新算子
+ * @param operator 算子数据
+ * @returns 创建的算子数据
+ */
+export const createOperator = async (
+  operator: Partial<Operator>
+): Promise<{ data: Operator }> => {
+  // 在开发环境中模拟成功响应
+  if (import.meta.env.DEV) {
+    // 模拟创建成功，生成ID
+    const newId =
+      Math.max(...mockOperatorsData.operators.map((op) => op.id)) + 1;
+    const newOperator: Operator = {
+      id: newId,
+      name: operator.name || "新算子",
+      description: operator.description || "",
+      parameters: operator.parameters || "",
+      costEvaluation: undefined,
+      datasetSize: undefined,
+    };
+
+    // 添加到本地mock数据(实际开发中可能不需要)
+    mockOperatorsData.operators.unshift(newOperator as any);
+
+    return Promise.resolve({ data: newOperator });
+  }
+
+  // 实际环境中调用真实接口
+  return http.post("/operators", operator);
+};
+
+/**
+ * 删除算子
+ * @param id 算子ID
+ * @returns 删除结果
+ */
+export const deleteOperator = async (
+  id: number
+): Promise<{ data: { success: boolean } }> => {
+  // 在开发环境中模拟成功响应
+  if (import.meta.env.DEV) {
+    // 从mock数据中删除(实际开发中可能不需要)
+    const index = mockOperatorsData.operators.findIndex((op) => op.id === id);
+    if (index !== -1) {
+      mockOperatorsData.operators.splice(index, 1);
+    }
+
+    return Promise.resolve({ data: { success: true } });
+  }
+
+  // 实际环境中调用真实接口
+  return http.delete(`/operators/${id}`);
 };

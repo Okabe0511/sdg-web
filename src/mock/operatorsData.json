@@ -4,43 +4,113 @@
       "id": 1,
       "name": "基于图像生成代码算子",
       "description": "面向智能数据可视化场景设计的先进数据制备算子，基于大规模视觉-语言模型（VLMs）。能够在图像存在模糊、缺失、变形等情况下，推测用户设计意图，合理补全缺省信息。",
-      "parameters": ""
+      "parameters": "",
+      "costEvaluation": {
+        "resourceCost": 20.9,
+        "timeCost": 348.39,
+        "qualityContribution": 176.43
+      },
+      "datasetSize": {
+        "dataPairs": 664,
+        "imageCount": 580,
+        "codeCount": 664
+      }
     },
     {
       "id": 2,
       "name": "代码扰动算子",
       "description": "面向代码生成与优化场景设计的高阶数据制备算子，旨在通过引入随机扰动机制，结合语法树解析、语义保持与控制噪声注入技术系统性地提升代码样本的多样性与鲁棒性。",
-      "parameters": "mutation_prob: 1, mutation_range: 0.5"
+      "parameters": "mutation_prob: 1, mutation_range: 0.5",
+      "costEvaluation": {
+        "resourceCost": 0.0002,
+        "timeCost": 0.24,
+        "qualityContribution": 153.42
+      },
+      "datasetSize": {
+        "dataPairs": 1305,
+        "imageCount": 580,
+        "codeCount": 1305
+      }
     },
     {
       "id": 3,
       "name": "图像加噪算子",
       "description": "面向图像数据制备过程的增强算子，旨在模拟真实世界场景中不可控噪声对图像内容的干扰。支持可配置的噪声参数空间，包括噪声强度、注入概率、内容分布与布局策略等。",
-      "parameters": "add_watermark: True, water_count: 25, add_noise: True, add_text: True, text_count: 15"
+      "parameters": "add_watermark: True, water_count: 25, add_noise: True, add_text: True, text_count: 15",
+      "costEvaluation": {
+        "resourceCost": 0.01,
+        "timeCost": 5.3,
+        "qualityContribution": 42.8
+      },
+      "datasetSize": {
+        "dataPairs": 640,
+        "imageCount": 640,
+        "codeCount": 592
+      }
     },
     {
       "id": 4,
       "name": "配置项修复算子",
       "description": "面向配置项数据质量提升的增强算子，旨在修复因抓取、标注或生成过程导致的配置项缺失、错误或不规范问题。",
-      "parameters": ""
+      "parameters": "",
+      "costEvaluation": {
+        "resourceCost": 0.0001,
+        "timeCost": 0.11,
+        "qualityContribution": 10.68
+      },
+      "datasetSize": {
+        "dataPairs": 640,
+        "imageCount": 580,
+        "codeCount": 592
+      }
     },
     {
       "id": 5,
       "name": "配置多样性增强算子",
       "description": "面向配置项数据制备过程的增强算子，旨在通过插入不影响主要图表语义的辅助配置项，扩大模型接触的配置项种类与组合方式，提升生成模型的表达覆盖能力。",
-      "parameters": "probability: 0.5"
+      "parameters": "probability: 0.5",
+      "costEvaluation": {
+        "resourceCost": 3.76,
+        "timeCost": 85.08,
+        "qualityContribution": 1115.07
+      },
+      "datasetSize": {
+        "dataPairs": 664,
+        "imageCount": 580,
+        "codeCount": 616
+      }
     },
     {
       "id": 6,
       "name": "基于代码生成图像算子",
       "description": "面向智能数据可视化场景设计的数据制备算子，基于配置代码自动渲染图表并截取图像。可用于构建高质量图文对齐样本，提升图像到代码模型的监督信号一致性与图表视觉还原能力。",
-      "parameters": ""
+      "parameters": "",
+      "costEvaluation": {
+        "resourceCost": 0.05,
+        "timeCost": 53.61,
+        "qualityContribution": 274.35
+      },
+      "datasetSize": {
+        "dataPairs": 1305,
+        "imageCount": 1302,
+        "codeCount": 1305
+      }
     },
     {
       "id": 7,
       "name": "语法修复算子",
       "description": "面向语法质量提升的语法修复算子，旨在自动识别并纠正配置代码中的语法错误与格式异常。支持缺失字段补全、属性名纠正、结构嵌套修复等操作，提升训练数据的可解析性与模型学习的稳定性。",
-      "parameters": ""
+      "parameters": "",
+      "costEvaluation": {
+        "resourceCost": 23.4,
+        "timeCost": 409.13,
+        "qualityContribution": 55.69
+      },
+      "datasetSize": {
+        "dataPairs": 640,
+        "imageCount": 580,
+        "codeCount": 592
+      }
     }
   ]
 }

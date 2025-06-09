@@ -109,35 +109,29 @@ export const useTargetAnalysis = () => {
     const currentStepIndex = Math.min(stepIndex, radarDataList.length - 1);
     const newData = radarDataList[currentStepIndex];
 
-    // 生成一个随机颜色
-    const hue = 275;
-    const color = `hsla(${hue}, 70%, 50%, 1)`;
-    const areaColor = `hsla(${hue}, 70%, 50%, 0.2)`;
+    // 基于步骤索引生成不同的颜色
+    // 使用偏暗色系的颜色
+    const colorIndex = stepIndex % darkColors.length;
+    const color = darkColors[colorIndex];
+    const areaColor = `${color}33`; // 添加透明度
 
-    // 如果已经有优化后的数据，则更新它；否则，添加新数据
-    if (radarDataSeries.length > 1) {
-      // 更新现有的优化数据
-      radarDataSeries[1].name = `当前数据`;
-      radarDataSeries[1].value = newData;
-      radarDataSeries[1].itemStyle.color = color;
-      radarDataSeries[1].lineStyle.color = color;
-      radarDataSeries[1].areaStyle.color = areaColor;
-    } else {
-      // 添加新的优化数据
-      radarDataSeries.push({
-        name: `当前数据`,
-        value: newData,
-        itemStyle: {
-          color: color,
-        },
-        lineStyle: {
-          color: color,
-        },
-        areaStyle: {
-          color: areaColor,
-        },
-      });
-    }
+    // 保存每个算子的数据，用 v1/v2/... 命名
+    const seriesName = `v${stepIndex + 1}`;
+
+    // 添加新的数据系列，而不是替换
+    radarDataSeries.push({
+      name: seriesName,
+      value: newData,
+      itemStyle: {
+        color: color,
+      },
+      lineStyle: {
+        color: color,
+      },
+      areaStyle: {
+        color: areaColor,
+      },
+    });
 
     // 更新图表
     if (radarChart) {
@@ -147,12 +141,13 @@ export const useTargetAnalysis = () => {
 
   // 新增一个方法用于工作流完成后一次性更新靶点数据
   const updateFinalTargetData = () => {
-    // 一次性更新为指定的固定值
-    updateTargetData("configDiversity", 20);
-    updateTargetData("dataVolume", 0);
-    updateTargetData("chartTypeBalance", 30);
+    // 只更新靶点数据
+    updateTargetData("configDiversity", 85);
+    updateTargetData("dataVolume", 90);
+    updateTargetData("chartTypeBalance", 78);
 
-    // 更新图表
+    // 不再添加最终结果的数据系列
+    // 仅更新图表
     if (radarChart) {
       updateRadarChart();
     }
@@ -172,6 +167,11 @@ export const useTargetAnalysis = () => {
         bottom: 0,
         left: "center",
         padding: [10, 10],
+        textStyle: {
+          fontSize: 12,
+        },
+        itemWidth: 12,
+        itemHeight: 9,
       },
       radar: {
         indicator: [
@@ -248,3 +248,17 @@ export const useTargetAnalysis = () => {
     updateFinalTargetData, // 导出新增的方法
   };
 };
+
+// 在文件开头附近添加一个偏暗色系的颜色数组
+const darkColors = [
+  "#5B8FF9", // 深蓝
+  "#5AD8A6", // 墨绿
+  "#5D7092", // 灰蓝
+  "#F6BD16", // 金黄
+  "#E8684A", // 砖红
+  "#6DC8EC", // 青蓝
+  "#9270CA", // 紫色
+  "#FF9D4D", // 橙色
+  "#269A99", // 深青
+  "#FF99C3", // 粉红
+];

@@ -15,6 +15,8 @@ import DataAnalysis from "./components/DataAnalysis.vue";
 import AIConsolePanel from "./components/AIConsolePanel.vue";
 // 引入新的任务配置弹窗
 import TaskConfigModal from "./components/TaskConfigModal.vue";
+// 引入数据集头部组件
+import DatasetHeader from "/@/components/DatasetHeader/index.vue";
 
 // 引入数据制备组件
 import DataPreparation from "./components/DataPreparation.vue";
@@ -25,6 +27,8 @@ import { useDatasets } from "./hooks/useDatasets";
 import { useQualityAssessment } from "./hooks/useQualityAssessment";
 import { useDataAnalysis } from "./hooks/useDataAnalysis";
 import { useConsoleInteraction } from "./hooks/useConsoleInteraction";
+// 添加导入 useDatasetMetrics 钩子
+import { useDatasetMetrics } from "./hooks/useDatasetMetrics";
 
 export default defineComponent({
   components: {
@@ -36,6 +40,7 @@ export default defineComponent({
     AIConsolePanel,
     TaskConfigModal,
     DataPreparation,
+    DatasetHeader,
   },
   setup() {
     const router = useRouter();
@@ -62,6 +67,9 @@ export default defineComponent({
       startTaskStream,
       startDataPreparationStream,
     } = useConsoleInteraction();
+
+    // 使用钩子替代直接初始化
+    const { metrics: datasetMetrics, updateMetrics } = useDatasetMetrics();
 
     // 模块显示控制
     const modulesVisible = reactive({
@@ -142,6 +150,15 @@ export default defineComponent({
           taskDescription: taskData.description,
         });
 
+        // 更新数据集指标 - 使用updateMetrics函数
+        if (taskData.metrics) {
+          updateMetrics({
+            dataPairs: taskData.metrics.dataPairs || 0,
+            imageCount: taskData.metrics.imageCount || 0,
+            codeCount: taskData.metrics.codeCount || 0,
+          });
+        }
+
         // 加载任务相关数据
         await loadDatasets(taskData);
 
@@ -181,6 +198,9 @@ export default defineComponent({
       () => consoleMessages,
       () => {
         consoleMessages.value.forEach((msg) => {
+          if (currentStep.value > 2) {
+            return;
+          }
           if (msg.type === "system") {
             if (msg.content.includes("完成数据原料召回")) {
               handleStartDataDescription();
@@ -221,6 +241,9 @@ export default defineComponent({
       isDetailMode,
       taskId,
 
+      // 数据集指标
+      datasetMetrics,
+
       // 新增的处理下一步的函数
       handleNextStep,
     };
@@ -236,6 +259,12 @@ export default defineComponent({
       <div class="left-container">
         <!-- 1. 任务进度条部分 -->
         <ProgressSteps :current-step="currentStep" :steps="steps" />
+
+        <!-- 添加数据集头部信息 -->
+        <DatasetHeader
+          v-if="currentStep < 4 && !showDataPreparation"
+          :metrics="datasetMetrics"
+        />
 
         <div v-if="currentStep < 4 && !showDataPreparation" class="middle-area">
           <div class="left-middle-area">
@@ -297,6 +326,7 @@ export default defineComponent({
   background-color: #f5f5f5;
   height: 100%;
   overflow: hidden;
+  position: relative; /* 添加这个以便DatasetHeader可以定位 */
 }
 
 .page-header {

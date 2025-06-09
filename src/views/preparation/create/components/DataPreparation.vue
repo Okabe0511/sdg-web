@@ -1,5 +1,8 @@
 <template>
   <div class="preparation-section">
+    <!-- 添加数据集信息头部 -->
+    <DatasetHeader :metrics="metrics" />
+
     <div v-if="visible" class="preparation-content">
       <div class="preparation-layout">
         <!-- 左侧：算子库和工作流 -->
@@ -8,13 +11,34 @@
           <div class="operator-library">
             <div class="section-header">
               <h3>数据制备算子库</h3>
-              <a-pagination
-                v-model:current="currentPage"
-                :pageSize="operatorPageSize"
-                :total="operatorsTotal"
-                class="operator-pagination"
-                size="small"
-              />
+              <div class="header-actions">
+                <!-- 添加搜索框 -->
+                <a-input-search
+                  v-model:value="searchKeyword"
+                  placeholder="搜索算子"
+                  style="width: 150px; margin-right: 8px"
+                  @search="handleSearch"
+                  allowClear
+                />
+                <!-- 管理按钮 -->
+                <a-button
+                  type="text"
+                  @click="toggleManageMode"
+                  :class="{ active: isManageMode }"
+                >
+                  {{ isManageMode ? "退出管理" : "管理" }}
+                </a-button>
+                <!-- 管理状态下的添加按钮 -->
+                <a-button
+                  v-if="isManageMode"
+                  type="primary"
+                  size="small"
+                  @click="showAddOperatorModal"
+                  style="margin-left: 8px"
+                >
+                  添加算子
+                </a-button>
+              </div>
             </div>
             <div class="operators-list">
               <div
@@ -22,19 +46,64 @@
                 :key="operator.id"
                 class="operator-card"
               >
+                <!-- 添加管理模式下的删除按钮 - 放到右上角 -->
+                <div v-if="isManageMode" class="operator-manage-actions">
+                  <a-button
+                    type="text"
+                    danger
+                    @click.stop="removeOperator(operator.id)"
+                  >
+                    <DeleteOutlined />
+                  </a-button>
+                </div>
+
                 <div class="operator-content">
+                  <!-- 原有内容保持不变 -->
                   <div class="operator-desc">
                     <div class="operator-name">{{ operator.name }}</div>
                     {{ operator.description }}
                   </div>
                   <div class="operator-image">
-                    <img v-if="index === 0" :src="Operator1" alt="算子图示" />
-                    <img v-if="index === 1" :src="Operator2" alt="算子图示" />
-                    <img v-if="index === 2" :src="Operator3" alt="算子图示" />
-                    <img v-if="index === 3" :src="Operator4" alt="算子图示" />
-                    <img v-if="index === 4" :src="Operator5" alt="算子图示" />
-                    <img v-if="index === 5" :src="Operator6" alt="算子图示" />
-                    <img v-if="index === 6" :src="Operator7" alt="算子图示" />
+                    <img
+                      v-if="operator.name === '基于图像生成代码算子'"
+                      :src="Operator1"
+                      alt="算子图示"
+                    />
+                    <img
+                      v-if="operator.name === '代码扰动算子'"
+                      :src="Operator2"
+                      alt="算子图示"
+                    />
+                    <img
+                      v-if="operator.name === '图像加噪算子'"
+                      :src="Operator3"
+                      alt="算子图示"
+                    />
+                    <img
+                      v-if="operator.name === '配置项修复算子'"
+                      :src="Operator4"
+                      alt="算子图示"
+                    />
+                    <img
+                      v-if="operator.name === '配置多样性增强算子'"
+                      :src="Operator5"
+                      alt="算子图示"
+                    />
+                    <img
+                      v-if="operator.name === '基于代码生成图像算子'"
+                      :src="Operator6"
+                      alt="算子图示"
+                    />
+                    <img
+                      v-if="operator.name === '语法修复算子'"
+                      :src="Operator7"
+                      alt="算子图示"
+                    />
+                    <img
+                      v-if="operator.name === '数据去重算子'"
+                      :src="Operator8"
+                      alt="算子图示"
+                    />
                   </div>
                 </div>
                 <div
@@ -45,6 +114,14 @@
                   添加
                 </div>
               </div>
+            </div>
+            <div class="operator-pagination">
+              <a-pagination
+                v-model:current="currentPage"
+                :pageSize="operatorPageSize"
+                :total="operatorsTotal"
+                size="small"
+              />
             </div>
           </div>
 
@@ -85,6 +162,33 @@
                     {{ formatParameters(step.parameters) }}
                   </div>
                 </div>
+
+                <!-- 在展示算子参数的区域下方添加代价评估数据 -->
+                <template v-if="step.costEvaluation">
+                  <div class="step-cost-evaluation">
+                    <div class="evaluation-title">代价评估：</div>
+                    <div class="evaluation-content">
+                      <div class="evaluation-item">
+                        <span class="evaluation-label">资源成本：</span>
+                        <span class="evaluation-value">{{
+                          step.costEvaluation.resourceCost
+                        }}</span>
+                      </div>
+                      <div class="evaluation-item">
+                        <span class="evaluation-label">时间成本：</span>
+                        <span class="evaluation-value">{{
+                          step.costEvaluation.timeCost
+                        }}</span>
+                      </div>
+                      <div class="evaluation-item">
+                        <span class="evaluation-label">质量贡献：</span>
+                        <span class="evaluation-value">{{
+                          step.costEvaluation.qualityContribution
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </template>
 
                 <div
                   class="step-preview"
@@ -291,20 +395,25 @@
       :footer="null"
       width="500px"
     >
-      <a-form layout="vertical">
-        <a-form-item label="推荐策略" name="strategy">
-          <a-radio-group v-model:value="recommendConfig.strategy">
-            <a-radio value="time">时间优先</a-radio>
-            <a-radio value="balanced">均衡</a-radio>
-            <a-radio value="quantity">数量优先</a-radio>
-          </a-radio-group>
+      <a-form>
+        <a-form-item label="时间限制(分钟)" name="timeLimit">
+          <a-input-number
+            v-model:value="recommendConfig.timeLimit"
+            placeholder="请输入时间限制"
+            style="width: 100%"
+            :min="1"
+            :max="120"
+          />
         </a-form-item>
-        <a-form-item label="优化靶点" name="targets">
-          <a-checkbox-group v-model:value="recommendConfig.targets">
-            <a-checkbox value="configDiversity">配置多样性</a-checkbox>
-            <a-checkbox value="chartTypeBalance">图表类型均衡性</a-checkbox>
-            <a-checkbox value="dataVolume">数据量</a-checkbox>
-          </a-checkbox-group>
+        <a-form-item label="资源成本限制" name="costLimit">
+          <a-input-number
+            v-model:value="recommendConfig.costLimit"
+            placeholder="请输入资源成本限制"
+            style="width: 100%"
+            :min="100"
+            :max="1000"
+            :step="100"
+          />
         </a-form-item>
         <a-form-item>
           <a-space>
@@ -369,6 +478,47 @@
         </div>
       </a-form>
     </a-modal>
+
+    <!-- 添加新算子弹窗 -->
+    <a-modal
+      v-model:visible="addOperatorModalVisible"
+      title="添加新算子"
+      @ok="createNewOperator"
+      @cancel="closeAddOperatorModal"
+      :okText="'创建'"
+      :cancelText="'取消'"
+    >
+      <a-form :model="newOperator" layout="vertical">
+        <a-form-item label="算子名称" required>
+          <a-input
+            v-model:value="newOperator.name"
+            placeholder="请输入算子名称"
+          />
+        </a-form-item>
+
+        <a-form-item label="算子描述" required>
+          <a-textarea
+            v-model:value="newOperator.description"
+            placeholder="请输入算子描述"
+            :autoSize="{ minRows: 3, maxRows: 6 }"
+          />
+        </a-form-item>
+
+        <a-form-item label="上传算子定义文件">
+          <a-upload
+            v-model:file-list="uploadFileList"
+            :beforeUpload="beforeUpload"
+            :maxCount="1"
+            action=""
+          >
+            <a-button>
+              <upload-outlined />
+              选择文件
+            </a-button>
+          </a-upload>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -382,6 +532,7 @@ import {
   CheckCircleFilled,
   LoadingOutlined,
   ClockCircleOutlined,
+  UploadOutlined,
 } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue"; // 引入 message
 import Icon from "/@/components/Icon/index.vue";
@@ -390,6 +541,8 @@ import { useTargetAnalysis } from "/@/views/preparation/create/hooks/useTargetAn
 import { useWorkflow } from "/@/views/preparation/create/hooks/useWorkflow";
 // 引入新的钩子函数
 import { useCodePreview } from "/@/views/preparation/create/hooks/useCodePreview";
+import DatasetHeader from "/@/components/DatasetHeader/index.vue";
+import { useDatasetMetrics } from "/@/views/preparation/create/hooks/useDatasetMetrics";
 
 import Operator1 from "/@/assets/images/operators/operator-1.png";
 import Operator2 from "/@/assets/images/operators/operator-2.png";
@@ -398,6 +551,7 @@ import Operator4 from "/@/assets/images/operators/operator-4.png";
 import Operator5 from "/@/assets/images/operators/operator-5.png";
 import Operator6 from "/@/assets/images/operators/operator-6.png";
 import Operator7 from "/@/assets/images/operators/operator-7.png";
+import Operator8 from "/@/assets/images/operators/operator-8.png";
 import { Operator } from "/@/serve/api/operators";
 
 interface TargetExplanation {
@@ -416,6 +570,8 @@ export default defineComponent({
     CheckCircleFilled,
     LoadingOutlined,
     ClockCircleOutlined,
+    UploadOutlined,
+    DatasetHeader, // 添加数据集头部组件
   },
   props: {
     visible: {
@@ -445,6 +601,21 @@ export default defineComponent({
       addOperatorToWorkflow,
       parseParameters,
       updateParameterString,
+      // 添加搜索关键词状态
+      searchKeyword,
+      handleSearch,
+      isManageMode,
+      toggleManageMode,
+
+      // 添加算子管理相关功能
+      addOperatorModalVisible,
+      uploadFileList,
+      newOperator,
+      removeOperator,
+      showAddOperatorModal,
+      closeAddOperatorModal,
+      beforeUpload,
+      createNewOperator, // 添加这行，使用钩子中的方法
     } = useOperators();
 
     // 使用靶点分析钩子
@@ -482,6 +653,9 @@ export default defineComponent({
     // 使用代码预览钩子 - 新增
     const { diffHtml, generateCodeDiff } = useCodePreview();
 
+    // 使用数据集指标钩子
+    const { metrics, updateMetrics } = useDatasetMetrics();
+
     // 步骤编辑相关
     const stepEditModalVisible = ref(false);
     const currentEditingStepIndex = ref(-1);
@@ -518,7 +692,7 @@ export default defineComponent({
       emit("start-data-preparation");
     };
 
-    // 监听currentExecutingStep的变化
+    // 监听工作流步骤完成
     watch(
       () => currentExecutingStep.value,
       (newVal, oldVal) => {
@@ -533,8 +707,14 @@ export default defineComponent({
             const operatorName =
               workflow.steps[completedStepIndex]?.name ||
               `算子${completedStepIndex + 1}`;
+
             // 添加算子数据到雷达图
             addOperatorData(operatorName, completedStepIndex);
+
+            // 更新数据集指标
+            if (workflow.steps[completedStepIndex]?.datasetSize) {
+              updateMetrics(workflow.steps[completedStepIndex].datasetSize);
+            }
           }
         }
       }
@@ -684,6 +864,7 @@ export default defineComponent({
       prepareAddOperator,
       saveAndAddToWorkflow,
 
+      // 图像引用
       Operator1,
       Operator2,
       Operator3,
@@ -691,7 +872,29 @@ export default defineComponent({
       Operator5,
       Operator6,
       Operator7,
-      diffHtml, // 替换为钩子函数中的 diffHtml
+      Operator8,
+
+      // 添加搜索相关项
+      searchKeyword,
+      handleSearch,
+      isManageMode,
+      toggleManageMode,
+
+      // 添加算子管理相关
+      addOperatorModalVisible,
+      uploadFileList,
+      newOperator,
+      removeOperator,
+      showAddOperatorModal,
+      closeAddOperatorModal,
+      beforeUpload,
+      createNewOperator,
+
+      // 添加代码预览相关
+      diffHtml,
+
+      // 添加数据集指标相关
+      metrics, // 添加数据集指标
     };
   },
 });
@@ -760,6 +963,29 @@ export default defineComponent({
             font-size: 16px;
             color: @primary-color;
           }
+
+          .header-actions {
+            display: flex;
+            align-items: center;
+
+            .ant-input-search {
+              width: 150px;
+              margin-right: 8px;
+            }
+
+            .ant-btn {
+              height: 32px;
+              padding: 0 12px;
+              font-size: 14px;
+              display: flex;
+              align-items: center;
+
+              &.active {
+                color: @primary-color;
+                font-weight: 500;
+              }
+            }
+          }
         }
 
         .operators-list {
@@ -771,6 +997,7 @@ export default defineComponent({
           margin-top: 10px;
 
           .operator-card {
+            position: relative;
             display: flex;
             flex-direction: column;
             border: 1px solid @primary-color;
@@ -804,7 +1031,6 @@ export default defineComponent({
                 height: 160px;
                 border-radius: 4px;
                 overflow: hidden;
-                background-color: #f5f5f5;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -831,6 +1057,31 @@ export default defineComponent({
                 background-color: #e0e0e0;
                 color: #999;
                 cursor: not-allowed;
+              }
+            }
+
+            // 管理模式下的删除按钮样式
+            .operator-manage-actions {
+              position: absolute;
+              top: 5px;
+              right: 5px;
+              z-index: 10;
+
+              .ant-btn {
+                width: 32px;
+                height: 32px;
+                padding: 0;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: rgba(255, 255, 255, 0.8);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+                &:hover {
+                  background-color: #ff4d4f;
+                  color: #fff;
+                }
               }
             }
           }
@@ -1421,6 +1672,37 @@ export default defineComponent({
       background-color: #f9f9f9;
       border-radius: 4px;
       margin-bottom: 10px;
+    }
+  }
+  .step-cost-evaluation {
+    padding: 0 15px 10px;
+    font-size: 13px;
+    color: #666;
+
+    .evaluation-title {
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .evaluation-content {
+      background-color: #f5f5f5;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-family: "Courier New", monospace;
+
+      .evaluation-item {
+        display: flex;
+        justify-content: flex-start;
+        margin: 3px 0;
+
+        .evaluation-label {
+          color: #666;
+        }
+
+        .evaluation-value {
+          font-weight: 500;
+        }
+      }
     }
   }
 }

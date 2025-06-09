@@ -61,7 +61,7 @@ export const useHistogramCharts = () => {
       const interval = 20;
 
       // 自定义渲染函数
-      function renderItem(params, api) {
+      function renderItem(params: any, api: any) {
         const yValue = api.value(2);
         const start = api.coord([api.value(0), yValue]);
         const size = api.size([api.value(1) - api.value(0), yValue]);
@@ -83,7 +83,7 @@ export const useHistogramCharts = () => {
       chart.setOption({
         tooltip: {
           trigger: "item",
-          formatter: function (params) {
+          formatter: function (params: any) {
             const range = `[${params.value[0]}, ${params.value[1]}]`;
             return `${range}: ${params.value[2]}`;
           },
