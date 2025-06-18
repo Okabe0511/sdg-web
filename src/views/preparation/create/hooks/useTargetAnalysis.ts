@@ -142,9 +142,9 @@ export const useTargetAnalysis = () => {
   // 新增一个方法用于工作流完成后一次性更新靶点数据
   const updateFinalTargetData = () => {
     // 只更新靶点数据
-    updateTargetData("configDiversity", 85);
-    updateTargetData("dataVolume", 90);
-    updateTargetData("chartTypeBalance", 78);
+    updateTargetData("configDiversity", 20);
+    updateTargetData("dataVolume", 0);
+    updateTargetData("chartTypeBalance", 30);
 
     // 不再添加最终结果的数据系列
     // 仅更新图表

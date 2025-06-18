@@ -44,6 +44,15 @@ export const routes: RouteRecordRaw[] = [
               mode: "detail",
             },
           },
+          {
+            path: "comparison/:id",
+            name: "对比训练",
+            component: () =>
+              import("/@/views/preparation/comparison/index.vue"),
+            meta: {
+              hide: true,
+            },
+          },
         ],
       },
     ],

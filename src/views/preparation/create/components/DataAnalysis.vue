@@ -9,7 +9,7 @@
             <!-- 靶心圆环 -->
             <div class="target-circle circle-1"></div>
             <div class="target-circle circle-2"></div>
-            <div class="target-circle circle-5"></div>
+            <div class="target-circle circle-3"></div>
 
             <!-- 三个指标点 -->
             <div
@@ -27,34 +27,64 @@
                 <div class="line-left"></div>
                 <div class="circle-ring"></div>
               </div>
-              <!-- 添加悬浮提示框 -->
+
+              <!-- 修改后的悬浮提示框 -->
               <div class="tooltip">
                 <div class="tooltip-title">
                   {{ targetExplanations[key].title }}
                 </div>
+                <!-- 新增的编辑按钮浮窗 -->
+                <div class="edit-popup">
+                  <a-button
+                    type="primary"
+                    size="small"
+                    shape="circle"
+                    class="edit-button"
+                    @click.stop="openEditDialog(key)"
+                  >
+                    <template #icon>
+                      <edit-outlined />
+                    </template>
+                  </a-button>
+                </div>
                 <div class="tooltip-value">
-                  <span class="label">得分:</span>
+                  <span class="label">权重:</span>
                   <span class="value">{{ formatScore(item) }}</span>
                 </div>
                 <div class="tooltip-value" v-if="key === 'configDiversity'">
                   <span class="label">多样性:</span>
                   <span class="value">{{
-                    item > 70 ? "高" : item > 40 ? "中" : "低"
+                    item > 70 ? "严重靶点" : item > 40 ? "中等靶点" : "轻度靶点"
                   }}</span>
                 </div>
                 <div class="tooltip-value" v-if="key === 'dataVolume'">
                   <span class="label">数据量:</span>
                   <span class="value">{{
-                    item > 70 ? "充足" : item > 40 ? "适中" : "不足"
+                    item > 70 ? "严重靶点" : item > 40 ? "中等靶点" : "轻度靶点"
                   }}</span>
                 </div>
                 <div class="tooltip-value" v-if="key === 'chartTypeBalance'">
                   <span class="label">均衡性:</span>
                   <span class="value">{{
-                    item > 70 ? "优" : item > 40 ? "良" : "差"
+                    item > 70 ? "严重靶点" : item > 40 ? "中等靶点" : "轻度靶点"
                   }}</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- 修改后的图例部分 -->
+          <div class="target-legend">
+            <div
+              v-for="(legend, index) in legendItems"
+              :key="index"
+              class="legend-item"
+            >
+              <div
+                class="legend-color"
+                :style="{ backgroundColor: legend.color }"
+              ></div>
+              <span>{{ legend.label }}</span>
             </div>
           </div>
         </div>
@@ -119,8 +149,70 @@
 
     <div v-else class="module-placeholder">
       <a-spin />
-      <div class="placeholder-text">等待数据靶点发现完成...</div>
+      <div class="placeholder-text">正在分析数据...</div>
     </div>
+
+    <!-- 新增靶点编辑弹窗 -->
+    <a-modal
+      v-model:visible="editDialogVisible"
+      :title="`编辑${
+        currentEditTarget
+          ? targetExplanations[currentEditTarget]?.title
+          : '靶点'
+      }`"
+      @ok="saveTargetChange"
+      @cancel="cancelTargetEdit"
+      :okText="'保存'"
+      :cancelText="'取消'"
+      :maskClosable="false"
+    >
+      <a-form>
+        <a-form-item label="靶点名称：">
+          <div class="form-value">
+            {{
+              currentEditTarget
+                ? targetExplanations[currentEditTarget]?.title
+                : ""
+            }}
+          </div>
+        </a-form-item>
+        <a-form-item label="当前权重：">
+          <div class="form-value">{{ formatScore(currentEditValue) }}</div>
+        </a-form-item>
+        <a-form-item label="新权重：">
+          <a-slider
+            v-if="editDialogVisible"
+            v-model:value="newTargetValue"
+            :min="0"
+            :max="100"
+            :step="1"
+            :tooltip-visible="true"
+            :getTooltipPopupContainer="(node) => node"
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-button danger @click="confirmDeleteTarget">删除靶点</a-button>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <!-- 确认删除弹窗 -->
+    <a-modal
+      v-model:visible="deleteConfirmVisible"
+      title="确认删除靶点"
+      @ok="deleteTarget"
+      @cancel="deleteConfirmVisible = false"
+      :okText="'删除'"
+      :cancelText="'取消'"
+    >
+      <p>
+        确定要删除
+        {{
+          currentEditTarget ? targetExplanations[currentEditTarget]?.title : ""
+        }}
+        靶点吗？
+      </p>
+    </a-modal>
   </div>
 </template>
 
@@ -128,17 +220,18 @@
 import {
   defineComponent,
   ref,
-  onMounted,
-  watch,
   reactive,
+  onMounted,
   onBeforeUnmount,
+  watch,
   nextTick,
+  PropType,
 } from "vue";
-import Icon from "/@/components/Icon/index.vue";
-import { RightOutlined } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
+import { RightOutlined, EditOutlined } from "@ant-design/icons-vue";
+import { useHeatmapChart } from "/@/views/preparation/create/hooks/useHeatmapChart";
+import { useHistogramCharts } from "/@/views/preparation/create/hooks/useHistogramCharts";
 import { getTargetAnalysis } from "/@/serve/api/targetAnalysis";
-import { useHeatmapChart } from "../hooks/useHeatmapChart";
-import { useHistogramCharts } from "../hooks/useHistogramCharts";
 
 interface TargetExplanation {
   title: string;
@@ -148,20 +241,25 @@ interface TargetExplanation {
 
 export default defineComponent({
   components: {
-    Icon,
     RightOutlined,
+    EditOutlined,
   },
   props: {
     visible: {
       type: Boolean,
-      required: true,
+      default: false,
+    },
+    onNextStep: {
+      type: Function as PropType<() => void>,
+      required: false,
     },
   },
   emits: ["next-step"],
   setup(props, { emit }) {
-    const isAnalysisEnd = ref(false);
+    // 原有部分保持不变
     const chartType = ref("heatmap"); // 默认显示热力图
     const histogramChartRefs = ref<HTMLElement[]>([]);
+    const isAnalysisEnd = ref(false);
 
     // 使用热力图钩子
     const {
@@ -189,6 +287,9 @@ export default defineComponent({
       chartTypeBalance: 0,
     });
 
+    // 用于记录删除的靶点
+    const deletedTargets = ref<string[]>([]);
+
     // 靶点解释数据
     const targetExplanations = reactive<Record<string, TargetExplanation>>({
       configDiversity: { title: "配置项多样性", score: 0, content: "" },
@@ -198,6 +299,86 @@ export default defineComponent({
 
     // 当前选中的靶点
     const selectedTargetKey = ref("configDiversity");
+
+    // 新增编辑弹窗状态
+    const editDialogVisible = ref(false);
+    const currentEditTarget = ref<string | null>(null);
+    const currentEditValue = ref(0);
+    const newTargetValue = ref(0);
+    const deleteConfirmVisible = ref(false);
+
+    // 打开编辑弹窗
+    const openEditDialog = (key: string) => {
+      selectedTargetKey.value = key;
+      currentEditTarget.value = key;
+      currentEditValue.value = targetData[key as keyof typeof targetData];
+      newTargetValue.value = currentEditValue.value;
+      editDialogVisible.value = true;
+    };
+
+    // 保存靶点修改
+    const saveTargetChange = () => {
+      if (
+        currentEditTarget.value &&
+        newTargetValue.value >= 0 &&
+        newTargetValue.value <= 100
+      ) {
+        // 更新靶点值
+        const key = currentEditTarget.value as keyof typeof targetData;
+        targetData[key] = newTargetValue.value;
+
+        // 更新解释数据中的分数
+        if (targetExplanations[currentEditTarget.value]) {
+          targetExplanations[currentEditTarget.value].score =
+            newTargetValue.value;
+        }
+
+        message.success(
+          `${
+            targetExplanations[currentEditTarget.value]?.title || "靶点"
+          }值已更新`
+        );
+        editDialogVisible.value = false;
+      }
+    };
+
+    // 取消编辑
+    const cancelTargetEdit = () => {
+      editDialogVisible.value = false;
+    };
+
+    // 确认删除靶点
+    const confirmDeleteTarget = () => {
+      deleteConfirmVisible.value = true;
+    };
+
+    // 删除靶点
+    const deleteTarget = () => {
+      if (currentEditTarget.value) {
+        // 记录已删除的靶点
+        deletedTargets.value.push(currentEditTarget.value);
+
+        // 从数据中删除该靶点
+        delete targetData[currentEditTarget.value as keyof typeof targetData];
+
+        message.success(
+          `${
+            targetExplanations[currentEditTarget.value]?.title || "靶点"
+          }已删除`
+        );
+        deleteConfirmVisible.value = false;
+        editDialogVisible.value = false;
+
+        // 如果删除的是当前选中的靶点，则选择另一个靶点
+        if (selectedTargetKey.value === currentEditTarget.value) {
+          // 找到一个未删除的靶点作为新的选中项
+          const availableKeys = Object.keys(targetData);
+          if (availableKeys.length > 0) {
+            selectedTargetKey.value = availableKeys[0];
+          }
+        }
+      }
+    };
 
     // 选择靶点
     const selectTarget = (key: string) => {
@@ -228,12 +409,13 @@ export default defineComponent({
         chartTypeBalance: 270, // 下方
       };
 
-      // 计算离靶心的距离
-      const distancePercent = ((100 - value) / 100) * 40 + 10;
+      // 计算离靶心的距离，当值为100时在靶心(0%)，当值为0时在靶边缘(100%)
+      const distancePercent = 100 - value;
+
       const angle = angles[key];
       const radians = (angle * Math.PI) / 180;
-      const x = 50 + Math.cos(radians) * distancePercent;
-      const y = 50 + Math.sin(radians) * distancePercent;
+      const x = 50 + (Math.cos(radians) * distancePercent) / 2; // 除以2使得最大范围不超过边界
+      const y = 50 + (Math.sin(radians) * distancePercent) / 2;
 
       return {
         left: `${x}%`,
@@ -393,25 +575,54 @@ export default defineComponent({
       emit("next-step");
     };
 
+    // 新增图例数据数组
+    const legendItems = ref([
+      {
+        color: "rgb(169, 209, 142)",
+        label: "轻度靶点 (0-30)",
+      },
+      {
+        color: "rgb(255, 217, 102)",
+        label: "中等靶点 (30-60)",
+      },
+      {
+        color: "rgb(192, 0, 0)",
+        label: "严重靶点 (60-100)",
+      },
+    ]);
+
     return {
+      chartType,
+      histogramChartRefs,
+      histogramData,
       targetData,
       targetExplanations,
       selectedTargetKey,
-      isAnalysisEnd,
-      chartType,
       selectTarget,
       formatScore,
-      getIndicatorStyle,
       getIconForMetric,
+      getIndicatorStyle,
+      isAnalysisEnd,
       handleNextStep,
-      histogramData,
-      histogramChartRefs,
+      // 新增的属性和方法
+      editDialogVisible,
+      currentEditTarget,
+      currentEditValue,
+      newTargetValue,
+      deleteConfirmVisible,
+      openEditDialog,
+      saveTargetChange,
+      cancelTargetEdit,
+      confirmDeleteTarget,
+      deleteTarget,
+      legendItems, // 新增返回值
     };
   },
 });
 </script>
 
 <style lang="less" scoped>
+/* 保留原有样式 */
 .analysis-section {
   height: 100%;
   background-color: #fff;
@@ -440,13 +651,14 @@ export default defineComponent({
       align-items: flex-start;
 
       .target-chart-container {
-        width: 250px;
+        width: 230px;
+        margin: 10px;
         position: relative;
 
         .target-board {
           position: relative;
           width: 100%;
-          height: 250px;
+          height: 230px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -461,20 +673,20 @@ export default defineComponent({
             top: 50%;
 
             &.circle-1 {
-              width: 90%;
-              height: 90%;
+              width: 100%;
+              height: 100%;
               background-color: rgb(169, 209, 142);
               border: 1px solid #000;
             }
 
             &.circle-2 {
-              width: 66%;
-              height: 66%;
-              background-color: rgb(255, 217, 102); // 红色背景
+              width: 70%;
+              height: 70%;
+              background-color: rgb(255, 217, 102);
               border: 1px solid #000;
             }
 
-            &.circle-5 {
+            &.circle-3 {
               width: 40%;
               height: 40%;
               background-color: rgb(192, 0, 0);
@@ -490,7 +702,7 @@ export default defineComponent({
             cursor: pointer;
             transition: all 0.3s ease;
 
-            // 添加悬浮提示框
+            // 修改后的悬浮提示框样式
             .tooltip {
               position: absolute;
               visibility: hidden;
@@ -503,10 +715,15 @@ export default defineComponent({
               padding: 8px 10px;
               z-index: 100;
               transition: opacity 0.3s;
-              bottom: 120%;
+              bottom: 100%;
               left: 50%;
               transform: translateX(-50%);
-              pointer-events: none;
+              pointer-events: auto;
+
+              &:hover {
+                visibility: visible;
+                opacity: 1;
+              }
 
               &:after {
                 content: "";
@@ -542,6 +759,29 @@ export default defineComponent({
               }
             }
 
+            // 新增的编辑按钮浮窗样式
+            .edit-popup {
+              position: absolute;
+              color: rgba(0, 0, 0, 0.75);
+              text-align: left;
+              border-radius: 6px;
+              padding: 0;
+              z-index: 1000;
+              transition: opacity 0.3s;
+              right: 0;
+              top: 0;
+              transform: translateX(-50%);
+              pointer-events: auto;
+
+              .ant-btn {
+                font-size: 12px;
+                height: 28px;
+                line-height: 26px;
+                padding: 0 8px;
+                border-radius: 4px;
+              }
+            }
+
             .indicator-marker {
               position: relative;
               width: 36px;
@@ -558,7 +798,7 @@ export default defineComponent({
                 position: absolute;
                 width: 2px;
                 height: 7px;
-                background-color: #fff;
+                background-color: #1890ff;
                 transition: background-color 0.3s ease;
                 top: 50%;
                 left: 50%;
@@ -569,7 +809,7 @@ export default defineComponent({
                 position: absolute;
                 width: 7px;
                 height: 2px;
-                background-color: #fff;
+                background-color: #1890ff;
                 transition: background-color 0.3s ease;
                 right: 50%;
                 top: 50%;
@@ -580,7 +820,7 @@ export default defineComponent({
                 position: absolute;
                 width: 2px;
                 height: 7px;
-                background-color: #fff;
+                background-color: #1890ff;
                 transition: background-color 0.3s ease;
                 bottom: 50%;
                 left: 50%;
@@ -591,7 +831,7 @@ export default defineComponent({
                 position: absolute;
                 width: 7px;
                 height: 2px;
-                background-color: #fff;
+                background-color: #1890ff;
                 transition: background-color 0.3s ease;
                 left: 50%;
                 top: 50%;
@@ -603,7 +843,7 @@ export default defineComponent({
                 position: absolute;
                 width: 14px;
                 height: 14px;
-                border: 3px solid #fff;
+                border: 3px solid #1890ff;
                 border-radius: 50%;
                 transition: border-color 0.3s ease;
                 z-index: 1; // 确保圆环在十字前面
@@ -611,7 +851,7 @@ export default defineComponent({
             }
 
             &:hover {
-              z-index: 10;
+              z-index: 100;
 
               .tooltip {
                 visibility: visible;
@@ -625,11 +865,11 @@ export default defineComponent({
                 .line-right,
                 .line-bottom,
                 .line-left {
-                  background-color: #13c2c2; // 选中为青绿色
+                  background-color: #220baa; // 选中为青绿色
                 }
 
                 .circle-ring {
-                  border-color: #13c2c2; // 选中为青绿色边框
+                  border-color: #220baa; // 选中为青绿色边框
                 }
               }
             }
@@ -644,11 +884,11 @@ export default defineComponent({
                 .line-right,
                 .line-bottom,
                 .line-left {
-                  background-color: #13c2c2; // 选中为青绿色
+                  background-color: #220baa; // 选中为青绿色
                 }
 
                 .circle-ring {
-                  border-color: #13c2c2; // 选中为青绿色边框
+                  border-color: #220baa; // 选中为青绿色边框
                 }
               }
             }
@@ -748,5 +988,78 @@ export default defineComponent({
     display: flex;
     justify-content: flex-end;
   }
+
+  .target-legend {
+    position: absolute;
+    left: -35px;
+    width: 300px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 0 5px;
+
+      .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        margin-right: 5px;
+      }
+
+      span {
+        font-size: 12px;
+        color: #666;
+      }
+    }
+  }
+
+  /* 添加靶点编辑弹窗样式 */
+  .edit-target-form {
+    padding: 10px 0;
+
+    .form-row {
+      display: flex;
+      margin-bottom: 16px;
+      align-items: center;
+
+      .form-label {
+        width: 80px;
+        flex-shrink: 0;
+        color: #666;
+      }
+
+      .form-value {
+        flex: 1;
+        font-weight: 500;
+      }
+    }
+
+    .ant-slider {
+      width: 100%;
+      margin: 10px 0;
+    }
+  }
+
+  .form-actions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-start;
+  }
+}
+
+:global(.ant-slider-tooltip) {
+  position: absolute !important;
+  top: -50px !important;
+  left: -11px !important;
+}
+
+:global(.edit-button) {
+  padding: 0 !important;
+  background-color: transparent !important;
 }
 </style>

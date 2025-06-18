@@ -138,10 +138,25 @@ export const useHistogramCharts = () => {
           },
         ],
         title: {
-          text: getMetricName(dataItem.name),
+          text: (() => {
+            if (getMetricName(dataItem.name) === "距离评分") {
+              return `{specialStyle|${getMetricName(dataItem.name)}}`;
+            }
+            return getMetricName(dataItem.name);
+          })(),
           textStyle: {
             fontSize: 12,
             fontWeight: "normal",
+
+            rich: {
+              specialStyle: {
+                fontWeight: "bold",
+                backgroundColor: "rgb(192, 0, 0)", // 特殊标签的背景色
+                padding: [2, 4], // 内边距 [上下, 左右]
+                borderRadius: 2, // 圆角
+                color: "#fff", // 文字颜色
+              },
+            },
           },
           left: "center",
         },

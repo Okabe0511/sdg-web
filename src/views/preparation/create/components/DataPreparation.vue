@@ -345,6 +345,13 @@
                 </div>
               </div>
             </div>
+
+            <!-- 添加悬浮的下一步按钮 -->
+            <div class="floating-next-button" v-if="isWorkflowCompleted">
+              <a-button type="primary" @click="handleCompletePreparation">
+                下一步 <right-outlined />
+              </a-button>
+            </div>
           </div>
         </div>
       </div>
@@ -523,7 +530,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref, watch } from "vue";
+import {
+  defineComponent,
+  ref,
+  watch,
+  onMounted,
+  reactive,
+  nextTick,
+} from "vue";
+import { message } from "ant-design-vue";
 import {
   UpOutlined,
   DownOutlined,
@@ -533,8 +548,8 @@ import {
   LoadingOutlined,
   ClockCircleOutlined,
   UploadOutlined,
+  RightOutlined, // 添加右箭头图标
 } from "@ant-design/icons-vue";
-import { message } from "ant-design-vue"; // 引入 message
 import Icon from "/@/components/Icon/index.vue";
 import { useOperators } from "/@/views/preparation/create/hooks/useOperators";
 import { useTargetAnalysis } from "/@/views/preparation/create/hooks/useTargetAnalysis";
@@ -571,7 +586,8 @@ export default defineComponent({
     LoadingOutlined,
     ClockCircleOutlined,
     UploadOutlined,
-    DatasetHeader, // 添加数据集头部组件
+    RightOutlined, // 添加组件
+    DatasetHeader,
   },
   props: {
     visible: {
@@ -581,7 +597,7 @@ export default defineComponent({
   },
 
   // 添加emit定义
-  emits: ["start-data-preparation"],
+  emits: ["start-data-preparation", "complete-preparation"],
   setup(props, { emit }) {
     // 使用算子钩子
     const {
@@ -814,6 +830,11 @@ export default defineComponent({
       generateCodeDiff(step);
     };
 
+    // 添加处理完成按钮点击事件的方法
+    const handleCompletePreparation = () => {
+      emit("complete-preparation");
+    };
+
     // 替换原有的previewStep引用
     return {
       // 算子库相关
@@ -895,6 +916,9 @@ export default defineComponent({
 
       // 添加数据集指标相关
       metrics, // 添加数据集指标
+
+      // 返回处理完成方法
+      handleCompletePreparation,
     };
   },
 });
@@ -1466,7 +1490,7 @@ export default defineComponent({
                 position: absolute;
                 width: 2px;
                 height: 7px;
-                background-color: #fff; // 改为蓝色，与靶图颜色区分
+                background-color: #1890ff; // 改为蓝色，与靶图颜色区分
                 transition: background-color 0.3s ease;
                 top: 50%;
                 left: 50%;
@@ -1477,7 +1501,7 @@ export default defineComponent({
                 position: absolute;
                 width: 7px;
                 height: 2px;
-                background-color: #fff; // 改为蓝色
+                background-color: #1890ff; // 改为蓝色
                 transition: background-color 0.3s ease;
                 right: 50%;
                 top: 50%;
@@ -1488,7 +1512,7 @@ export default defineComponent({
                 position: absolute;
                 width: 2px;
                 height: 7px;
-                background-color: #fff; // 改为蓝色
+                background-color: #1890ff; // 改为蓝色
                 transition: background-color 0.3s ease;
                 bottom: 50%;
                 left: 50%;
@@ -1499,7 +1523,7 @@ export default defineComponent({
                 position: absolute;
                 width: 7px;
                 height: 2px;
-                background-color: #fff; // 改为蓝色
+                background-color: #1890ff; // 改为蓝色
                 transition: background-color 0.3s ease;
                 left: 50%;
                 top: 50%;
@@ -1511,7 +1535,7 @@ export default defineComponent({
                 position: absolute;
                 width: 14px;
                 height: 14px;
-                border: 3px solid #fff; // 改为蓝色边框
+                border: 3px solid #1890ff; // 改为蓝色边框
                 border-radius: 50%;
                 transition: border-color 0.3s ease;
                 z-index: 1; // 确保圆环在十字前面
@@ -1533,11 +1557,11 @@ export default defineComponent({
                 .line-right,
                 .line-bottom,
                 .line-left {
-                  background-color: #13c2c2; // 选中为青绿色
+                  background-color: #220baa; // 选中为青绿色
                 }
 
                 .circle-ring {
-                  border-color: #13c2c2; // 选中为青绿色边框
+                  border-color: #220baa; // 选中为青绿色边框
                 }
               }
             }
@@ -1701,6 +1725,47 @@ export default defineComponent({
 
         .evaluation-value {
           font-weight: 500;
+        }
+      }
+    }
+  }
+
+  .target-analysis {
+    flex: 1;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative; /* 确保相对定位 */
+
+    .section-header {
+      margin-bottom: 15px;
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        color: @primary-color;
+      }
+    }
+
+    // 添加悬浮按钮样式
+    .floating-next-button {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      z-index: 10;
+
+      .ant-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 16px;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
       }
     }

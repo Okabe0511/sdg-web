@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, reactive, watch } from "vue";
-import { useRouter, useRoute } from "vue-router"; // 添加 useRoute
+import { useRouter, useRoute } from "vue-router";
 import { LeftOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 // 导入任务详情 API
@@ -20,6 +20,8 @@ import DatasetHeader from "/@/components/DatasetHeader/index.vue";
 
 // 引入数据制备组件
 import DataPreparation from "./components/DataPreparation.vue";
+// 引入数据导出结果组件
+import DataExportResult from "./components/DataExportResult.vue";
 
 // 引入钩子函数
 import { useProgressSteps } from "./hooks/useProgressSteps";
@@ -27,7 +29,6 @@ import { useDatasets } from "./hooks/useDatasets";
 import { useQualityAssessment } from "./hooks/useQualityAssessment";
 import { useDataAnalysis } from "./hooks/useDataAnalysis";
 import { useConsoleInteraction } from "./hooks/useConsoleInteraction";
-// 添加导入 useDatasetMetrics 钩子
 import { useDatasetMetrics } from "./hooks/useDatasetMetrics";
 
 export default defineComponent({
@@ -41,13 +42,14 @@ export default defineComponent({
     TaskConfigModal,
     DataPreparation,
     DatasetHeader,
+    DataExportResult,
   },
   setup() {
     const router = useRouter();
-    const route = useRoute(); // 获取当前路由信息
-    const taskId = ref<number | null>(null); // 存储任务ID
-    const isDetailMode = ref(false); // 是否为详情模式
-    const configModalVisible = ref(false); // 默认不显示配置弹窗
+    const route = useRoute();
+    const taskId = ref<number | null>(null);
+    const isDetailMode = ref(false);
+    const configModalVisible = ref(false);
 
     // 使用各个钩子函数
     const { currentStep, steps, setCurrentStep } = useProgressSteps();
@@ -76,27 +78,24 @@ export default defineComponent({
       datasetDescription: false,
       qualityAssessment: false,
       dataAnalysis: false,
-      dataPreparation: false, // 新增数据制备模块控制
+      dataPreparation: false,
+      dataExportResult: false, // 新增数据导出结果模块控制
     });
 
-    const showDataPreparation = ref(false); // 控制数据制备模块的显示
+    // 控制页面显示特定步骤
+    const showDataPreparation = ref(false);
+    const showDataExportResult = ref(false); // 新增导出结果显示控制
 
     // 返回列表页
     const goBackToList = () => {
       router.push("/home/list");
     };
 
-    // 处理任务配置提交 - 修改为使用API
+    // 处理任务配置提交
     const handleTaskConfigSubmit = async (config: any) => {
       console.log("任务配置:", config);
-
-      // 创建一个任务ID
       const taskId = Date.now();
-
-      // 开始处理任务流程
       startTaskStream(config);
-
-      // 提交数据集配置并显示数据集描述模块
       const datasetResult = await submitDatasetConfig(config);
     };
 
@@ -108,11 +107,9 @@ export default defineComponent({
 
     // 初始化 - 判断是创建页还是详情页
     onMounted(async () => {
-      // 优先使用路由元信息判断模式
       const routeMode = route.meta.mode as string;
 
       if (routeMode === "detail" || route.params.id) {
-        // 详情模式 - 从路由参数获取任务ID
         const id = Number(route.params.id || route.query.taskId);
         if (!id) {
           message.error("缺少任务ID参数");
@@ -120,14 +117,10 @@ export default defineComponent({
           return;
         }
 
-        // 设置详情模式
         taskId.value = id;
         isDetailMode.value = true;
-
-        // 加载任务详情
         await loadTaskDetail(id);
       } else {
-        // 创建模式 - 显示创建弹窗
         isDetailMode.value = false;
         configModalVisible.value = true;
       }
@@ -150,7 +143,6 @@ export default defineComponent({
           taskDescription: taskData.description,
         });
 
-        // 更新数据集指标 - 使用updateMetrics函数
         if (taskData.metrics) {
           updateMetrics({
             dataPairs: taskData.metrics.dataPairs || 0,
@@ -159,7 +151,6 @@ export default defineComponent({
           });
         }
 
-        // 加载任务相关数据
         await loadDatasets(taskData);
 
         return true;
@@ -170,13 +161,26 @@ export default defineComponent({
       }
     };
 
-    // 新增处理下一步的函数
+    // 处理下一步的函数
     const handleNextStep = () => {
       if (currentStep.value === 3) {
         setCurrentStep(3, "process");
         showDataPreparation.value = true;
         modulesVisible.dataPreparation = true;
+      } else if (currentStep.value === 4) {
+        // 从数据制备到结果导出
+        setCurrentStep(4);
+        showDataExportResult.value = true;
+        modulesVisible.dataExportResult = true;
       }
+    };
+
+    // 从数据制备到结果导出的处理函数
+    const handleCompletePreparation = () => {
+      setCurrentStep(4);
+      showDataPreparation.value = false;
+      showDataExportResult.value = true;
+      modulesVisible.dataExportResult = true;
     };
 
     const handleStartDataDescription = () => {
@@ -184,15 +188,18 @@ export default defineComponent({
       loadQualityMetrics(taskId.value || 0);
       setCurrentStep(1);
     };
+
     const handleStartQualityAssessment = () => {
       modulesVisible.qualityAssessment = true;
       setCurrentStep(2);
     };
+
     const handleStartDataAnalysis = () => {
       modulesVisible.dataAnalysis = true;
       startAnalysis();
       setCurrentStep(3, "wait");
     };
+
     // 监听路由变化
     watch(
       () => consoleMessages,
@@ -215,6 +222,21 @@ export default defineComponent({
       { deep: true }
     );
 
+    // 监听工作流完成状态，自动跳转到结果页
+    watch(
+      () => modulesVisible.dataPreparation,
+      (newVal) => {
+        if (
+          newVal &&
+          consoleMessages.value.some((msg) =>
+            msg.content.includes("任务流程执行完成")
+          )
+        ) {
+          setTimeout(handleCompletePreparation, 1000);
+        }
+      }
+    );
+
     return {
       // 配置弹窗相关
       configModalVisible,
@@ -235,6 +257,7 @@ export default defineComponent({
       selectedQualityMetric,
       isLoading,
       showDataPreparation,
+      showDataExportResult, // 新增导出结果显示控制
       startDataPreparationStream,
 
       // 新增返回值
@@ -246,6 +269,7 @@ export default defineComponent({
 
       // 新增的处理下一步的函数
       handleNextStep,
+      handleCompletePreparation,
     };
   },
 });
@@ -253,20 +277,25 @@ export default defineComponent({
 
 <template>
   <div class="task-create-page">
-    <!-- 调整为左右布局 -->
     <div class="task-content">
-      <!-- 左侧四个模块整体 -->
       <div class="left-container">
         <!-- 1. 任务进度条部分 -->
         <ProgressSteps :current-step="currentStep" :steps="steps" />
 
         <!-- 添加数据集头部信息 -->
         <DatasetHeader
-          v-if="currentStep < 4 && !showDataPreparation"
+          v-if="
+            currentStep < 4 && !showDataPreparation && !showDataExportResult
+          "
           :metrics="datasetMetrics"
         />
 
-        <div v-if="currentStep < 4 && !showDataPreparation" class="middle-area">
+        <div
+          v-if="
+            currentStep < 4 && !showDataPreparation && !showDataExportResult
+          "
+          class="middle-area"
+        >
           <div class="left-middle-area">
             <!-- 2. 数据集描述部分 -->
             <DatasetDescription
@@ -296,17 +325,28 @@ export default defineComponent({
             />
           </div>
         </div>
-        <!-- 新增数据制备组件 -->
+
+        <!-- 数据制备组件 -->
         <DataPreparation
-          v-if="currentStep === 3 && showDataPreparation"
+          v-if="
+            currentStep === 3 && showDataPreparation && !showDataExportResult
+          "
           :visible="modulesVisible.dataPreparation"
           :loading="!modulesVisible.dataPreparation"
           @start-data-preparation="startDataPreparationStream"
+          @complete-preparation="handleCompletePreparation"
+        />
+
+        <!-- 数据导出结果组件 -->
+        <DataExportResult
+          v-if="currentStep === 4 && showDataExportResult"
+          :visible="modulesVisible.dataExportResult"
+          :metrics="datasetMetrics"
         />
       </div>
 
-      <!-- 右侧控制台部分 - 只显示不交互 -->
-      <div class="right-container">
+      <!-- 右侧控制台部分 - 结果页不显示控制台 -->
+      <div v-if="!showDataExportResult" class="right-container">
         <AIConsolePanel :messages="consoleMessages" :loading="isLoading" />
       </div>
     </div>
@@ -326,7 +366,7 @@ export default defineComponent({
   background-color: #f5f5f5;
   height: 100%;
   overflow: hidden;
-  position: relative; /* 添加这个以便DatasetHeader可以定位 */
+  position: relative;
 }
 
 .page-header {

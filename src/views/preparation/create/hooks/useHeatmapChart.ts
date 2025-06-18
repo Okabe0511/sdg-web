@@ -49,6 +49,24 @@ export const useHeatmapChart = () => {
           "缺失率",
         ],
         show: true,
+        axisLabel: {
+          formatter: function (params: any) {
+            if (params === "配置项多样性") {
+              // 返回加粗的配置多样性
+              return "{specialStyle|" + params + "}";
+            }
+            return params;
+          },
+          rich: {
+            specialStyle: {
+              fontWeight: "bold",
+              backgroundColor: "rgb(192, 0, 0)", // 特殊标签的背景色
+              padding: [2, 4], // 内边距 [上下, 左右]
+              borderRadius: 2, // 圆角
+              color: "#fff", // 文字颜色
+            },
+          },
+        },
       },
       visualMap: {
         precision: 2,
