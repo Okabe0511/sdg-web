@@ -102,40 +102,14 @@
       </div>
 
       <div class="additional-analysis">
-        <div class="analysis-controls">
-          <a-radio-group
-            v-model:value="chartType"
-            button-style="solid"
-            size="small"
-          >
-            <a-radio-button value="heatmap">微观</a-radio-button>
-            <a-radio-button value="analysis">聚合</a-radio-button>
-          </a-radio-group>
-        </div>
+       
 
         <div
-          v-show="chartType === 'heatmap'"
+          v-show="chartType === 'eisenhower'"
           id="main"
-          style="width: 100%; height: 350px"
+          style="width: 100%; height: 405px"
         ></div>
 
-        <div v-show="chartType === 'analysis'" class="histogram-container">
-          <div
-            v-if="histogramData && histogramData.histogramData"
-            class="histogram-grid"
-          >
-            <div
-              v-for="(_, index) in histogramData.histogramData"
-              :key="index"
-              class="histogram-item"
-              ref="histogramChartRefs"
-            ></div>
-          </div>
-          <div v-else class="loading-charts">
-            <a-spin />
-            <div>正在加载分析图表...</div>
-          </div>
-        </div>
       </div>
 
       <!-- 添加下一步按钮 -->
@@ -229,8 +203,7 @@ import {
 } from "vue";
 import { message } from "ant-design-vue";
 import { RightOutlined, EditOutlined } from "@ant-design/icons-vue";
-import { useHeatmapChart } from "/@/views/preparation/create/hooks/useHeatmapChart";
-import { useHistogramCharts } from "/@/views/preparation/create/hooks/useHistogramCharts";
+import { useEisenhowerMatrix } from "../hooks/useEisenhowerMatrix";
 import { getTargetAnalysis } from "/@/serve/api/targetAnalysis";
 
 interface TargetExplanation {
@@ -257,28 +230,19 @@ export default defineComponent({
   emits: ["next-step"],
   setup(props, { emit }) {
     // 原有部分保持不变
-    const chartType = ref("heatmap"); // 默认显示热力图
+    const chartType = ref("eisenhower"); // 默认显示eisenhower图
     const histogramChartRefs = ref<HTMLElement[]>([]);
     const isAnalysisEnd = ref(false);
 
-    // 使用热力图钩子
+    // 使用eisenhower图钩子
     const {
-      chartLoaded,
-      initHeatmap,
-      disposeChart,
-      resizeChart,
-      handleResize: resizeHeatmap,
-    } = useHeatmapChart();
+    chartLoaded,
+    initEisenhowerMatrix,
+    disposeChart,
+    resizeChart: handleResize,
+    } = useEisenhowerMatrix();
 
-    // 使用柱状图钩子
-    const {
-      histogramData,
-      setChartRefs,
-      loadHistogramData,
-      initHistogramCharts,
-      disposeCharts: disposeHistogramCharts,
-      handleResize: resizeHistograms,
-    } = useHistogramCharts();
+
 
     // 靶点分析数据
     const targetData = reactive({
@@ -425,11 +389,9 @@ export default defineComponent({
 
     // 处理窗口大小变化
     const handleWindowResize = () => {
-      if (chartType.value === "heatmap") {
-        resizeHeatmap();
-      } else if (chartType.value === "analysis") {
-        resizeHistograms();
-      }
+      if (chartType.value === "eisenhower") {
+        handleResize();
+      } 
     };
 
     // 加载靶点分析数据
@@ -475,13 +437,10 @@ export default defineComponent({
       // 加载靶点分析数据
       await loadTargetAnalysis();
 
-      // 加载柱状图数据
-      await loadHistogramData();
-
       // 加载初始图表
       if (props.visible) {
-        if (chartType.value === "heatmap") {
-          initHeatmap();
+        if (chartType.value === "eisenhower") {
+          initEisenhowerMatrix();
         }
       }
 
@@ -493,7 +452,6 @@ export default defineComponent({
     onBeforeUnmount(() => {
       window.removeEventListener("resize", handleWindowResize);
       disposeChart();
-      disposeHistogramCharts();
     });
 
     // 监听可见性变化，重新渲染图表
@@ -501,24 +459,16 @@ export default defineComponent({
       () => props.visible,
       (isVisible) => {
         if (isVisible) {
-          if (chartType.value === "heatmap") {
+          if (chartType.value === "eisenhower") {
             // 页面显示时，确保图表正确渲染
             setTimeout(() => {
               if (chartLoaded.value) {
-                resizeChart();
+                handleResize();
               } else {
-                initHeatmap();
+                initEisenhowerMatrix();
               }
             }, 300);
-          } else if (chartType.value === "analysis") {
-            // 初始化柱状图
-            nextTick(() => {
-              if (histogramChartRefs.value.length > 0) {
-                setChartRefs(histogramChartRefs.value);
-                initHistogramCharts();
-              }
-            });
-          }
+          } 
         }
       }
     );
@@ -529,46 +479,19 @@ export default defineComponent({
       async (newType) => {
         if (!props.visible) return;
 
-        if (newType === "heatmap") {
+        if (newType === "eisenhower") {
           setTimeout(() => {
             if (chartLoaded.value) {
-              resizeChart();
+              handleResize();
             } else {
-              initHeatmap();
+              initEisenhowerMatrix();
             }
           }, 100);
-        } else if (newType === "analysis") {
-          // 确保数据已加载
-          if (!histogramData.value) {
-            await loadHistogramData();
-          }
-
-          // 等待DOM更新后初始化图表
-          nextTick(() => {
-            if (histogramChartRefs.value.length > 0) {
-              setChartRefs(histogramChartRefs.value);
-              initHistogramCharts();
-            }
-          });
-        }
+        } 
       }
     );
 
-    // 监听柱状图DOM引用变化
-    watch(
-      () => histogramChartRefs.value,
-      (refs) => {
-        if (
-          refs.length > 0 &&
-          chartType.value === "analysis" &&
-          props.visible
-        ) {
-          setChartRefs(refs);
-          initHistogramCharts();
-        }
-      },
-      { deep: true }
-    );
+
 
     // 添加处理下一步的方法
     const handleNextStep = () => {
@@ -594,7 +517,6 @@ export default defineComponent({
     return {
       chartType,
       histogramChartRefs,
-      histogramData,
       targetData,
       targetExplanations,
       selectedTargetKey,
@@ -924,7 +846,7 @@ export default defineComponent({
     }
 
     .additional-analysis {
-      min-height: 350px;
+      min-height: 405px;
 
       .analysis-controls {
         display: flex;
@@ -932,40 +854,6 @@ export default defineComponent({
         margin-bottom: 15px;
       }
 
-      .histogram-container {
-        width: 100%;
-        height: 350px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        .loading-charts {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-          color: #999;
-        }
-
-        .histogram-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          grid-gap: 15px;
-          width: 100%;
-          height: 100%;
-
-          @media (min-width: 1200px) {
-            grid-template-columns: repeat(4, 1fr);
-          }
-
-          .histogram-item {
-            width: 100%;
-            height: 160px;
-            background-color: #fff;
-            border-radius: 6px;
-          }
-        }
-      }
     }
   }
 
