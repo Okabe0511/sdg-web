@@ -1,14 +1,35 @@
 {
-  "datasets": [
-    {
-      "dataType": "图像",
-      "dataAmount": 580,
-      "dataSize": "19.2MB"
-    },
-    {
-      "dataType": "代码",
-      "dataAmount": 592,
-      "dataSize": "2.6MB"
-    }
-  ]
+  "datasets": {
+    "1": [
+      {
+        "dataType": "图像",
+        "dataAmount": 580,
+        "dataSize": "19.2MB"
+      },
+      {
+        "dataType": "代码",
+        "dataAmount": 592,
+        "dataSize": "2.6MB"
+      }
+    ],
+    "2": [
+      {
+        "dataType": "文本",
+        "dataAmount": 1200,
+        "dataSize": "4.8MB"
+      },
+      {
+        "dataType": "音频",
+        "dataAmount": 85,
+        "dataSize": "156MB"
+      }
+    ],
+    "default": [
+      {
+        "dataType": "混合数据",
+        "dataAmount": 100,
+        "dataSize": "10MB"
+      }
+    ]
+  }
 }

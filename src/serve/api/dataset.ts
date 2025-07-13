@@ -7,13 +7,28 @@ import { DatasetInfo } from "/@/views/preparation/create/hooks/useDatasets";
  * @param taskId 任务ID
  * @returns 数据集信息
  */
-export const getDatasetInfo = async (taskId: number) => {
-  // 在开发环境中使用mock数据
+
+export const getDatasetInfo = async (taskId: any) => {
   if (import.meta.env.DEV) {
-    return Promise.resolve({ data: mockDatasetResponse.datasets });
+    // 只兼容mock数据为对象格式
+    console.log(taskId.id);
+   const datasetId: number = Number(taskId.id);
+  if(taskId.id === 1) {
+   const data = mockDatasetResponse.datasets[1];
+
+    return Promise.resolve({ data });
   }
-  // 实际环境中调用真实接口
-  return http.get(`/dataset/info/${taskId}`);
+}
+  if(taskId.id === 2) {
+    const data = mockDatasetResponse.datasets[2];
+    return Promise.resolve({ data });
+  }
+  else{
+   const data = mockDatasetResponse.datasets.default;
+
+    return Promise.resolve({ data });
+  }
+    return http.get(`/dataset/info/${taskId}`);
 };
 
 /**
