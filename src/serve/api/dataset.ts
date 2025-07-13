@@ -11,7 +11,6 @@ import { DatasetInfo } from "/@/views/preparation/create/hooks/useDatasets";
 export const getDatasetInfo = async (taskId: any) => {
   if (import.meta.env.DEV) {
     // 只兼容mock数据为对象格式
-    console.log(taskId.id);
    const datasetId: number = Number(taskId.id);
   if(taskId.id === 1) {
    const data = mockDatasetResponse.datasets[1];

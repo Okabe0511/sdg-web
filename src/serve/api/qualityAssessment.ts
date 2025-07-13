@@ -13,14 +13,28 @@ import {
 export const getQualityMetrics = async (taskId: number) => {
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
-    // 直接返回整个mock对象，包含primaryMetrics和secondaryMetrics
-    return Promise.resolve({
-      data: {
-        primaryMetrics: mockQualityResponse.primaryMetrics,
-        secondaryMetrics: mockQualityResponse.secondaryMetrics,
-      },
-    });
+    
+    
+    if (taskId === 1) {
+       const data = {
+      primaryMetrics: mockQualityResponse.metrics[1].primaryMetrics,
+      secondaryMetrics: mockQualityResponse.metrics[1].secondaryMetrics,
+    };
+    return Promise.resolve({ data });
+    } 
+    if (taskId === 2) {
+      const data = {
+      primaryMetrics: mockQualityResponse.metrics[2].primaryMetrics,
+      secondaryMetrics: mockQualityResponse.metrics[2].secondaryMetrics,
+     
+    };
+     console.log(taskId);
+    return Promise.resolve({ data });
+    }
+  
+    
   }
+   console.log(taskId);
   // 实际环境中调用真实接口
   return http.get(`/quality/metrics/${taskId}`);
 };
@@ -32,7 +46,7 @@ export const getQualityMetrics = async (taskId: number) => {
 export const getQualityExplanations = async () => {
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
-    return Promise.resolve({ data: mockQualityResponse.explanations });
+    return Promise.resolve({ data: mockQualityResponse.metrics[1].explanations });
   }
   // 实际环境中调用真实接口
   return http.get("/quality/explanations");
