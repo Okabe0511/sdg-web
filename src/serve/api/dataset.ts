@@ -7,7 +7,6 @@ import { DatasetInfo } from "/@/views/preparation/create/hooks/useDatasets";
  * @param taskId 任务ID
  * @returns 数据集信息
  */
-
 export const getDatasetInfo = async (taskId: any) => {
   if (import.meta.env.DEV) {
     // 只兼容mock数据为对象格式
@@ -17,7 +16,7 @@ export const getDatasetInfo = async (taskId: any) => {
 
     return Promise.resolve({ data });
   }
-}
+
   if(taskId.id === 2) {
     const data = mockDatasetResponse.datasets[2];
     return Promise.resolve({ data });
@@ -26,6 +25,7 @@ export const getDatasetInfo = async (taskId: any) => {
    const data = mockDatasetResponse.datasets.default;
 
     return Promise.resolve({ data });
+  }
   }
     return http.get(`/dataset/info/${taskId}`);
 };

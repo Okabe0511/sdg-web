@@ -8,7 +8,8 @@ import {
   GridComponent,
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
-import { Grid } from "ant-design-vue";
+import mockData from '/@/mock/eisenhowerRawData.json';
+import { useRoute } from 'vue-router';
 
 // 注册必需的组件
 echarts.use([
@@ -20,107 +21,63 @@ echarts.use([
   CanvasRenderer,
 ]);
 
+// 定义数据类型
+interface DataItem {
+  primary: string;
+  secondary: string;
+  importance: number;
+  problem: number;
+  urgency: number;
+}
+
+interface EisenhowerData {
+  main: {
+    [key: string]: DataItem[];
+    default: DataItem[];
+  };
+}
+
 export const useEisenhowerMatrix = () => {
-  
+  const route = useRoute();
   let chartInstance: echarts.ECharts | null = null;
   const chartLoaded = ref(false);
-
-  // 内置数据（直接写在代码中）
-  const RawData = [
-    {
-      primary: '数据量',
-      secondary: '时间粒度覆盖率',
-      importance: 0.3,
-      problem: 0.8,
-      urgency: 0.24
-    },
-    {
-      primary: '数据量',
-      secondary: '季节性强度',
-      importance: 0.3,
-      problem: 0.426,
-      urgency: 0.128
-    },
-     {
-      primary: '数据量',
-      secondary: '趋势强度',
-      importance: 0.05,
-      problem: 0.426,
-      urgency: 0.021
-    },
-     {
-      primary: '数据量',
-      secondary: '主频强度',
-      importance: 0.25,
-      problem: 0.256,
-      urgency: 0.064
-    },
-     {
-      primary: '数据量',
-      secondary: '样本均衡性',
-      importance: 0.1,
-      problem: 0.118,
-      urgency: 0.012
-    },
-    {
-      primary: '数据内在质量',
-      secondary: '标签一致性',
-      importance: 0.1,
-      problem: 0.07,
-      urgency: 0.007
-    },
-    {
-      primary: '数据表示质量',
-      secondary: '时序平稳性',
-      importance: 0.6,
-      problem: 0.306,
-      urgency: 0.183
-    },
-     {
-      primary: '数据表示质量',
-      secondary: '时间特征完备度',
-      importance: 0.4,
-      problem: 1,
-      urgency: 0.4
-    },
-    {
-      primary: '数据上下文质量',
-      secondary: '领域知识完备性',
-      importance: 0.7,
-      problem: 0.708,
-      urgency: 0.496
-    },
-     {
-      primary: '数据上下文质量',
-      secondary: '领域知识多样性',
-      importance: 0.3,
-      problem: 0.444,
-      urgency: 0.133
-    },
-    {
-      primary: '数据冗余',
-      secondary: '特征独立性',
-      importance: 0.6,
-      problem: 0.272,
-      urgency: 0.163
-    },
-    {
-      primary: '数据冗余',
-      secondary: '样本均衡性',
-      importance: 0.4,
-      problem: 0.118,
-      urgency: 0.
+  
+  // 获取数据函数（根据环境返回mock数据或真实数据）
+  const getData = async (): Promise<DataItem[]> => {
+    const taskId = route.params.id; // 直接从路由获取taskId
+    console.log(taskId);
+    if (import.meta.env.DEV) {
+      // 开发环境使用mock数据
+      await new Promise(resolve => setTimeout(resolve, 500)); // 模拟延迟
+      
+      const eisenhowerData = mockData as EisenhowerData;
+      
+      // 根据taskId返回对应的数据集
+      if (eisenhowerData.main[taskId as string]) {
+        return eisenhowerData.main[taskId as string];
+      }
+      return eisenhowerData.main.default;
+    } else {
+      // 生产环境调用真实API
+      // 这里应该是你的API调用逻辑
+      // 例如: const response = await fetch(`/api/eisenhower/${taskId}`);
+      // return response.data;
+      
+      // 暂时用默认数据代替
+      return (mockData as EisenhowerData).main.default;
     }
-  ];
+  };
 
-  // 初始化函数（现在只需要containerId参数）
-  const initEisenhowerMatrix = (containerId: string = "main") => {
+  // 初始化函数（接受容器ID作为参数）
+  const initEisenhowerMatrix = async (containerId: string = "eisenhower-matrix") => {
     const chartDom = document.getElementById(containerId);
     if (!chartDom) return;
 
     chartInstance = echarts.init(chartDom);
     
-    // 使用内置数据
+    // 获取数据
+    const data = await getData();
+
     const option = {
       tooltip: {
         trigger: 'item',
@@ -138,7 +95,6 @@ export const useEisenhowerMatrix = () => {
         bottom: 0,
         padding: [0, 0]
       },
-     
       xAxis: {
         name: '重要性',
         nameLocation: 'middle',
@@ -163,7 +119,6 @@ export const useEisenhowerMatrix = () => {
         axisLabel: {
           formatter: function (value: number) {
             return (value * 100).toFixed(0) + '%';
-            
           },
           fontSize: 14
         }
@@ -172,7 +127,7 @@ export const useEisenhowerMatrix = () => {
         {
           name: '数据量',
           type: 'scatter',
-          data: RawData.filter(item => item.primary === '数据量').map(item => ({
+          data: data.filter(item => item.primary === '数据量').map(item => ({
             value: [item.importance * 2 - 1, item.problem * 2 - 1],
             name: item.secondary,
             importance: item.importance,
@@ -182,10 +137,10 @@ export const useEisenhowerMatrix = () => {
           })),
           itemStyle: { color: '#e6194b' }
         },
-         {
+        {
           name: '数据内在质量',
           type: 'scatter',
-          data: RawData.filter(item => item.primary === '数据内在质量').map(item => ({
+          data: data.filter(item => item.primary === '数据内在质量').map(item => ({
             value: [item.importance * 2 - 1, item.problem * 2 - 1],
             name: item.secondary,
             importance: item.importance,
@@ -198,7 +153,7 @@ export const useEisenhowerMatrix = () => {
         {
           name: '数据表示质量',
           type: 'scatter',
-          data: RawData.filter(item => item.primary === '数据表示质量').map(item => ({
+          data: data.filter(item => item.primary === '数据表示质量').map(item => ({
             value: [item.importance * 2 - 1, item.problem * 2 - 1],
             name: item.secondary,
             importance: item.importance,
@@ -211,7 +166,7 @@ export const useEisenhowerMatrix = () => {
         {
           name: '数据上下文质量',
           type: 'scatter',
-          data: RawData.filter(item => item.primary === '数据上下文质量').map(item => ({
+          data: data.filter(item => item.primary === '数据上下文质量').map(item => ({
             value: [item.importance * 2 - 1, item.problem * 2 - 1],
             name: item.secondary,
             importance: item.importance,
@@ -224,7 +179,7 @@ export const useEisenhowerMatrix = () => {
         {
           name: '数据冗余',
           type: 'scatter',
-          data: RawData.filter(item => item.primary === '数据冗余').map(item => ({
+          data: data.filter(item => item.primary === '数据冗余').map(item => ({
             value: [item.importance * 2 - 1, item.problem * 2 - 1],
             name: item.secondary,
             importance: item.importance,
@@ -242,7 +197,6 @@ export const useEisenhowerMatrix = () => {
     return chartInstance;
   };
 
-  // 保留原有的窗口大小处理、资源清理等方法...
   const handleResize = () => {
     if (chartInstance) {
       chartInstance.resize();

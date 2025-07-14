@@ -37,7 +37,6 @@ export const getQualityMetrics = async (taskId: number) => {
   
     
   }
-   console.log(taskId);
   // 实际环境中调用真实接口
   return http.get(`/quality/metrics/${taskId}`);
 };

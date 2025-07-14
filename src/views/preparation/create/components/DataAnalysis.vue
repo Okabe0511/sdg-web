@@ -106,7 +106,7 @@
 
         <div
           v-show="chartType === 'eisenhower'"
-          id="main"
+          id="eisenhower-matrix"
           style="width: 100%; height: 405px"
         ></div>
 
