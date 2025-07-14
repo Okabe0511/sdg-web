@@ -15,14 +15,12 @@ export const useDatasets = () => {
   const loadDatasets = async (taskId: number) => {
     try {
       const response = await getDatasetInfo(taskId);
-      const datasetInfo = response.data;
+      const datasetInfo: DatasetInfo[] = response.data;
 
-      // 清空当前数据集
       datasets.clear();
 
-      // 填充数据集信息
-      Object.keys(datasetInfo).forEach((key) => {
-        datasets.set(key, datasetInfo[key]);
+      datasetInfo.forEach((item, idx) => {
+        datasets.set(String(idx), item);
       });
 
       return true;
@@ -37,13 +35,12 @@ export const useDatasets = () => {
       const response = await createDataset(config);
 
       if (response.data.success) {
-        // 清空当前数据集
         datasets.clear();
 
-        // 填充返回的数据集信息
-        const datasetInfo = response.data.datasets;
-        Object.keys(datasetInfo).forEach((key) => {
-          datasets.set(key, datasetInfo[key]);
+        // 这里以 mock 数据结构为例，取 default
+        const datasetInfo: DatasetInfo[] = response.data.datasets.default;
+        datasetInfo.forEach((item, idx) => {
+          datasets.set(String(idx), item);
         });
 
         return true;

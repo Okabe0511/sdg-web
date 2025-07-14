@@ -16,20 +16,23 @@ export const getQualityMetrics = async (taskId: number) => {
     
     
     if (taskId === 1) {
-       const data = {
-      primaryMetrics: mockQualityResponse.metrics[1].primaryMetrics,
-      secondaryMetrics: mockQualityResponse.metrics[1].secondaryMetrics,
-    };
-    return Promise.resolve({ data });
-    } 
-    if (taskId === 2) {
       const data = {
-      primaryMetrics: mockQualityResponse.metrics[2].primaryMetrics,
-      secondaryMetrics: mockQualityResponse.metrics[2].secondaryMetrics,
-     
-    };
-     console.log(taskId);
-    return Promise.resolve({ data });
+        primaryMetrics: mockQualityResponse.metrics[1].primaryMetrics,
+        secondaryMetrics: mockQualityResponse.metrics[1].secondaryMetrics,
+      };
+      return Promise.resolve({ data });
+    } else if (taskId === 2) {
+      const data = {
+        primaryMetrics: mockQualityResponse.metrics[2].primaryMetrics,
+        secondaryMetrics: mockQualityResponse.metrics[2].secondaryMetrics,
+      };
+      return Promise.resolve({ data });
+    } else {
+      const data = {
+        primaryMetrics: mockQualityResponse.metrics.default.primaryMetrics,
+        secondaryMetrics: mockQualityResponse.metrics.default.secondaryMetrics,
+      };
+      return Promise.resolve({ data });
     }
   
     

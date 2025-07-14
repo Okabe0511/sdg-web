@@ -29,6 +29,11 @@
         "dataType": "混合数据",
         "dataAmount": 100,
         "dataSize": "10MB"
+      },
+      {
+        "dataType": "表格",
+        "dataAmount": 200,
+        "dataSize": "5MB"
       }
     ]
   }
