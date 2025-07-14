@@ -25,15 +25,15 @@ export const useDataExport = () => {
 
   // 原始指标数据
   const originalMetrics = {
-    syntaxDetection: 84.53,
-    configCompleteness: 93.74,
-    sampleCount: 40.44,
-    imageRenderMatch: 82.6,
-    missingRate: 75,
-    chartTypeBalance: 66.65,
-    configDiversity: 0.44,
-    codeRedundancy: 70,
-    imageRedundancy: 70,
+    syntaxDetection: 8.53,
+    configCompleteness: 9.74,
+    sampleCount: 4.44,
+    imageRenderMatch: 8.6,
+    missingRate: 7,
+    chartTypeBalance: 6.65,
+    configDiversity: 0.4,
+    codeRedundancy: 0,
+    imageRedundancy: 7,
   };
 
   // 数据量指标

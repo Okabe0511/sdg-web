@@ -9,15 +9,15 @@
         "dataRedundancy": 70
       },
       "secondaryMetrics": {
-        "syntaxDetection": 84.53,
-        "configCompleteness": 93.74,
-        "sampleCount": 40.44,
-        "imageRenderMatch": 82.6,
-        "missingRate": 75,
-        "chartTypeBalance": 66.65,
+        "syntaxDetection": 8.53,
+        "configCompleteness": 9.74,
+        "sampleCount": 4.44,
+        "imageRenderMatch": 2.6,
+        "missingRate": 7,
+        "chartTypeBalance": 6.65,
         "configDiversity": 0.44,
-        "codeRedundancy": 70,
-        "imageRedundancy": 70
+        "codeRedundancy": 7,
+        "imageRedundancy": 7
       },
       "explanations": {
         "codeQuality": "用于衡量数据集中代码样本的正确性、规范性与可读性。低质量代码会干扰模型学习，导致生成结果不准确或结构混乱。",
