@@ -1,4 +1,5 @@
 import { ref, reactive, watch } from "vue";
+import { useRoute } from "vue-router";
 
 // 定义数据集指标接口
 export interface DatasetMetrics {
@@ -12,14 +13,39 @@ export interface DatasetMetrics {
 
 export const useDatasetMetrics = () => {
   // 初始化指标数据
-  const metrics = reactive<DatasetMetrics>({
-    dataPairs: 640,
-    dataPairsGrowth: 0,
-    imageCount: 580,
-    imageCountGrowth: 0,
-    codeCount: 592,
-    codeCountGrowth: 0,
-  });
+  const route = useRoute();
+  const taskId = ref(route.params.id as string);
+  const getInitialData = (): DatasetMetrics => {
+    if(taskId.value === "1") {
+      return {
+        dataPairs: 640,
+        dataPairsGrowth: 0,
+        imageCount: 580,
+        imageCountGrowth: 0,
+        codeCount: 592,
+        codeCountGrowth: 0
+      };
+  }
+    if(taskId.value === "2") {
+      return {
+        dataPairs: 610,
+        dataPairsGrowth: 0,
+        imageCount: 530,
+        imageCountGrowth: 0,
+        codeCount: 532,
+        codeCountGrowth: 0
+      }
+    }
+       return {
+      dataPairs: 0,
+      dataPairsGrowth: 0,
+      imageCount: 0,
+      imageCountGrowth: 0,
+      codeCount: 0,
+      codeCountGrowth: 0
+    };
+  }
+ const metrics = reactive<DatasetMetrics>(getInitialData());
 
   // 上一次的指标数据，用于计算增长率
   const previousMetrics = reactive({
