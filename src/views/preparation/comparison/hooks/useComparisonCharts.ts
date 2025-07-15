@@ -146,12 +146,25 @@ export const useComparisonCharts = () => {
    * 加载图表数据
    */
   const loadChartData = async (taskId?: string) => {
-    try {
-      const response = await getData();
-      const data = response.data;
-      const { epochs, A, B, C } = data;
+  try {
+  const response = await getData();
+  const data = response.data;
+  console.log("加载数据", taskId, data);
 
-      // 更新各个图表的数据
+  // 根据taskId选择数据集
+  const selectedData = (() => {
+    if (taskId === "1") {
+      return data.F; // 使用F数据集
+    } else if (taskId === "2") {
+      return data.S; // 使用S数据集
+    } else {
+      return data.T; // 使用T数据集（默认）
+    }
+  })();
+
+  // 解构选中的数据
+  const { epochs, A, B, C } = selectedData;
+    console.log("对照训练数据", A);
       updateChartData(task1Chart1Data, {
         labels: epochs,
         datasets: [

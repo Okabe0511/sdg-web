@@ -45,7 +45,6 @@ export const useEisenhowerMatrix = () => {
   // 获取数据函数（根据环境返回mock数据或真实数据）
   const getData = async (): Promise<DataItem[]> => {
     const taskId = route.params.id; // 直接从路由获取taskId
-    console.log(taskId);
     if (import.meta.env.DEV) {
       // 开发环境使用mock数据
       await new Promise(resolve => setTimeout(resolve, 500)); // 模拟延迟
