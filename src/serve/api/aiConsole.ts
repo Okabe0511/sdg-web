@@ -118,7 +118,7 @@ export const getFullTaskLog = async (
   try {
     // 在开发环境中使用mock数据
     if (import.meta.env.DEV) {
-      return simulateStream(mockData.responses, streamHandler);
+      return simulateStream(mockData.responses.default, streamHandler);
     }
     return Promise.resolve() as any;
   } catch (error: any) {
@@ -143,7 +143,8 @@ export const getDataPreparationLog = async (
   try {
     // 在开发环境中使用mock数据
     if (import.meta.env.DEV) {
-      return simulateStream(mockData.preparation, streamHandler);
+      
+      return simulateStream(mockData.preparation.default, streamHandler);
     }
     return Promise.resolve() as any;
   } catch (error: any) {
