@@ -1,8 +1,8 @@
 import { reactive, ref, onMounted, onBeforeUnmount, watch } from "vue";
 import * as echarts from "echarts";
+import { useRoute } from 'vue-router';
 
-// 基于日志文件中的实际评估数据更新雷达图数据
-const radarDataList = [
+let radarDataList = [
   // 初始评估数据
   [40.44, 83.53, 75.17, 31.98, 92.31], // [数据量, 数据对齐, 数据重复性, 多样均衡性, 代码质量]
   // 配置项修复算子后的评估数据
@@ -19,6 +19,40 @@ const radarDataList = [
 
 export const useTargetAnalysis = () => {
   // 雷达图相关
+  const route = useRoute();
+  const taskId = route.params.id;
+  if(taskId === "1") {
+    radarDataList = [
+  // 初始评估数据
+  [4.44, 8.3, 75.17, 31.98, 92.31], // [数据量, 数据对齐, 数据重复性, 多样均衡性, 代码质量]
+  // 配置项修复算子后的评估数据
+  [40.44, 3.53, 75.14, 57.25, 92.75],
+  // 语法修复算子后的评估数据
+  [50.26, 8.03, 7.46, 59.72, 91.11],
+  // 配置项多样性增强算子后的评估数据
+  [50.26, 82.88, 76.1, 6.41, 90.3],
+  // 代码扰动算子后的评估数据
+  [100.0, 62.94, 64.5, 6.6, 93.77],
+  // 基于代码生成图像算子后的评估数据
+  [100.0, 65.11, 71.28, 61.68, 3.77],
+];
+  }
+    if(taskId === "2") {
+    radarDataList = [
+  // 初始评估数据
+  [43.44, 83.3, 75.17, 31.98, 92.31], // [数据量, 数据对齐, 数据重复性, 多样均衡性, 代码质量]
+  // 配置项修复算子后的评估数据
+  [40.44, 32.53, 75.14, 57.25, 92.75],
+  // 语法修复算子后的评估数据
+  [50.26, 83.03, 73.46, 59.72, 91.11],
+  // 配置项多样性增强算子后的评估数据
+  [50.26, 82.88, 76.1, 63.41, 90.3],
+  // 代码扰动算子后的评估数据
+  [100.0, 62.94, 64.5, 63.6, 93.77],
+  // 基于代码生成图像算子后的评估数据
+  [100.0, 65.11, 71.28, 61.68, 33.77],
+];
+  }
   const radarChartRef = ref<HTMLElement | null>(null);
   let radarChart: echarts.ECharts | null = null;
 
@@ -34,7 +68,7 @@ export const useTargetAnalysis = () => {
         chartTypeBalance: 53.23,
       },
       current: {
-        configDiversity: 70.02,
+        configDiversity: 99.02,
         dataVolume: 64.63,
         chartTypeBalance: 53.23,
       },
@@ -90,7 +124,14 @@ export const useTargetAnalysis = () => {
   >([
     {
       name: "原始数据",
-      value: [40.44, 78.8, 70, 33.55, 89.13],
+      value:(()=>{
+        if(taskId === "1") {
+          return [40.44, 83.53, 75.17, 31.98, 92.31];
+        } else if(taskId === "2") {
+          return [43.44, 83.3, 75.17, 31.98, 92.31];
+        }
+        return [10, 20, 30, 20, 30]; // 默认值
+      })(),
       itemStyle: {
         color: "rgba(0, 155, 164, 1)",
       },
@@ -142,9 +183,21 @@ export const useTargetAnalysis = () => {
   // 新增一个方法用于工作流完成后一次性更新靶点数据
   const updateFinalTargetData = () => {
     // 只更新靶点数据
+    if(taskId === "1") {
     updateTargetData("configDiversity", 20);
     updateTargetData("dataVolume", 0);
     updateTargetData("chartTypeBalance", 30);
+    }
+    else if(taskId === "2") {
+    updateTargetData("configDiversity", 30);
+    updateTargetData("dataVolume", 10);
+    updateTargetData("chartTypeBalance", 20);
+    }
+    else{
+      updateTargetData("configDiversity", 50);
+      updateTargetData("dataVolume", 20);
+      updateTargetData("chartTypeBalance", 40);
+    }
 
     // 不再添加最终结果的数据系列
     // 仅更新图表
