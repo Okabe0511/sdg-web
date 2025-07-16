@@ -2,8 +2,10 @@ import { ref, reactive, computed, onBeforeUnmount } from "vue";
 import { message } from "ant-design-vue";
 import { getRecommendWorkflow } from "/@/serve/api/operators";
 import type { Operator } from "/@/serve/api/operators";
-
+import { useRoute } from 'vue-router';
 export const useWorkflow = () => {
+  const route = useRoute();
+  const taskId = route.params.id;
   // 工作流数据
   const workflow = reactive<{
     steps: Array<any>;
@@ -38,7 +40,7 @@ export const useWorkflow = () => {
   const showRecommendModal = () => {
     recommendModalVisible.value = true;
   };
-
+  
   // 生成工作流
   const generateWorkflow = async () => {
     if (!recommendConfig.timeLimit || recommendConfig.timeLimit <= 0) {
@@ -50,12 +52,12 @@ export const useWorkflow = () => {
     }
 
     try {
-      const response = await getRecommendWorkflow(recommendConfig);
+      const response = await getRecommendWorkflow(taskId, recommendConfig);
       workflow.steps = response.data.map((op: Operator) => ({
         ...op,
         isCompleted: false,
       }));
-
+      
       recommendModalVisible.value = false;
       message.success("工作流生成成功，已按最佳顺序安排算子");
     } catch (error) {

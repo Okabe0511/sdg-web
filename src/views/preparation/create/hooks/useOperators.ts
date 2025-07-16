@@ -7,6 +7,7 @@ import {
   createOperator,
   deleteOperator,
 } from "/@/serve/api/operators";
+import { useRoute } from 'vue-router';
 
 // 定义参数接口
 export interface OperatorParam {
@@ -17,6 +18,9 @@ export interface OperatorParam {
 }
 
 export const useOperators = () => {
+  const route = useRoute();
+  const taskId = route.params.id; // 获取路由参数
+
   // 算子库数据
   const operators = reactive<Operator[]>([]);
   const loading = ref(false);
@@ -55,10 +59,13 @@ export const useOperators = () => {
   const loadOperators = async () => {
     try {
       loading.value = true;
-      const response = await getAllOperators({
-        pageSize: operatorPageSize.value,
-        page: currentPage.value,
-      });
+      const response = await getAllOperators(
+        taskId, // 传递路由参数
+        {
+          pageSize: operatorPageSize.value,
+          page: currentPage.value,
+        }
+      );
 
       // 保存原始算子列表用于搜索
       originalOperators.length = 0;
@@ -191,7 +198,7 @@ export const useOperators = () => {
   const saveOperator = async () => {
     try {
       updateParameterString();
-      await updateOperator(currentOperator.value);
+      await updateOperator(taskId, currentOperator.value); // 传递路由参数
 
       // 更新本地算子列表
       const index = operators.findIndex(
@@ -225,7 +232,7 @@ export const useOperators = () => {
   const saveAndAddToWorkflow = async () => {
     try {
       updateParameterString();
-      await updateOperator(currentOperator.value);
+      await updateOperator(taskId, currentOperator.value); // 传递路由参数
 
       // 更新本地算子列表
       const index = operators.findIndex(
@@ -251,7 +258,7 @@ export const useOperators = () => {
   // 删除算子
   const removeOperator = async (operatorId: number) => {
     try {
-      await deleteOperator(operatorId);
+      await deleteOperator(taskId, operatorId); // 传递路由参数
 
       // 从本地列表中移除
       const index = operators.findIndex((op) => op.id === operatorId);
@@ -359,12 +366,8 @@ export const useOperators = () => {
 
   // 提交创建算子请求
   const submitCreateOperator = async (operatorData: Partial<Operator>) => {
-    const response = await createOperator(operatorData);
+    const response = await createOperator(taskId, operatorData); // 传递路由参数
     const newOperatorData = response.data;
-
-    // 不再直接添加到列表
-    // operators.unshift(newOperatorData);
-    // originalOperators.unshift(newOperatorData);
 
     // 重置页码
     currentPage.value = 1;
@@ -379,7 +382,7 @@ export const useOperators = () => {
     addOperatorModalVisible.value = false;
   };
 
-  // 监听分页变化（移除对searchKeyword的监听）
+  // 监听分页变化
   watch([currentPage], () => {
     loadOperators();
   });
@@ -401,13 +404,10 @@ export const useOperators = () => {
     prepareAddOperator,
     saveAndAddToWorkflow,
     parseParameters,
-    // 添加新的返回值
     searchKeyword,
     handleSearch,
     isManageMode,
     toggleManageMode,
-
-    // 添加算子管理相关
     addOperatorModalVisible,
     uploadFileList,
     newOperator,
