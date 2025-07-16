@@ -112,13 +112,21 @@ const simulateStream = (
  * @returns AI响应对象
  */
 export const getFullTaskLog = async (
-  taskConfig: any,
+  task: any,
   streamHandler: (event: SSEEvent) => void
 ): Promise<AIConsoleResponse> => {
   try {
     // 在开发环境中使用mock数据
     if (import.meta.env.DEV) {
-      return simulateStream(mockData.responses.default, streamHandler);
+      if (task.taskId == "1") {
+      return simulateStream(mockData.responses[1], streamHandler);
+    }
+      else if (task.taskId == "2") {
+        return simulateStream(mockData.responses[2], streamHandler);
+      }
+      else {
+        return simulateStream(mockData.responses.default, streamHandler);
+      }
     }
     return Promise.resolve() as any;
   } catch (error: any) {
@@ -138,14 +146,22 @@ export const getFullTaskLog = async (
  * @returns AI响应对象
  */
 export const getDataPreparationLog = async (
+  task: any,
   streamHandler: (event: SSEEvent) => void
 ): Promise<AIConsoleResponse> => {
   try {
     // 在开发环境中使用mock数据
     if (import.meta.env.DEV) {
-      
-      return simulateStream(mockData.preparation.default, streamHandler);
+      console.log("控制台2",task);
+      if (task === "1") {
+        return simulateStream(mockData.preparation[1], streamHandler);
+      } else if (task === "2") {
+        return simulateStream(mockData.preparation[2], streamHandler);
+      }
+      else  {
+        return simulateStream(mockData.preparation.default, streamHandler);
     }
+  }
     return Promise.resolve() as any;
   } catch (error: any) {
     console.error("获取任务日志失败", error);
