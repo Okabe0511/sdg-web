@@ -190,7 +190,7 @@
                   </div>
                 </template>
 
-                <div
+                <!-- <div
                   class="step-preview"
                   v-if="isExecuting || isWorkflowCompleted"
                 >
@@ -202,7 +202,7 @@
                   >
                     预览
                   </a-button>
-                </div>
+                </div> -->
                 <div
                   v-if="isExecuting || isWorkflowCompleted"
                   class="step-status"
