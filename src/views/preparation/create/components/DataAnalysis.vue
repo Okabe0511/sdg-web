@@ -107,7 +107,7 @@
         <div
           v-show="chartType === 'eisenhower'"
           id="eisenhower-matrix"
-          style="width: 100%; height: 405px"
+          style="width: 100%; height: 430px"
         ></div>
 
       </div>
@@ -872,7 +872,7 @@ export default defineComponent({
 
   /* 添加下一步按钮样式 */
   .next-step-action {
-    margin-top: 20px;
+    margin-top: 0px;
     display: flex;
     justify-content: flex-end;
   }

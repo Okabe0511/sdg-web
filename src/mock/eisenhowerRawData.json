@@ -1,6 +1,6 @@
 {
-    "main":{
-  "1": [
+  "main":{
+    "1": [
     {"primary": "数据量", "secondary": "时间粒度覆盖率", "importance": 0.3, "problem": 0.8, "urgency": 0.24},
     {"primary": "数据量", "secondary": "季节性强度", "importance": 0.3, "problem": 0.426, "urgency": 0.128},
     {"primary": "数据量", "secondary": "趋势强度", "importance": 0.05, "problem": 0.426, "urgency": 0.021},
@@ -11,10 +11,9 @@
     {"primary": "数据表示质量", "secondary": "时间特征完备度", "importance": 0.4, "problem": 1, "urgency": 0.4},
     {"primary": "数据上下文质量", "secondary": "领域知识完备性", "importance": 0.7, "problem": 0.708, "urgency": 0.496},
     {"primary": "数据上下文质量", "secondary": "领域知识多样性", "importance": 0.3, "problem": 0.444, "urgency": 0.133},
-    {"primary": "数据冗余", "secondary": "特征独立性", "importance": 0.6, "problem": 0.272, "urgency": 0.163},
-    {"primary": "数据冗余", "secondary": "样本均衡性", "importance": 0.4, "problem": 0.118, "urgency": 0.0}
-  ],
-  "2": [
+    {"primary": "数据冗余", "secondary": "特征独立性", "importance": 0.6, "problem": 0.272, "urgency": 0.163}
+    ],
+    "2": [
     {"primary": "数据量", "secondary": "时间粒度覆盖率", "importance": 0.2, "problem": 0.5, "urgency": 0.12},
     {"primary": "数据量", "secondary": "季节性强度", "importance": 0.2, "problem": 0.226, "urgency": 0.058},
     {"primary": "数据量", "secondary": "趋势强度", "importance": 0.15, "problem": 0.326, "urgency": 0.031},
@@ -27,8 +26,8 @@
     {"primary": "数据上下文质量", "secondary": "领域知识多样性", "importance": 0.2, "problem": 0.244, "urgency": 0.063},
     {"primary": "数据冗余", "secondary": "特征独立性", "importance": 0.3, "problem": 0.172, "urgency": 0.093},
     {"primary": "数据冗余", "secondary": "样本均衡性", "importance": 0.2, "problem": 0.218, "urgency": 0.0}
-  ],
-  "default": [
+    ],
+    "default": [
     {"primary": "数据量", "secondary": "时间粒度覆盖率", "importance": 0.1, "problem": 0.2, "urgency": 0.05},
     {"primary": "数据量", "secondary": "季节性强度", "importance": 0.1, "problem": 0.126, "urgency": 0.028},
     {"primary": "数据量", "secondary": "趋势强度", "importance": 0.05, "problem": 0.126, "urgency": 0.011},
@@ -41,6 +40,6 @@
     {"primary": "数据上下文质量", "secondary": "领域知识多样性", "importance": 0.1, "problem": 0.144, "urgency": 0.033},
     {"primary": "数据冗余", "secondary": "特征独立性", "importance": 0.2, "problem": 0.072, "urgency": 0.043},
     {"primary": "数据冗余", "secondary": "样本均衡性", "importance": 0.1, "problem": 0.118, "urgency": 0.0}
-  ]
-}
+    ]
+  }
 }

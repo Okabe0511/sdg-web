@@ -154,11 +154,11 @@ export const useComparisonCharts = () => {
   // 根据taskId选择数据集
   const selectedData = (() => {
     if (taskId === "1") {
-      return data.F; // 使用F数据集
+      return data.Task1; // 使用1数据集
     } else if (taskId === "2") {
-      return data.S; // 使用S数据集
+      return data.Task2; // 使用2数据集
     } else {
-      return data.T; // 使用T数据集（默认）
+      return data.Default; // 使用默认数据集
     }
   })();
 

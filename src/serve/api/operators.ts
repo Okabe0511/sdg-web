@@ -20,17 +20,17 @@ export interface Operator {
 }
 
 // 根据任务ID获取数据集类型
-const getDatasetType = (taskId: string | string[]): 'F' | 'S' | 'T' => {
+const getDatasetType = (taskId: string | string[]): 'Task1' | 'Task2' | 'default' => {
   console.log('当前数据集ID:', taskId);
-  if (taskId === '1') return 'F';
-  if (taskId === '2') return 'S';
-  return 'T'; // 明确默认值
+  if (taskId === '1') return 'Task1';
+  if (taskId === '2') return 'Task2';
+  return 'default'; // 明确默认值
 };
 
 // 获取指定数据集的算子列表
 const getOperatorsByDataset = (taskId: string | string[]): Operator[] => {
   const datasetType = getDatasetType(taskId);
-  return [...(mockOperatorsData.operators[datasetType] || mockOperatorsData.operators.F)];
+  return [...(mockOperatorsData.operators[datasetType] || mockOperatorsData.operators)];
 };
 
 /**
