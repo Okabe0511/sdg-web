@@ -1,0 +1,158 @@
+{
+  "volumeMetrics": {
+    "1": [
+      {
+        "label": "数据对数量",
+        "key": "dataPairs",
+        "value": 1305,
+        "previousValue": 640,
+        "growthRate": 0
+      },
+      {
+        "label": "图像数量",
+        "key": "imageCount",
+        "value": 1302,
+        "previousValue": 580,
+        "growthRate": 0
+      },
+      {
+        "label": "程序代码数量",
+        "key": "codeCount",
+        "value": 1305,
+        "previousValue": 592,
+        "growthRate": 0
+      }
+    ],
+    "2": [
+      {
+        "label": "数据对数量",
+        "key": "dataPairs",
+        "value": 1200,
+        "previousValue": 1000,
+        "growthRate": 0
+      },
+      {
+        "label": "图像数量",
+        "key": "imageCount",
+        "value": 1800,
+        "previousValue": 900,
+        "growthRate": 0
+      },
+      {
+        "label": "程序代码数量",
+        "key": "codeCount",
+        "value": 1500,
+        "previousValue": 750,
+        "growthRate": 0
+      }
+    ],
+    "default": [
+      {
+        "label": "数据对数量",
+        "key": "dataPairs",
+        "value": 500,
+        "previousValue": 250,
+        "growthRate": 0
+      },
+      {
+        "label": "图像数量",
+        "key": "imageCount",
+        "value": 400,
+        "previousValue": 200,
+        "growthRate": 0
+      },
+      {
+        "label": "程序代码数量",
+        "key": "codeCount",
+        "value": 300,
+        "previousValue": 150,
+        "growthRate": 0
+      }
+    ]
+  },
+  "originalMetrics": {
+    "1": {
+      "syntaxDetection": 85.3,
+      "configCompleteness": 94,
+      "sampleCount": 44,
+      "imageRenderMatch": 86,
+      "missingRate": 71,
+      "chartTypeBalance": 65,
+      "configDiversity": 4,
+      "codeRedundancy": 30,
+      "imageRedundancy": 37
+    },
+    "2": {
+      "syntaxDetection": 111,
+      "configCompleteness": 222,
+      "sampleCount": 442,
+      "imageRenderMatch": 286,
+      "missingRate": 712,
+      "chartTypeBalance": 625,
+      "configDiversity": 422,
+      "codeRedundancy": 310,
+      "imageRedundancy": 327
+    },
+    "default": {
+      "syntaxDetection": 8.53,
+      "configCompleteness": 9.74,
+      "sampleCount": 4.44,
+      "imageRenderMatch": 8.6,
+      "missingRate": 7,
+      "chartTypeBalance": 6.65,
+      "configDiversity": 0.4,
+      "codeRedundancy": 0,
+      "imageRedundancy": 7
+    }
+  },
+  "chartSeriesData": {
+    "1": [
+      {
+        "name": "原始数据",
+        "value": [40.44, 78.8, 70, 33.55, 89.13],
+        "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
+      },
+      {
+        "name": "制备后数据",
+        "value": [100.0, 65.11, 71.28, 61.68, 93.77],
+        "itemStyle": { "color": "#f56c6c" },
+        "lineStyle": { "color": "#f56c6c" },
+        "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
+      }
+    ],
+    "2": [
+      {
+        "name": "原始数据",
+        "value": [50.44, 88.8, 80, 43.55, 99.13],
+        "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
+      },
+      {
+        "name": "制备后数据",
+        "value": [120.0, 75.11, 81.28, 71.68, 103.77],
+        "itemStyle": { "color": "#f56c6c" },
+        "lineStyle": { "color": "#f56c6c" },
+        "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
+      }
+    ],
+    "default": [
+      {
+        "name": "原始数据",
+        "value": [30.44, 68.8, 60, 23.55, 79.13],
+        "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
+      },
+      {
+        "name": "制备后数据",
+        "value": [80.0, 55.11, 61.28, 51.68, 83.77],
+        "itemStyle": { "color": "#f56c6c" },
+        "lineStyle": { "color": "#f56c6c" },
+        "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
+      }
+    ]
+  }
+}

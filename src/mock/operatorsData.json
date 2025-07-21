@@ -240,9 +240,9 @@
         "qualityContribution": 176.43
       },
       "datasetSize": {
-        "dataPairs": 664,
-        "imageCount": 580,
-        "codeCount": 664
+        "dataPairs": 4,
+        "imageCount": 58,
+        "codeCount": 66
       }
     },
     {
@@ -256,7 +256,7 @@
         "qualityContribution": 153.42
       },
       "datasetSize": {
-        "dataPairs": 1305,
+        "dataPairs": 135,
         "imageCount": 580,
         "codeCount": 1305
       }
