@@ -120,7 +120,7 @@ export const getRecommendWorkflow = async (
   config: any
 ): Promise<{ data: Operator[] }> => {
   if (import.meta.env.DEV) {
-    const workflowIds = [4, 7, 5, 1, 2, 6];
+    const workflowIds = mockOperatorsData.recommendWorkflows?.[getDatasetType(taskId)];
     const operators = getOperatorsByDataset(taskId);
     const recommendedOperators = workflowIds
       .map((id) => operators.find((op) => op.id === id))
