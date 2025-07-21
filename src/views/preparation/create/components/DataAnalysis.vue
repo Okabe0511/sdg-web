@@ -102,14 +102,56 @@
       </div>
 
       <div class="additional-analysis">
-       
+        <div class="analysis-controls">
+          <!-- 根据routeId显示不同的图表切换按钮 -->
+          <a-radio-group
+            v-model:value="chartType"
+            button-style="solid"
+            size="small"
+            v-if="routeId === '1'"
+          >
+            <a-radio-button value="heatmap">微观</a-radio-button>
+            <a-radio-button value="analysis">聚合</a-radio-button>
+          </a-radio-group>
+        
+        </div>
 
+        <!-- 热力图和柱状图容器 - 仅routeId为1时显示 -->
+        <template v-if="routeId === '1'">
+          <div
+            v-show="chartType === 'heatmap'"
+            id="main"
+            style="width: 100%; height: 380px"
+          ></div>
+
+          <div
+            v-show="chartType === 'analysis'"
+            class="histogram-container"
+          >
+            <div
+              v-if="histogramData && histogramData.histogramData"
+              class="histogram-grid"
+            >
+              <div
+                v-for="(_, index) in histogramData.histogramData"
+                :key="index"
+                class="histogram-item"
+                ref="histogramChartRefs"
+              ></div>
+            </div>
+            <div v-else class="loading-charts">
+              <a-spin />
+              <div>正在加载分析图表...</div>
+            </div>
+          </div>
+        </template>
+
+        <!-- 艾森豪威尔矩阵容器 - 仅routeId为2时显示 -->
         <div
-          v-show="chartType === 'eisenhower'"
+          v-if="routeId === '2' && chartType === 'eisenhower'"
           id="eisenhower-matrix"
-          style="width: 100%; height: 430px"
+          style="width: 100%; height: 400px"
         ></div>
-
       </div>
 
       <!-- 添加下一步按钮 -->
@@ -203,8 +245,11 @@ import {
 } from "vue";
 import { message } from "ant-design-vue";
 import { RightOutlined, EditOutlined } from "@ant-design/icons-vue";
+import { useHeatmapChart } from "../hooks/useHeatmapChart";
+import { useHistogramCharts } from "../hooks/useHistogramCharts";
 import { useEisenhowerMatrix } from "../hooks/useEisenhowerMatrix";
 import { getTargetAnalysis } from "/@/serve/api/targetAnalysis";
+import { useRoute } from 'vue-router'; 
 
 interface TargetExplanation {
   title: string;
@@ -222,6 +267,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    taskid: {
+      type: Number,
+      default: 1,
+    },
     onNextStep: {
       type: Function as PropType<() => void>,
       required: false,
@@ -229,20 +278,40 @@ export default defineComponent({
   },
   emits: ["next-step"],
   setup(props, { emit }) {
-    // 原有部分保持不变
-    const chartType = ref("eisenhower"); // 默认显示eisenhower图
+    const route = useRoute();
+    const routeId = ref(route.params.id as string);
+    const chartType = ref(
+      routeId.value === '1' ? "heatmap" : "eisenhower"
+    );  
     const histogramChartRefs = ref<HTMLElement[]>([]);
     const isAnalysisEnd = ref(false);
 
-    // 使用eisenhower图钩子
+    // 使用热力图钩子
     const {
-    chartLoaded,
-    initEisenhowerMatrix,
-    disposeChart,
-    resizeChart: handleResize,
+      chartLoaded: heatmapLoaded,
+      initHeatmap,
+      disposeChart: disposeHeatmap,
+      resizeChart: resizeHeatmap,
+      handleResize: resizeHeatmapHandler,
+    } = useHeatmapChart();
+
+    // 使用柱状图钩子
+    const {
+      histogramData,
+      setChartRefs,
+      loadHistogramData,
+      initHistogramCharts,
+      disposeCharts: disposeHistogramCharts,
+      handleResize: resizeHistograms,
+    } = useHistogramCharts();
+
+    // 使用艾森豪威尔矩阵钩子
+    const {
+      chartLoaded: eisenhowerLoaded,
+      initEisenhowerMatrix,
+      disposeChart: disposeEisenhower,
+      resizeChart: resizeEisenhower,
     } = useEisenhowerMatrix();
-
-
 
     // 靶点分析数据
     const targetData = reactive({
@@ -389,9 +458,15 @@ export default defineComponent({
 
     // 处理窗口大小变化
     const handleWindowResize = () => {
-      if (chartType.value === "eisenhower") {
-        handleResize();
-      } 
+      if (routeId.value === '1') {
+        if (chartType.value === "heatmap") {
+          resizeHeatmapHandler();
+        } else if (chartType.value === "analysis") {
+          resizeHistograms();
+        }
+      } else if (routeId.value === '2') {
+        resizeEisenhower();
+      }
     };
 
     // 加载靶点分析数据
@@ -432,17 +507,35 @@ export default defineComponent({
       }
     };
 
+    // 初始化图表
+    const initCharts = async () => {
+      if (routeId.value === '1') {
+        if (chartType.value === "heatmap") {
+          initHeatmap();
+        } else if (chartType.value === "analysis") {
+          await loadHistogramData();
+          nextTick(() => {
+            if (histogramChartRefs.value.length > 0) {
+              setChartRefs(histogramChartRefs.value);
+              initHistogramCharts();
+            }
+          });
+        }
+      } else if (routeId.value === '2') {
+        // 确保艾森豪威尔矩阵正确初始化
+        if (chartType.value === "eisenhower") {
+          await initEisenhowerMatrix();
+        }
+      }
+    };
+
     // 组件挂载时加载数据
     onMounted(async () => {
       // 加载靶点分析数据
       await loadTargetAnalysis();
 
-      // 加载初始图表
-      if (props.visible) {
-        if (chartType.value === "eisenhower") {
-          initEisenhowerMatrix();
-        }
-      }
+      // 初始化图表
+      await initCharts();
 
       // 添加窗口大小变化监听
       window.addEventListener("resize", handleWindowResize);
@@ -451,24 +544,31 @@ export default defineComponent({
     // 在组件销毁前清理资源
     onBeforeUnmount(() => {
       window.removeEventListener("resize", handleWindowResize);
-      disposeChart();
+      disposeHeatmap();
+      disposeHistogramCharts();
+      disposeEisenhower();
     });
+
+    // 监听路由参数变化
+    watch(
+      () => route.params.id,
+      (newId) => {
+        routeId.value = newId as string;
+        // 根据新的routeId设置默认的chartType
+        chartType.value = routeId.value === '1' ? "heatmap" : "eisenhower";
+        // 重新初始化图表
+        initCharts();
+      }
+    );
 
     // 监听可见性变化，重新渲染图表
     watch(
       () => props.visible,
       (isVisible) => {
         if (isVisible) {
-          if (chartType.value === "eisenhower") {
-            // 页面显示时，确保图表正确渲染
-            setTimeout(() => {
-              if (chartLoaded.value) {
-                handleResize();
-              } else {
-                initEisenhowerMatrix();
-              }
-            }, 300);
-          } 
+          setTimeout(() => {
+            initCharts();
+          }, 300);
         }
       }
     );
@@ -479,19 +579,59 @@ export default defineComponent({
       async (newType) => {
         if (!props.visible) return;
 
-        if (newType === "eisenhower") {
-          setTimeout(() => {
-            if (chartLoaded.value) {
-              handleResize();
-            } else {
-              initEisenhowerMatrix();
+        if (routeId.value === '1') {
+          if (newType === "heatmap") {
+            setTimeout(() => {
+              if (heatmapLoaded.value) {
+                resizeHeatmap();
+              } else {
+                initHeatmap();
+              }
+            }, 100);
+          } else if (newType === "analysis") {
+            // 确保数据已加载
+            if (!histogramData.value) {
+              await loadHistogramData();
             }
-          }, 100);
-        } 
+
+            // 等待DOM更新后初始化图表
+            nextTick(() => {
+              if (histogramChartRefs.value.length > 0) {
+                setChartRefs(histogramChartRefs.value);
+                initHistogramCharts();
+              }
+            });
+          }
+        } else if (routeId.value === '2') {
+          if (newType === "eisenhower") {
+            setTimeout(() => {
+              if (eisenhowerLoaded.value) {
+                resizeEisenhower();
+              } else {
+                initEisenhowerMatrix();
+              }
+            }, 100);
+          }
+        }
       }
     );
 
-
+    // 监听柱状图DOM引用变化
+    watch(
+      () => histogramChartRefs.value,
+      (refs) => {
+        if (
+          refs.length > 0 &&
+          chartType.value === "analysis" &&
+          props.visible &&
+          routeId.value === '1'
+        ) {
+          setChartRefs(refs);
+          initHistogramCharts();
+        }
+      },
+      { deep: true }
+    );
 
     // 添加处理下一步的方法
     const handleNextStep = () => {
@@ -517,6 +657,7 @@ export default defineComponent({
     return {
       chartType,
       histogramChartRefs,
+      histogramData,
       targetData,
       targetExplanations,
       selectedTargetKey,
@@ -537,14 +678,14 @@ export default defineComponent({
       cancelTargetEdit,
       confirmDeleteTarget,
       deleteTarget,
-      legendItems, // 新增返回值
+      legendItems,
+      routeId,
     };
   },
 });
 </script>
 
 <style lang="less" scoped>
-/* 保留原有样式 */
 .analysis-section {
   height: 100%;
   background-color: #fff;
@@ -854,6 +995,40 @@ export default defineComponent({
         margin-bottom: 15px;
       }
 
+      .histogram-container {
+        width: 100%;
+        height: 350px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .loading-charts {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          color: #999;
+        }
+
+        .histogram-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          grid-gap: 15px;
+          width: 100%;
+          height: 100%;
+
+          @media (min-width: 1200px) {
+            grid-template-columns: repeat(4, 1fr);
+          }
+
+          .histogram-item {
+            width: 100%;
+            height: 160px;
+            background-color: #fff;
+            border-radius: 6px;
+          }
+        }
+      }
     }
   }
 
@@ -872,7 +1047,7 @@ export default defineComponent({
 
   /* 添加下一步按钮样式 */
   .next-step-action {
-    margin-top: 0px;
+    margin-bottom: 100px;
     display: flex;
     justify-content: flex-end;
   }

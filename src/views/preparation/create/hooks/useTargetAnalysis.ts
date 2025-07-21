@@ -2,6 +2,8 @@ import { reactive, ref, onMounted, onBeforeUnmount, watch } from "vue";
 import * as echarts from "echarts";
 import { useRoute } from 'vue-router';
 import radardata from '/@/mock/radarData.json';
+import finalTargetData from '/@/mock/targetData.json';
+
 let radarDataList = 
  radardata.RadarDataDefault;
 
@@ -144,23 +146,21 @@ export const useTargetAnalysis = () => {
   };
 
   // 新增一个方法用于工作流完成后一次性更新靶点数据
-  const updateFinalTargetData = () => {
-    // 只更新靶点数据
-    if(taskId === "1") {
-    updateTargetData("configDiversity", 20);
-    updateTargetData("dataVolume", 0);
-    updateTargetData("chartTypeBalance", 30);
-    }
-    else if(taskId === "2") {
-    updateTargetData("configDiversity", 30);
-    updateTargetData("dataVolume", 10);
-    updateTargetData("chartTypeBalance", 20);
-    }
-    else{
-      updateTargetData("configDiversity", 50);
-      updateTargetData("dataVolume", 20);
-      updateTargetData("chartTypeBalance", 40);
-    }
+const updateFinalTargetData = () => {
+  // 根据任务ID选择最终数据
+  let finalData;
+  if (taskId === "1") {
+    finalData = finalTargetData.FinalData1;
+  } else if (taskId === "2") {
+    finalData = finalTargetData.FinalData2;
+  } else {
+    finalData = finalTargetData.FinalDataDefault;
+  }
+
+  // 更新靶点数据
+  updateTargetData("configDiversity", finalData.configDiversity);
+  updateTargetData("dataVolume", finalData.dataVolume);
+  updateTargetData("chartTypeBalance", finalData.chartTypeBalance);
 
     // 不再添加最终结果的数据系列
     // 仅更新图表

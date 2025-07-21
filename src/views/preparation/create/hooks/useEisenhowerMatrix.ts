@@ -97,7 +97,7 @@ export const useEisenhowerMatrix = () => {
         ],
         textStyle: { fontSize: 16 },
         itemGap: 15,
-        bottom: 10,
+        bottom: 0,
          padding: [50, 0, 0, 0],  
       },
       xAxis: {
