@@ -1,0 +1,31 @@
+{
+  "DatasetMetricsDefault": {
+    "dataPairs": 0,
+    "dataPairsGrowth": 0,
+    "imageCount": 0,
+    "imageCountGrowth": 0,
+    "codeCount": 0,
+    "codeCountGrowth": 0
+  },
+  "DatasetMetrics1": {
+    "dataPairs": 640,
+    "dataPairsGrowth": 0,
+    "imageCount": 580,
+    "imageCountGrowth": 0,
+    "codeCount": 592,
+    "codeCountGrowth": 0
+  },
+  "DatasetMetrics2": {
+    "dataPairs": 610,
+    "dataPairsGrowth": 0,
+    "imageCount": 530,
+    "imageCountGrowth": 0,
+    "codeCount": 532,
+    "codeCountGrowth": 0
+  },
+  "PreviousMetricsDefault": {
+    "dataPairs": 640,
+    "imageCount": 580,
+    "codeCount": 592
+  }
+}

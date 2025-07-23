@@ -2,6 +2,13 @@
   <div class="result-section">
     <h2>制备结果导出</h2>
     <div v-if="visible" class="result-content">
+      <!-- 显示当前任务标识 -->
+      <div class="task-indicator">
+        <a-tag :color="taskId === '1' ? 'blue' : 'green'">
+          {{ taskId === '1' ? '任务1' : '任务2' }}
+        </a-tag>
+      </div>
+
       <!-- 导出按钮区域 -->
       <div class="export-actions">
         <a-button type="primary" @click="handleDownload">
@@ -68,7 +75,7 @@
                 <div class="header-cell">提升率</div>
               </div>
               <div
-                v-for="(item, key) in secondaryMetrics"
+                v-for="(item, key) in currentMetrics"
                 :key="key"
                 class="table-row"
               >
@@ -116,13 +123,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, onMounted } from "vue";
+import { defineComponent, watch, onMounted, computed } from "vue";
 import { DownloadOutlined, LinkOutlined } from "@ant-design/icons-vue";
 import Icon from "/@/components/Icon/index.vue";
 import DatasetHeader from "/@/components/DatasetHeader/index.vue";
 import { useDataExport } from "../hooks/useDataExport";
 import { useRoute, useRouter } from "vue-router";
-
+import taskMetrics from  "/@/mock/secondaryMetrics.json"
 export interface SecondaryMetrics {
   [key: string]: number;
 }
@@ -145,22 +152,22 @@ export default defineComponent({
     },
     secondaryMetrics: {
       type: Object,
-      default: () => ({
-        syntaxDetection: 100.0,
-        configCompleteness: 94.66,
-        sampleCount: 100.0,
-        imageRenderMatch: 88.12,
-        missingRate: 99.77,
-        chartTypeBalance: 66.58,
-        configDiversity: 58.05,
-        codeRedundancy: 91.73,
-        imageRedundancy: 85.28,
-      }),
+      default: () => (taskMetrics),
     },
   },
   setup(props) {
     const route = useRoute();
     const router = useRouter();
+
+    // 获取当前任务ID
+    const taskId = computed(() => {
+      return route.params.id?.toString() || "1";
+    });
+
+    // 根据任务ID选择对应的指标数据
+    const currentMetrics = computed(() => {
+      return props.secondaryMetrics[`Task${taskId.value}`] || {};
+    });
 
     // 使用数据导出钩子
     const {
@@ -178,22 +185,22 @@ export default defineComponent({
 
     onMounted(() => {
       if (props.visible) {
-        initChart(props.secondaryMetrics);
+        initChart(currentMetrics.value);
       }
     });
 
     watch(
-      () => props.visible,
-      (newVal) => {
-        if (newVal) {
-          initChart(props.secondaryMetrics);
+      [() => props.visible, taskId],
+      () => {
+        if (props.visible) {
+          initChart(currentMetrics.value);
         }
       }
     );
 
     // 封装提升率计算，适配组件接口
     const getImprovementRateWrapped = (key: string) => {
-      return getImprovementRate(key, props.secondaryMetrics);
+      return getImprovementRate(key, currentMetrics.value);
     };
 
     // 格式化增长率
@@ -203,12 +210,12 @@ export default defineComponent({
     };
 
     const handleComparisonTrain = () => {
-      // 假设当前任务ID可以从路由参数中获取
-      const taskId = route.params.id || "0";
-      router.push(`/home/comparison/${taskId}`);
+      router.push(`/home/comparison/${taskId.value}`);
     };
 
     return {
+      taskId,
+      currentMetrics,
       qualityChartRef,
       originalMetrics,
       volumeMetrics,
@@ -243,6 +250,16 @@ export default defineComponent({
     font-weight: 500;
     border-bottom: 1px solid #f0f0f0;
     padding-bottom: 10px;
+  }
+
+  .task-indicator {
+    margin-bottom: 15px;
+    
+    .ant-tag {
+      font-size: 14px;
+      padding: 4px 12px;
+      border-radius: 4px;
+    }
   }
 
   .result-content {

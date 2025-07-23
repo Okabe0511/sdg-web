@@ -1,0 +1,24 @@
+{
+  "Task1": {
+    "syntaxDetection": 100.0,
+    "configCompleteness": 94.66,
+    "sampleCount": 100.0,
+    "imageRenderMatch": 88.12,
+    "missingRate": 99.77,
+    "chartTypeBalance": 66.58,
+    "configDiversity": 58.05,
+    "codeRedundancy": 91.73,
+    "imageRedundancy": 85.28
+  },
+  "Task2": {
+    "syntaxDetection": 95.0,
+    "configCompleteness": 90.66,
+    "sampleCount": 98.0,
+    "imageRenderMatch": 85.12,
+    "missingRate": 97.77,
+    "chartTypeBalance": 70.58,
+    "configDiversity": 62.05,
+    "codeRedundancy": 88.73,
+    "imageRedundancy": 80.28
+  }
+}
