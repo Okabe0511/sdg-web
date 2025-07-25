@@ -56,22 +56,22 @@
     },
     "default": {
       "primaryMetrics": {
-        "codeQuality": 50,
-        "dataVolume": 50,
-        "dataAlignment": 50,
-        "diversityBalance": 50,
-        "dataRedundancy": 50
+        "codeQuality": 8.13,
+        "dataVolume": 4.44,
+        "dataAlignment": 7.8,
+        "diversityBalance": 3.55,
+        "dataRedundancy": 70
       },
       "secondaryMetrics": {
-        "syntaxDetection": 50,
-        "configCompleteness": 50,
-        "sampleCount": 50,
-        "imageRenderMatch": 50,
-        "missingRate": 50,
-        "chartTypeBalance": 50,
-        "configDiversity": 0.5,
-        "codeRedundancy": 50,
-        "imageRedundancy": 50
+        "syntaxDetection": 84.53,
+        "configCompleteness": 93.74,
+        "sampleCount": 40.44,
+        "imageRenderMatch": 82.6,
+        "missingRate": 75,
+        "chartTypeBalance": 66.65,
+        "configDiversity": 0.44,
+        "codeRedundancy": 70,
+        "imageRedundancy": 70
       },
       "explanations": {
         "codeQuality": "用于衡量数据集中代码样本的正确性、规范性与可读性。低质量代码会干扰模型学习，导致生成结果不准确或结构混乱。",

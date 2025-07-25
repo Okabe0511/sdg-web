@@ -1,7 +1,7 @@
 {
   "responses": {
     "default":[
-      {
+     {
         "event": "REQUEST",
         "data": "加载图像数据集路径/data/echarts-image, 加载代码数据集路径/data/echarts-code, 加载元数据路径/metadata/echarts-task.metadata"
       },
@@ -11,7 +11,7 @@
       },
       {
         "event": "REASONING",
-        "data": "召回数据文件639个，数据大小19.2MB，耗时1.4秒"
+        "data": "召回数据文件1个，数据大小19.2MB，耗时1.4秒"
       },
       {
         "event": "REASONING",

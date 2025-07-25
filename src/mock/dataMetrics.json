@@ -47,25 +47,25 @@
       }
     ],
     "default": [
-      {
+        {
         "label": "数据对数量",
         "key": "dataPairs",
-        "value": 500,
-        "previousValue": 250,
+        "value": 1305,
+        "previousValue": 640,
         "growthRate": 0
       },
       {
         "label": "图像数量",
         "key": "imageCount",
-        "value": 400,
-        "previousValue": 200,
+        "value": 1302,
+        "previousValue": 580,
         "growthRate": 0
       },
       {
         "label": "程序代码数量",
         "key": "codeCount",
-        "value": 300,
-        "previousValue": 150,
+        "value": 1305,
+        "previousValue": 592,
         "growthRate": 0
       }
     ]
@@ -94,15 +94,15 @@
       "imageRedundancy": 327
     },
     "default": {
-      "syntaxDetection": 8.53,
-      "configCompleteness": 9.74,
-      "sampleCount": 4.44,
-      "imageRenderMatch": 8.6,
-      "missingRate": 7,
-      "chartTypeBalance": 6.65,
-      "configDiversity": 0.4,
-      "codeRedundancy": 0,
-      "imageRedundancy": 7
+     "syntaxDetection": 85.3,
+      "configCompleteness": 94,
+      "sampleCount": 44,
+      "imageRenderMatch": 86,
+      "missingRate": 71,
+      "chartTypeBalance": 65,
+      "configDiversity": 4,
+      "codeRedundancy": 30,
+      "imageRedundancy": 37
     }
   },
   "chartSeriesData": {
@@ -139,16 +139,16 @@
       }
     ],
     "default": [
-      {
+     {
         "name": "原始数据",
-        "value": [30.44, 68.8, 60, 23.55, 79.13],
+        "value": [40.44, 78.8, 70, 33.55, 89.13],
         "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
         "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
         "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
       },
       {
         "name": "制备后数据",
-        "value": [80.0, 55.11, 61.28, 51.68, 83.77],
+        "value": [100.0, 65.11, 71.28, 61.68, 93.77],
         "itemStyle": { "color": "#f56c6c" },
         "lineStyle": { "color": "#f56c6c" },
         "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }

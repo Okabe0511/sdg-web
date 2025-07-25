@@ -26,14 +26,14 @@
     ],
     "default": [
       {
-        "dataType": "混合数据",
-        "dataAmount": 100,
-        "dataSize": "10MB"
+        "dataType": "图像",
+        "dataAmount": 580,
+        "dataSize": "19.2MB"
       },
       {
-        "dataType": "表格",
-        "dataAmount": 200,
-        "dataSize": "5MB"
+        "dataType": "代码",
+        "dataAmount": 592,
+        "dataSize": "2.6MB"
       }
     ]
   }

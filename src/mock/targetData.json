@@ -1,8 +1,8 @@
 {
   "FinalDataDefault": {
-    "configDiversity": 50,
-    "dataVolume": 20,
-    "chartTypeBalance": 40
+    "configDiversity": 20,
+    "dataVolume": 0,
+    "chartTypeBalance": 30
   },
   "FinalData1": {
     "configDiversity": 20,
