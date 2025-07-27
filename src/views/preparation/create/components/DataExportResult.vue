@@ -129,7 +129,7 @@ import Icon from "/@/components/Icon/index.vue";
 import DatasetHeader from "/@/components/DatasetHeader/index.vue";
 import { useDataExport } from "../hooks/useDataExport";
 import { useRoute, useRouter } from "vue-router";
-import taskMetrics from  "/@/mock/secondaryMetrics.json"
+import dataMetrics from  "/@/mock/dataMetrics.json"
 export interface SecondaryMetrics {
   [key: string]: number;
 }
@@ -152,7 +152,7 @@ export default defineComponent({
     },
     secondaryMetrics: {
       type: Object,
-      default: () => (taskMetrics),
+      default: () => (dataMetrics.preparedMetrics),
     },
   },
   setup(props) {
@@ -164,9 +164,10 @@ export default defineComponent({
       return route.params.id?.toString() || "1";
     });
 
-    // 根据任务ID选择对应的指标数据
+    // 根据任务ID选择对应的制备后指标数据（task1->Internet, task2->energy）
     const currentMetrics = computed(() => {
-      return props.secondaryMetrics[`Task${taskId.value}`] || {};
+      const key = taskId.value === '1' ? 'Internet' : 'energy';
+      return dataMetrics.preparedMetrics[key] || {};
     });
 
     // 使用数据导出钩子

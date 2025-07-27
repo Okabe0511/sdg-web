@@ -16,22 +16,33 @@ export const useDatasetMetrics = () => {
   const route = useRoute();
   const taskId = ref(route.params.id as string);
 
-  // 初始化指标数据
+  // 只从 mock 文件读取基础数据，增长率本地初始化为 0
   const getInitialData = (): DatasetMetrics => {
+    let baseData;
     if (taskId.value === "1") {
-      return { ...datasetMetricsData.DatasetMetrics1 };
+      baseData = datasetMetricsData.Internet;
+    } else if (taskId.value === "2") {
+      baseData = datasetMetricsData.energy;
+    } else {
+      baseData = datasetMetricsData.Internet;
     }
-    if (taskId.value === "2") {
-      return { ...datasetMetricsData.DatasetMetrics2 };
-    }
-    return { ...datasetMetricsData.DatasetMetricsDefault };
+    return {
+      dataPairs: baseData.dataPairs,
+      dataPairsGrowth: 0,
+      imageCount: baseData.imageCount,
+      imageCountGrowth: 0,
+      codeCount: baseData.codeCount,
+      codeCountGrowth: 0,
+    };
   };
 
   const metrics = reactive<DatasetMetrics>(getInitialData());
 
   // 上一次的指标数据，用于计算增长率
   const previousMetrics = reactive({
-    ...datasetMetricsData.PreviousMetricsDefault
+    dataPairs: metrics.dataPairs,
+    imageCount: metrics.imageCount,
+    codeCount: metrics.codeCount
   });
 
   // 更新指标数据

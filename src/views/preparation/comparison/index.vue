@@ -106,8 +106,11 @@ export default defineComponent({
     onMounted(async () => {
       // 从路由参数获取任务ID并加载数据
       const taskId = route.params.id as string;
-      if (taskId) {
+      if (taskId === '1') {
         await loadChartData(taskId);
+      } else {
+        // 不是1则跳转回上一页或首页
+        window.history.length > 1 ? window.history.back() : window.location.replace('/');
       }
     });
 

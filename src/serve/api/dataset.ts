@@ -9,25 +9,13 @@ import { DatasetInfo } from "/@/views/preparation/create/hooks/useDatasets";
  */
 export const getDatasetInfo = async (taskId: any) => {
   if (import.meta.env.DEV) {
-    // 只兼容mock数据为对象格式
-   const datasetId: number = Number(taskId.id);
-  if(taskId.id === 1) {
-   const data = mockDatasetResponse.datasets[1];
-
+    let key = taskId.id;
+    if (key === 1 || key === '1') key = 'Internet';
+    else if (key === 2 || key === '2') key = 'energy';
+    const data = (mockDatasetResponse.datasets as any)[key];
     return Promise.resolve({ data });
   }
-
-  if(taskId.id === 2) {
-    const data = mockDatasetResponse.datasets[2];
-    return Promise.resolve({ data });
-  }
-  else{
-   const data = mockDatasetResponse.datasets.default;
-
-    return Promise.resolve({ data });
-  }
-  }
-    return http.get(`/dataset/info/${taskId}`);
+  return http.get(`/dataset/info/${taskId}`);
 };
 
 /**

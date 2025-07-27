@@ -1,6 +1,13 @@
 import { identity } from "lodash";
 import http from "..";
-import mockOperatorsData from "/@/mock/operatorsData.json";
+import mockOperatorsDataRaw from "/@/mock/operatorsData.json";
+
+// 明确 mock 数据类型
+interface MockOperatorsData {
+  operators: Operator[];
+  recommendWorkflows: Record<string, number[]>;
+}
+const mockOperatorsData = mockOperatorsDataRaw as unknown as MockOperatorsData;
 
 export interface Operator {
   id: number;
@@ -19,18 +26,17 @@ export interface Operator {
   };
 }
 
-// 根据任务ID获取数据集类型
-const getDatasetType = (taskId: string | string[]): 'Task1' | 'Task2' | 'default' => {
+// 根据任务ID获取数据集类型（仅支持字符串或数字）
+const getDatasetType = (taskId: string | number): 'Internet' | 'energy' => {
   console.log('当前数据集ID:', taskId);
-  if (taskId === '1') return 'Task1';
-  if (taskId === '2') return 'Task2';
-  return 'default'; // 明确默认值
+  if (String(taskId) === '1') return 'Internet';
+  if (String(taskId) === '2') return 'energy';
+  return 'Internet'; // 默认返回Internet
 };
 
-// 获取指定数据集的算子列表
-const getOperatorsByDataset = (taskId: string | string[]): Operator[] => {
-  const datasetType = getDatasetType(taskId);
-  return [...(mockOperatorsData.operators[datasetType] || mockOperatorsData.operators)];
+// 获取算子列表（不区分数据集类型）
+const getOperatorsByDataset = (): Operator[] => {
+  return Array.isArray(mockOperatorsData.operators) ? [...mockOperatorsData.operators] : [];
 };
 
 /**
@@ -40,7 +46,7 @@ const getOperatorsByDataset = (taskId: string | string[]): Operator[] => {
  * @returns 算子列表和总数
  */
 export const getAllOperators = async (
-  taskId: string | string[],
+  taskId: string | number,
   params?: {
     page?: number;
     pageSize?: number;
@@ -48,7 +54,7 @@ export const getAllOperators = async (
 ): Promise<{ data: Operator[]; total: number }> => {
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
-    let operators = getOperatorsByDataset(taskId);
+    let operators = getOperatorsByDataset();
     const total = operators.length;
 
     if (params?.page && params?.pageSize) {
@@ -75,11 +81,11 @@ export const getAllOperators = async (
  * @returns 算子详细信息
  */
 export const getOperatorById = async (
-  taskId: string | string[],
+  taskId: string | number,
   id: number
 ): Promise<{ data: Operator | null }> => {
   if (import.meta.env.DEV) {
-    const operators = getOperatorsByDataset(taskId);
+    const operators = getOperatorsByDataset();
     const operator = operators.find((op) => op.id === id);
     return Promise.resolve({ data: operator || null });
   }
@@ -96,7 +102,7 @@ export const getOperatorById = async (
  * @returns 更新结果
  */
 export const updateOperator = async (
-  taskId: string | string[],
+  taskId: string | number,
   operator: Operator
 ): Promise<{ data: { success: boolean } }> => {
   if (import.meta.env.DEV) {
@@ -116,15 +122,14 @@ export const updateOperator = async (
  * @returns 推荐的算子列表
  */
 export const getRecommendWorkflow = async (
-  taskId: string | string[],
+  taskId: string | number,
   config: any
 ): Promise<{ data: Operator[] }> => {
   if (import.meta.env.DEV) {
-    const workflowIds = mockOperatorsData.recommendWorkflows?.[getDatasetType(taskId)];
-    const operators = getOperatorsByDataset(taskId);
-    const recommendedOperators = workflowIds
-      .map((id) => operators.find((op) => op.id === id))
-      .filter(Boolean) as Operator[];
+    const datasetType = getDatasetType(taskId);
+    const workflowIds = (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows[datasetType]) || (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows["Internet"]) || [];
+    const operators = getOperatorsByDataset();
+    const recommendedOperators = (workflowIds as number[]).map((id: number) => operators.find((op) => op.id === id)).filter(Boolean) as Operator[];
     console.log('推荐的算子列表:', recommendedOperators);
     return Promise.resolve({ data: recommendedOperators });
   }
@@ -142,11 +147,11 @@ export const getRecommendWorkflow = async (
  * @returns 创建的算子数据
  */
 export const createOperator = async (
-  taskId: string | string[],
+  taskId: string | number,
   operator: Partial<Operator>
 ): Promise<{ data: Operator }> => {
   if (import.meta.env.DEV) {
-    const operators = getOperatorsByDataset(taskId);
+    const operators = getOperatorsByDataset();
     const newId = Math.max(...operators.map((op) => op.id)) + 1;
     const newOperator: Operator = {
       id: newId,
@@ -157,8 +162,9 @@ export const createOperator = async (
       datasetSize: undefined,
     };
 
-    const datasetType = getDatasetType(taskId);
-    mockOperatorsData.operators[datasetType].unshift(newOperator as any);
+    if (Array.isArray(mockOperatorsData.operators)) {
+      mockOperatorsData.operators.unshift(newOperator as any);
+    }
 
     return Promise.resolve({ data: newOperator });
   }
@@ -176,15 +182,15 @@ export const createOperator = async (
  * @returns 删除结果
  */
 export const deleteOperator = async (
-  taskId: string | string[],
+  taskId: string | number,
   id: number
 ): Promise<{ data: { success: boolean } }> => {
   if (import.meta.env.DEV) {
-    const datasetType = getDatasetType(taskId);
-    const operators = mockOperatorsData.operators[datasetType];
-    const index = operators.findIndex((op) => op.id === id);
-    if (index !== -1) {
-      operators.splice(index, 1);
+    if (Array.isArray(mockOperatorsData.operators)) {
+      const index = mockOperatorsData.operators.findIndex((op: any) => op.id === id);
+      if (index !== -1) {
+        mockOperatorsData.operators.splice(index, 1);
+      }
     }
     return Promise.resolve({ data: { success: true } });
   }

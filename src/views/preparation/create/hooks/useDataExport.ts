@@ -25,36 +25,43 @@ export const useDataExport = () => {
   const qualityChartRef = ref<HTMLElement | null>(null);
   let qualityChart: echarts.ECharts | null = null;
   const route = useRoute();
-  const taskId = route.params.id as string;
+  let taskId = route.params.id as string;
+  if (taskId === '1') taskId = 'Internet';
+  else if (taskId === '2') taskId = 'energy';
   
   // 获取数据指标
   const getMetrics = (id: string) => {
-    const metrics = dataMetrics.volumeMetrics[id as keyof typeof dataMetrics.volumeMetrics] || 
-                   dataMetrics.volumeMetrics.default;
+    const metrics = dataMetrics.volumeMetrics[id as keyof typeof dataMetrics.volumeMetrics];
     return JSON.parse(JSON.stringify(metrics)); // 深拷贝避免污染原始数据
   };
 
   // 获取原始指标
   const getOriginalMetrics = (id: string) => {
-    return dataMetrics.originalMetrics[id as keyof typeof dataMetrics.originalMetrics] || 
-           dataMetrics.originalMetrics.default;
+    return dataMetrics.originalMetrics[id as keyof typeof dataMetrics.originalMetrics];
+  };
+  // 获取制备后指标
+  const getPreparedMetrics = (id: string) => {
+    return dataMetrics.preparedMetrics[id as keyof typeof dataMetrics.preparedMetrics];
   };
 
   // 获取图表数据
   const getChartSeriesData = (id: string) => {
-    return dataMetrics.chartSeriesData[id as keyof typeof dataMetrics.chartSeriesData] || 
-           dataMetrics.chartSeriesData.default;
+    return dataMetrics.chartSeriesData[id as keyof typeof dataMetrics.chartSeriesData];
   };
 
   // 原始指标数据
   const originalMetrics = reactive(getOriginalMetrics(taskId));
+  // 制备后指标数据
+  const preparedMetrics = reactive(getPreparedMetrics(taskId));
   
   // 数据量指标
   const volumeMetrics = reactive<VolumeMetric[]>(getMetrics(taskId));
   
-  // 初始化计算增长率
+  // 初始化计算增长率（全部与最初原始数据比较）
   const initVolumeMetrics = () => {
+    // 获取原始数据（即 recommendWorkflows 的第一个算子或 dataMetrics.json 的 previousValue）
     volumeMetrics.forEach((metric) => {
+      // 以 previousValue 作为原始基准
       metric.growthRate = calculateGrowthRate(
         metric.previousValue,
         metric.value
@@ -74,10 +81,13 @@ export const useDataExport = () => {
   };
 
   // 计算提升率
-  const getImprovementRate = (key: string, secondaryMetrics: DataMetrics) => {
+  // 默认对比 originalMetrics 和 preparedMetrics
+  const getImprovementRate = (key: string, currentMetrics?: DataMetrics) => {
     const original = originalMetrics[key as keyof typeof originalMetrics] || 0;
-    const current = secondaryMetrics[key] || 0;
-
+    // 如果传入 currentMetrics，则用其，否则默认用 preparedMetrics
+    const current = currentMetrics
+      ? currentMetrics[key as keyof typeof currentMetrics] || 0
+      : (preparedMetrics[key as keyof typeof preparedMetrics] || 0);
     if (original === 0) return 0;
     return ((current - original) / original) * 100;
   };
@@ -89,21 +99,12 @@ export const useDataExport = () => {
     return `${prefix}${value.toFixed(1)}%`;
   };
 
-  // 获取指标名称
+  // 获取指标名称（根据页面id动态获取）
   const getMetricName = (key: string): string => {
-    const nameMap: Record<string, string> = {
-      syntaxDetection: "语法检测通过率",
-      configCompleteness: "配置项完整性",
-      sampleCount: "样本数量",
-      imageRenderMatch: "图像与渲染截图匹配度",
-      missingRate: "缺失率",
-      chartTypeBalance: "图表类型均衡性",
-      configDiversity: "配置项多样性",
-      codeRedundancy: "代码重复性",
-      imageRedundancy: "图像重复性",
-    };
-
-    return nameMap[key] || key;
+    // 只允许 'Internet' 或 'energy'，否则 fallback
+    const id = (taskId === 'Internet' || taskId === 'energy') ? taskId : 'Internet';
+    const metricNameMap = (dataMetrics.metricNameMap as Record<string, Record<string, string>>)[id] || {};
+    return metricNameMap[key] || key;
   };
 
   // 初始化雷达图
@@ -187,6 +188,7 @@ export const useDataExport = () => {
   return {
     qualityChartRef,
     originalMetrics,
+    preparedMetrics,
     volumeMetrics,
     initChart,
     formatPercent,

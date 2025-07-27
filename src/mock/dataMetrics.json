@@ -1,78 +1,68 @@
 {
   "volumeMetrics": {
-    "1": [
+    "Internet": [
       {
         "label": "数据对数量",
         "key": "dataPairs",
         "value": 1305,
-        "previousValue": 640,
-        "growthRate": 0
+        "previousValue": 640
       },
       {
         "label": "图像数量",
         "key": "imageCount",
         "value": 1302,
-        "previousValue": 580,
-        "growthRate": 0
+        "previousValue": 580
       },
       {
         "label": "程序代码数量",
         "key": "codeCount",
-        "value": 1305,
-        "previousValue": 592,
-        "growthRate": 0
+        "value": 1300,
+        "previousValue": 1000
       }
     ],
-    "2": [
+    "energy": [
       {
         "label": "数据对数量",
         "key": "dataPairs",
         "value": 1200,
-        "previousValue": 1000,
-        "growthRate": 0
+        "previousValue": 1000
       },
       {
         "label": "图像数量",
         "key": "imageCount",
         "value": 1800,
-        "previousValue": 900,
-        "growthRate": 0
+        "previousValue": 900
       },
       {
         "label": "程序代码数量",
         "key": "codeCount",
         "value": 1500,
-        "previousValue": 750,
-        "growthRate": 0
-      }
-    ],
-    "default": [
-        {
-        "label": "数据对数量",
-        "key": "dataPairs",
-        "value": 1305,
-        "previousValue": 640,
-        "growthRate": 0
-      },
-      {
-        "label": "图像数量",
-        "key": "imageCount",
-        "value": 1302,
-        "previousValue": 580,
-        "growthRate": 0
-      },
-      {
-        "label": "程序代码数量",
-        "key": "codeCount",
-        "value": 1305,
-        "previousValue": 592,
-        "growthRate": 0
+        "previousValue": 750
       }
     ]
+    
+  },
+  "primaryMetrics": {
+    "Internet": {
+      "dataPairs": 640,
+      "dataPairsGrowth": 0,
+      "imageCount": 580,
+      "imageCountGrowth": 0,
+      "codeCount": 592,
+      "codeCountGrowth": 0
+    },
+    "energy": {
+      "dataPairs": 610,
+      "dataPairsGrowth": 0,
+      "imageCount": 530,
+      "imageCountGrowth": 0,
+      "codeCount": 200,
+      "codeCountGrowth": 0
+    }
   },
   "originalMetrics": {
-    "1": {
-      "syntaxDetection": 85.3,
+    "Internet": {
+      "syntaxDetection": 85.6,
       "configCompleteness": 94,
       "sampleCount": 44,
       "imageRenderMatch": 86,
@@ -82,7 +72,7 @@
       "codeRedundancy": 30,
       "imageRedundancy": 37
     },
-    "2": {
+    "energy": {
       "syntaxDetection": 111,
       "configCompleteness": 222,
       "sampleCount": 442,
@@ -92,21 +82,58 @@
       "configDiversity": 422,
       "codeRedundancy": 310,
       "imageRedundancy": 327
+    }
+  },
+  "preparedMetrics": {
+    "Internet": {
+      "syntaxDetection": 100.0,
+      "configCompleteness": 98.5,
+      "sampleCount": 100.0,
+      "imageRenderMatch": 95.2,
+      "missingRate": 80.1,
+      "chartTypeBalance": 80.5,
+      "configDiversity": 60.0,
+      "codeRedundancy": 20.0,
+      "imageRedundancy": 25.0
     },
-    "default": {
-     "syntaxDetection": 85.3,
-      "configCompleteness": 94,
-      "sampleCount": 44,
-      "imageRenderMatch": 86,
-      "missingRate": 71,
-      "chartTypeBalance": 65,
-      "configDiversity": 4,
-      "codeRedundancy": 30,
-      "imageRedundancy": 37
+    "energy": {
+      "syntaxDetection": 120.0,
+      "configCompleteness": 250.0,
+      "sampleCount": 500.0,
+      "imageRenderMatch": 320.0,
+      "missingRate": 800.0,
+      "chartTypeBalance": 700.0,
+      "configDiversity": 500.0,
+      "codeRedundancy": 200.0,
+      "imageRedundancy": 220.0
+    }
+  },
+  "metricNameMap": {
+    "Internet": {
+      "syntaxDetection": "语法检测通过率",
+      "configCompleteness": "配置项完整性",
+      "sampleCount": "样本数量",
+      "imageRenderMatch": "图像与渲染截图匹配度",
+      "missingRate": "缺失率",
+      "chartTypeBalance": "图表类型均衡性",
+      "configDiversity": "配置项多样性",
+      "codeRedundancy": "代码重复性",
+      "imageRedundancy": "图像重复性"
+    },
+    "energy": {
+      "syntaxDetection": "语法检测通过率-能耗",
+      "configCompleteness": "配置项完整性-能耗",
+      "sampleCount": "样本数量-能耗",
+      "imageRenderMatch": "图像与渲染截图匹配度-能耗",
+      "missingRate": "缺失率-能耗",
+      "chartTypeBalance": "图表类型均衡性-能耗",
+      "configDiversity": "配置项多样性-能耗",
+      "codeRedundancy": "代码重复性-能耗",
+      "imageRedundancy": "图像重复性-能耗"
     }
   },
   "chartSeriesData": {
-    "1": [
+    "Internet": [
       {
         "name": "原始数据",
         "value": [40.44, 78.8, 70, 33.55, 89.13],
@@ -122,7 +149,7 @@
         "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
       }
     ],
-    "2": [
+    "energy": [
       {
         "name": "原始数据",
         "value": [50.44, 88.8, 80, 43.55, 99.13],
@@ -137,22 +164,7 @@
         "lineStyle": { "color": "#f56c6c" },
         "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
       }
-    ],
-    "default": [
-     {
-        "name": "原始数据",
-        "value": [40.44, 78.8, 70, 33.55, 89.13],
-        "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
-        "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
-        "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
-      },
-      {
-        "name": "制备后数据",
-        "value": [100.0, 65.11, 71.28, 61.68, 93.77],
-        "itemStyle": { "color": "#f56c6c" },
-        "lineStyle": { "color": "#f56c6c" },
-        "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
-      }
     ]
+    
   }
 }

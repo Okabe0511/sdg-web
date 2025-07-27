@@ -19,7 +19,7 @@
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
-              <span class="metric-label">数据量：</span>
+              <span class="metric-label">{{ getMetricName('sampleCount') }}：</span>
               <span class="metric-value">{{
                 formatValue(secondaryMetrics.sampleCount)
               }}</span>
@@ -38,13 +38,13 @@
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
-              <span class="metric-label">图像与渲染截图匹配度：</span>
+              <span class="metric-label">{{ getMetricName('imageRenderMatch') }}：</span>
               <span class="metric-value">{{
                 formatPercent(secondaryMetrics.imageRenderMatch)
               }}</span>
             </div>
             <div class="secondary-metric-item">
-              <span class="metric-label">缺失率：</span>
+              <span class="metric-label">{{ getMetricName('missingRate') }}：</span>
               <span class="metric-value">{{
                 formatPercent(secondaryMetrics.missingRate)
               }}</span>
@@ -63,13 +63,13 @@
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
-              <span class="metric-label">代码重复性：</span>
+              <span class="metric-label">{{ getMetricName('codeRedundancy') }}：</span>
               <span class="metric-value">{{
                 formatPercent(secondaryMetrics.codeRedundancy)
               }}</span>
             </div>
             <div class="secondary-metric-item">
-              <span class="metric-label">图像重复性：</span>
+              <span class="metric-label">{{ getMetricName('imageRedundancy') }}：</span>
               <span class="metric-value">{{
                 formatPercent(secondaryMetrics.imageRedundancy)
               }}</span>
@@ -88,13 +88,13 @@
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
-              <span class="metric-label">图表类型均衡性：</span>
+              <span class="metric-label">{{ getMetricName('chartTypeBalance') }}：</span>
               <span class="metric-value">{{
                 formatPercent(secondaryMetrics.chartTypeBalance)
               }}</span>
             </div>
             <div class="secondary-metric-item">
-              <span class="metric-label">配置项多样性：</span>
+              <span class="metric-label">{{ getMetricName('configDiversity') }}：</span>
               <span class="metric-value">{{
                 formatPercent(secondaryMetrics.configDiversity)
               }}</span>
@@ -113,13 +113,13 @@
           </div>
           <div class="secondary-metrics">
             <div class="secondary-metric-item">
-              <span class="metric-label">语法检测通过率：</span>
+              <span class="metric-label">{{ getMetricName('syntaxDetection') }}：</span>
               <span class="metric-value">{{
                 formatPercent(secondaryMetrics.syntaxDetection)
               }}</span>
             </div>
             <div class="secondary-metric-item">
-              <span class="metric-label">配置项完整性：</span>
+              <span class="metric-label">{{ getMetricName('configCompleteness') }}：</span>
               <span class="metric-value">{{
                 formatPercent(secondaryMetrics.configCompleteness)
               }}</span>
@@ -165,6 +165,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    metricNameMap: {
+      type: Object as PropType<Record<string, string>>,
+      required: true,
+    },
   },
   emits: ["update:selectedQualityMetric"],
   setup(props, { emit }) {
@@ -180,6 +184,11 @@ export default defineComponent({
     const formatValue = (value: number) => {
       if (!value) return "0";
       return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    // 动态获取指标中文名
+    const getMetricName = (key: string) => {
+      return props.metricNameMap?.[key] || key;
     };
 
     const initRadarChart = () => {
@@ -318,6 +327,7 @@ export default defineComponent({
       radarChartRef,
       formatPercent,
       formatValue,
+      getMetricName,
     };
   },
 });

@@ -119,13 +119,10 @@ export const getFullTaskLog = async (
     // 在开发环境中使用mock数据
     if (import.meta.env.DEV) {
       if (task.taskId == "1") {
-      return simulateStream(mockData.responses[1], streamHandler);
-    }
-      else if (task.taskId == "2") {
-        return simulateStream(mockData.responses[2], streamHandler);
+        return simulateStream(mockData.responses["Internet"], streamHandler);
       }
-      else {
-        return simulateStream(mockData.responses.default, streamHandler);
+      else if (task.taskId == "2") {
+        return simulateStream(mockData.responses["energy"], streamHandler);
       }
     }
     return Promise.resolve() as any;
@@ -154,12 +151,12 @@ export const getDataPreparationLog = async (
     if (import.meta.env.DEV) {
       console.log("控制台2",task);
       if (task === "1") {
-        return simulateStream(mockData.preparation[1], streamHandler);
+        return simulateStream(mockData.preparation.internet, streamHandler);
       } else if (task === "2") {
-        return simulateStream(mockData.preparation[2], streamHandler);
+        return simulateStream(mockData.preparation.energy, streamHandler);
       }
       else  {
-        return simulateStream(mockData.preparation.default, streamHandler);
+        return simulateStream(mockData.preparation.internet, streamHandler);
     }
   }
     return Promise.resolve() as any;

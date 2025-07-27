@@ -91,22 +91,7 @@ export const useQualityAssessment = () => {
   };
 
   // 加载质量评估说明
-  const loadQualityExplanations = async () => {
-    try {
-      const response = await getQualityExplanations();
-      const explanations = response.data;
 
-      // 更新质量说明
-      Object.assign(qualityExplanations, explanations);
-
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  // 初始化 - 加载说明信息
-  loadQualityExplanations();
 
   return {
     qualityMetrics,
@@ -114,6 +99,5 @@ export const useQualityAssessment = () => {
     qualityExplanations,
     selectedQualityMetric,
     loadQualityMetrics,
-    loadQualityExplanations,
   };
 };

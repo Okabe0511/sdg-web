@@ -17,20 +17,20 @@ export const getQualityMetrics = async (taskId: number) => {
     
     if (taskId === 1) {
       const data = {
-        primaryMetrics: mockQualityResponse.metrics[1].primaryMetrics,
-        secondaryMetrics: mockQualityResponse.metrics[1].secondaryMetrics,
+        primaryMetrics: mockQualityResponse.metrics["Internet"].primaryMetrics,
+        secondaryMetrics: mockQualityResponse.metrics["Internet"].secondaryMetrics,
       };
       return Promise.resolve({ data });
     } else if (taskId === 2) {
       const data = {
-        primaryMetrics: mockQualityResponse.metrics[2].primaryMetrics,
-        secondaryMetrics: mockQualityResponse.metrics[2].secondaryMetrics,
+        primaryMetrics: mockQualityResponse.metrics["energy"].primaryMetrics,
+        secondaryMetrics: mockQualityResponse.metrics["energy"].secondaryMetrics,
       };
       return Promise.resolve({ data });
     } else {
       const data = {
-        primaryMetrics: mockQualityResponse.metrics.default.primaryMetrics,
-        secondaryMetrics: mockQualityResponse.metrics.default.secondaryMetrics,
+        primaryMetrics: mockQualityResponse.metrics["Internet"].primaryMetrics,
+        secondaryMetrics: mockQualityResponse.metrics["Internet"].secondaryMetrics,
       };
       return Promise.resolve({ data });
     }
@@ -48,7 +48,7 @@ export const getQualityMetrics = async (taskId: number) => {
 export const getQualityExplanations = async () => {
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
-    return Promise.resolve({ data: mockQualityResponse.metrics[1].explanations });
+    return Promise.resolve({ data: mockQualityResponse.metrics["Internet"].explanations });
   }
   // 实际环境中调用真实接口
   return http.get("/quality/explanations");

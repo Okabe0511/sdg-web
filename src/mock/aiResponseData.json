@@ -1,140 +1,6 @@
 {
   "responses": {
-    "default":[
-     {
-        "event": "REQUEST",
-        "data": "加载图像数据集路径/data/echarts-image, 加载代码数据集路径/data/echarts-code, 加载元数据路径/metadata/echarts-task.metadata"
-      },
-      {
-        "event": "REASONING",
-        "data": "召回指定图像数据集"
-      },
-      {
-        "event": "REASONING",
-        "data": "召回数据文件1个，数据大小19.2MB，耗时1.4秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "召回指定代码数据集"
-      },
-      {
-        "event": "REASONING",
-        "data": "召回数据文件640个，数据大小2.6MB，耗时0.2秒"
-      },
-      {
-        "event": "RESPONSE",
-        "data": "完成数据原料召回，用时1.6秒"
-      },
-      {
-        "event": "REQUEST",
-        "data": "开始数据质量评估"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行语法检测"
-      },
-      {
-        "event": "REASONING",
-        "data": "语法检测耗时0.3秒，评估得分84.53"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行配置项完整性检测"
-      },
-      {
-        "event": "REASONING",
-        "data": "配置项完整性检测耗时0.1秒，评估得分84.53"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行数据量检测"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据量检测耗时0.1秒，评估得分40.44"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行图像与渲染截图匹配度检测"
-      },
-      {
-        "event": "REASONING",
-        "data": "图像与渲染截图匹配度检测耗时13.2秒，评估得分82.6"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行缺失率检测"
-      },
-      {
-        "event": "REASONING",
-        "data": "缺失率检测耗时0.3秒，评估得分75"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行图表类型均衡性检测"
-      },
-      {
-        "event": "REASONING",
-        "data": "图表类型均衡性检测耗时1.2秒，评估得分66.65"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行配置项多样性检测"
-      },
-      {
-        "event": "REASONING",
-        "data": "配置项多样性检测耗时3.4秒，评估得分0.44"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行代码重复性检测"
-      },
-      {
-        "event": "REASONING",
-        "data": "代码重复性检测耗时0.3秒，评估得分70"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行图像重复性检测"
-      },
-      {
-        "event": "REASONING",
-        "data": "图像重复性检测耗时5.1秒，评估得分70"
-      },
-      {
-        "event": "RESPONSE",
-        "data": "完成数据质量评估，耗时24秒"
-      },
-      {
-        "event": "REQUEST",
-        "data": "下游任务描述：训练一个代码生成模型，输入一张手绘草图或截图的统计图表生成对应的echart配置项代码，模型的训练数据为echart配置项代码和代码对应的图像数据对。\n基于下游领域知识洞察数据靶点。"
-      },
-      {
-        "event": "REASONING",
-        "data": "语言大模型分析数据靶点..."
-      },
-      {
-        "event": "REASONING",
-        "data": "语言大模型分析数据靶点完成，耗时3.2秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "本地经验模型分析数据靶点..."
-      },
-      {
-        "event": "REASONING",
-        "data": "本地经验模型分析数据靶点完成，耗时1.3秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "融合计算分析结果..."
-      },
-      {
-        "event": "RESPONSE",
-        "data": "完成数据洞察，发现数据靶点【配置项多样性、数据量、图表类型均衡性】,耗时5.4秒"
-      }
-    ],
-    "1":[
+    "Internet":[
       {
         "event": "REQUEST",
         "data": "加载图像数据集路径/data/echarts-image, 加载代码数据集路径/data/echarts-code, 加载元数据路径/metadata/echarts-task.metadata"
@@ -268,7 +134,7 @@
         "data": "完成数据洞察，发现数据靶点【配置项多样性、数据量、图表类型均衡性】,耗时5.4秒"
       }
     ],
-    "2":[
+    "energy":[
       {
         "event": "REQUEST",
         "data": "加载图像数据集路径/data/echarts-image, 加载代码数据集路径/data/echarts-code, 加载元数据路径/metadata/echarts-task.metadata"
@@ -404,7 +270,7 @@
     ]
   },
   "preparation": {
-    "default":[
+    "internet":[
       {
         "event": "REQUEST",
         "data": "开始执行任务流程"
@@ -510,113 +376,7 @@
         "data": "任务流程执行完成, 耗时: 3738.96秒"
       }
     ],
-    "1":[
-      {
-        "event": "REQUEST",
-        "data": "开始执行任务流程"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行制备算子 配置项修复算子"
-      },
-      {
-        "event": "REASONING",
-        "data": "算子 配置项修复算子 执行完成! 耗时: 0.16秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估完成, 耗时: 117.24秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行制备算子 语法修复算子"
-      },
-      {
-        "event": "REASONING",
-        "data": "算子 语法修复算子 执行完成! 耗时: 557.41秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估完成, 耗时: 144.54秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行制备算子 配置项多样性增强算子"
-      },
-      {
-        "event": "REASONING",
-        "data": "算子 配置项多样性增强算子 执行完成! 耗时: 117.36秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估完成, 耗时: 434.48秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行制备算子 基于图像生成代码算子"
-      },
-      {
-        "event": "REASONING",
-        "data": "算子 基于图像生成代码算子 执行完成! 耗时: 295.69秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估完成, 耗时: 184.71秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行制备算子 代码扰动算子"
-      },
-      {
-        "event": "REASONING",
-        "data": "算子 代码扰动算子 执行完成! 耗时: 0.29秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估完成, 耗时: 380.08秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "执行制备算子 基于代码生成图像算子"
-      },
-      {
-        "event": "REASONING",
-        "data": "算子 基于代码生成图像算子 执行完成! 耗时: 828.03秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估"
-      },
-      {
-        "event": "REASONING",
-        "data": "数据质量评估完成, 耗时: 678.96秒"
-      },
-      {
-        "event": "RESPONSE",
-        "data": "任务流程执行完成, 耗时: 3738.96秒"
-      }
-    ],
-    "2":[
+    "energy":[
       {
         "event": "REQUEST",
         "data": "开始执行任务流程"

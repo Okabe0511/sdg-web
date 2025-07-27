@@ -4,19 +4,17 @@ import { useRoute } from 'vue-router';
 import radardata from '/@/mock/radarData.json';
 import finalTargetData from '/@/mock/targetData.json';
 
-let radarDataList = 
- radardata.RadarDataDefault;
+let radarDataList = radardata.internet;
 
 export const useTargetAnalysis = () => {
   // 雷达图相关
   const route = useRoute();
   const taskId = route.params.id;
   if(taskId === "1") {
-    radarDataList = 
-      radardata.RadarData1;
+    radarDataList = radardata.internet;
   }
-    if(taskId === "2") {
-    radarDataList = radardata.RadarData2;
+  if(taskId === "2") {
+    radarDataList = radardata.energy;
   }
   const radarChartRef = ref<HTMLElement | null>(null);
   let radarChart: echarts.ECharts | null = null;
