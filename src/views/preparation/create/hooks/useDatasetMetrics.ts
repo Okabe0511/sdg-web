@@ -1,3 +1,4 @@
+import dataMetrics from '/@/mock/dataMetrics.json';
 import { ref, reactive } from "vue";
 import { useRoute } from "vue-router";
 import datasetMetricsData from '/@/mock/datasetMetrics.json';
@@ -5,40 +6,40 @@ import datasetMetricsData from '/@/mock/datasetMetrics.json';
 // 定义数据集指标接口
 export interface DatasetMetrics {
   dataPairs: number;
-  dataPairsGrowth: number;
   imageCount: number;
-  imageCountGrowth: number;
   codeCount: number;
-  codeCountGrowth: number;
+  dataPairsGrowth?: number;
+  imageCountGrowth?: number;
+  codeCountGrowth?: number;
 }
 
 export const useDatasetMetrics = () => {
   const route = useRoute();
   const taskId = ref(route.params.id as string);
 
-  // 只从 mock 文件读取基础数据，增长率本地初始化为 0
+  // 只从 mock 文件读取基础数据，增长率本地动态计算
   const getInitialData = (): DatasetMetrics => {
     let baseData;
-    if (taskId.value === "1") {
-      baseData = datasetMetricsData.Internet;
-    } else if (taskId.value === "2") {
-      baseData = datasetMetricsData.energy;
-    } else {
-      baseData = datasetMetricsData.Internet;
-    }
+    let type = "Internet";
+    if (taskId.value === "2") type = "energy";
+    baseData = (dataMetrics.volumeMetrics as Record<string, any[]>)[type];
     return {
-      dataPairs: baseData.dataPairs,
+      dataPairs: baseData.find((item: any) => item.key === "dataPairs")?.previousValue ?? 0,
+      imageCount: baseData.find((item: any) => item.key === "imageCount")?.previousValue ?? 0,
+      codeCount: baseData.find((item: any) => item.key === "codeCount")?.previousValue ?? 0,
       dataPairsGrowth: 0,
-      imageCount: baseData.imageCount,
       imageCountGrowth: 0,
-      codeCount: baseData.codeCount,
-      codeCountGrowth: 0,
+      codeCountGrowth: 0
     };
   };
 
   const metrics = reactive<DatasetMetrics>(getInitialData());
 
-  // 上一次的指标数据，用于计算增长率
+  // 计算增长率方法
+  function calculateGrowthRate(oldValue: number, newValue: number): number {
+    if (oldValue === 0) return 0;
+    return ((newValue - oldValue) / oldValue) * 100;
+  }
   const previousMetrics = reactive({
     dataPairs: metrics.dataPairs,
     imageCount: metrics.imageCount,
@@ -51,20 +52,6 @@ export const useDatasetMetrics = () => {
     imageCount: number;
     codeCount: number;
   }) => {
-    // 计算增长率
-    metrics.dataPairsGrowth = calculateGrowthRate(
-      previousMetrics.dataPairs,
-      operatorDatasetSize.dataPairs
-    );
-    metrics.imageCountGrowth = calculateGrowthRate(
-      previousMetrics.imageCount,
-      operatorDatasetSize.imageCount
-    );
-    metrics.codeCountGrowth = calculateGrowthRate(
-      previousMetrics.codeCount,
-      operatorDatasetSize.codeCount
-    );
-
     // 保存当前值作为前一次值
     previousMetrics.dataPairs = metrics.dataPairs;
     previousMetrics.imageCount = metrics.imageCount;
@@ -74,13 +61,14 @@ export const useDatasetMetrics = () => {
     metrics.dataPairs = operatorDatasetSize.dataPairs;
     metrics.imageCount = operatorDatasetSize.imageCount;
     metrics.codeCount = operatorDatasetSize.codeCount;
+
+    // 计算增长率
+    metrics.dataPairsGrowth = calculateGrowthRate(previousMetrics.dataPairs, metrics.dataPairs);
+    metrics.imageCountGrowth = calculateGrowthRate(previousMetrics.imageCount, metrics.imageCount);
+    metrics.codeCountGrowth = calculateGrowthRate(previousMetrics.codeCount, metrics.codeCount);
   };
 
-  // 计算增长率（百分比）
-  const calculateGrowthRate = (oldValue: number, newValue: number): number => {
-    if (oldValue === 0) return 0;
-    return ((newValue - oldValue) / oldValue) * 100;
-  };
+  // 可在组件中直接使用 dataPairsGrowth、imageCountGrowth、codeCountGrowth 展示增长率
 
   return {
     metrics,

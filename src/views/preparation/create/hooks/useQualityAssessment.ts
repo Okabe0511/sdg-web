@@ -14,21 +14,28 @@ export interface QualityMetrics {
 
 // 新增二级指标接口
 export interface SecondaryMetrics {
-  syntaxDetection: number; // 语法检测
-  configCompleteness: number; // 配置项完整性检测
-  sampleCount: number; // 数据量
-  imageCount: number; // 图像数量
-  imageRenderMatch: number; // 图像与渲染截图匹配度
-  missingRate: number; // 缺失率
-  chartTypeBalance: number; // 图表类型均衡性
-  configDiversity: number; // 配置项多样性
-  codeRedundancy: number; // 代码重复性
-  imageRedundancy: number; // 图像重复性
-  timeGranularityCoverage: number; // 时间粒度覆盖率（energy专用）
-  seasonalityStrength: number; // 季节性强度（energy专用）
-  trendStrength: number; // 趋势强度（energy专用）
-  mainFrequencyStrength: number; // 主频强度（energy专用）
-  sampleBalance: number; // 样本均衡性（energy专用）
+  syntaxDetection: number;
+  configCompleteness: number;
+  sampleCount: number;
+  imageCount: number;
+  imageRenderMatch: number;
+  missingRate: number;
+  chartTypeBalance: number;
+  configDiversity: number;
+  codeRedundancy: number;
+  imageRedundancy: number;
+  timeGranularityCoverage: number;
+  seasonalityStrength: number;
+  trendStrength: number;
+  mainFrequencyStrength: number;
+  sampleBalance: number;
+  dataCompleteness: number;
+  labelConsistency: number;
+  sequenceStability: number;
+  temporalFeatureCompleteness: number;
+  domainKnowledgeDiversity: number;
+  domainKnowledgeIntegrity: number;
+  featureIndependence: number;
 }
 
 export const useQualityAssessment = () => {
@@ -58,6 +65,13 @@ export const useQualityAssessment = () => {
     trendStrength: 0,
     mainFrequencyStrength: 0,
     sampleBalance: 0,
+    dataCompleteness: 0,
+    labelConsistency: 0,
+    sequenceStability: 0,
+    temporalFeatureCompleteness: 0,
+    domainKnowledgeDiversity: 0,
+    domainKnowledgeIntegrity: 0,
+    featureIndependence: 0,
   });
 
   // 当前选中的质量指标

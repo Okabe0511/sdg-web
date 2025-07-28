@@ -1,5 +1,6 @@
 import { reactive, ref, onMounted, onBeforeUnmount, watch } from "vue";
 import * as echarts from "echarts";
+import dataMetrics from '/@/mock/dataMetrics.json';
 import { useRoute } from 'vue-router';
 import radardata from '/@/mock/radarData.json';
 import finalTargetData from '/@/mock/targetData.json';
@@ -95,13 +96,21 @@ export const useTargetAnalysis = () => {
   >([
     {
       name: "原始数据",
-      value:(()=>{
-        if(taskId === "1") {
-          return [40.44, 83.53, 75.17, 31.98, 92.31];
-        } else if(taskId === "2") {
-          return [43.44, 83.3, 75.17, 31.98, 92.31];
-        }
-        return [10, 20, 30, 20, 30]; // 默认值
+      value: (() => {
+        const type: 'Internet' | 'energy' = taskId === "2" ? "energy" : "Internet";
+        const metrics = dataMetrics.qualityPrimaryMetrics[type];
+        // 按雷达图 indicator 顺序取值
+        // indicator: [数据量, 数据表示质量, 数据冗余, 数据上下文质量, 数据内在质量]
+        return [
+          metrics.dataVolume ?? 0,
+          metrics.dataAlignment ?? 0,
+          metrics.dataRedundancy ?? 0,
+          metrics.diversityBalance ?? 0,
+          metrics.codeQuality ?? 0,
+          
+          
+          
+        ];
       })(),
       itemStyle: {
         color: "rgba(0, 155, 164, 1)",

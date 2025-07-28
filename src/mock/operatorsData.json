@@ -6,8 +6,8 @@
       "description": "面向智能数据可视化场景设计的先进数据制备算子，基于大规模视觉-语言模型（VLMs）。能够在图像存在模糊、缺失、变形等情况下，推测用户设计意图，合理补全缺省信息。",
       "parameters": "",
       "costEvaluation": {
-        "resourceCost": 9.9,
-        "timeCost": 38.39,
+        "resourceCost": 20.9,
+        "timeCost": 348.39,
         "qualityContribution": 176.43
       },
       "datasetSize": {

@@ -137,23 +137,15 @@
     "energy":[
       {
         "event": "REQUEST",
-        "data": "加载图像数据集路径/data/echarts-image, 加载代码数据集路径/data/echarts-code, 加载元数据路径/metadata/echarts-task.metadata"
+        "data": "加载关系表数据集路径/data/shanxi-power-table"
       },
       {
         "event": "REASONING",
-        "data": "召回指定图像数据集"
+        "data": "召回指定关系表数据集"
       },
       {
         "event": "REASONING",
-        "data": "召回数据文件2个，数据大小19.2MB，耗时1.4秒"
-      },
-      {
-        "event": "REASONING",
-        "data": "召回指定代码数据集"
-      },
-      {
-        "event": "REASONING",
-        "data": "召回数据文件640个，数据大小2.6MB，耗时0.2秒"
+        "data": "召回数据文件138个，数据大小5.52MB，耗时1.4秒"
       },
       {
         "event": "RESPONSE",

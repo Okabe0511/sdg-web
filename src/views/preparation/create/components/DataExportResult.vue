@@ -2,12 +2,7 @@
   <div class="result-section">
     <h2>制备结果导出</h2>
     <div v-if="visible" class="result-content">
-      <!-- 显示当前任务标识 -->
-      <div class="task-indicator">
-        <a-tag :color="taskId === '1' ? 'blue' : 'green'">
-          {{ taskId === '1' ? '任务1' : '任务2' }}
-        </a-tag>
-      </div>
+      <!-- ...existing code... -->
 
       <!-- 导出按钮区域 -->
       <div class="export-actions">

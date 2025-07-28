@@ -14,14 +14,9 @@
     ],
     "energy": [
       {
-        "dataType": "文本",
-        "dataAmount": 1200,
-        "dataSize": "4.8MB"
-      },
-      {
-        "dataType": "音频",
-        "dataAmount": 85,
-        "dataSize": "156MB"
+        "dataType": "关系表",
+        "dataAmount": 138,
+        "dataSize": "5.52MB"
       }
     ]
     
