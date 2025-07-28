@@ -77,10 +77,15 @@ export const useEisenhowerMatrix = () => {
     const data = await getData();
 
     const option = {
-       grid: {
-         // 右边距
-    bottom: 120,    // 下边距（原可能为默认值，显式设置更小的值）
-  },
+      grid: {
+        left: '25%', // 图像右移，留出左侧空间
+        right: '15%',
+        top: '15%',
+        bottom: '0%',
+        containLabel: true,
+        width: '50%', // x轴长度
+        height: '70%' // y轴长度与x轴一致
+      },
       tooltip: {
         trigger: 'item',
         formatter: function (param: any) {
@@ -92,13 +97,29 @@ export const useEisenhowerMatrix = () => {
 
       },
       legend: {
-        data: ['时间粒度覆盖率', '季节性强度', '趋势强度', '主频强度', '样本均衡性','标签一致性','时序平稳性'
-          ,'时间特征完备度','领域知识完备性','领域知识多样性','特征独立性','样本均衡性'
+        data: [
+          '时间粒度覆盖率',
+          '季节性强度',
+          '主频强度',
+          '趋势强度',
+          '样本均衡性',
+          '标签一致性',
+          '数据完整性',
+          '时间特征完备度',
+          '时序平稳性',
+          '领域知识完整性',
+          '领域知识多样性',
+          '特征独立性'
         ],
-        textStyle: { fontSize: 16 },
-        itemGap: 15,
-        bottom: 0,
-         padding: [50, 0, 0, 0],  
+        orient: 'vertical',
+        left: '5%',
+        top: 'center',
+        align: 'left',
+        textStyle: { fontSize: 12 }, // 图例字体更小
+        itemGap: 12,
+        width: '18%', // 图例区域略缩小
+        height: '80%', // 图例区域高度与图像一致
+        padding: 0
       },
       xAxis: {
         name: '重要性',
@@ -130,148 +151,53 @@ export const useEisenhowerMatrix = () => {
       },
       series: [
         {
-          name: '时间粒度覆盖率',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '时间粒度覆盖率').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#e6194b' }
+          name: '时间粒度覆盖率', type: 'scatter',
+          data: data.filter(item => item.secondary === '时间粒度覆盖率').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#e6194b' }
         },
         {
-          name: '季节性强度',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '季节性强度').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#3cb44b' }
+          name: '季节性强度', type: 'scatter',
+          data: data.filter(item => item.secondary === '季节性强度').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#3cb44b' }
         },
         {
-          name: '趋势强度',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '趋势强度').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#0082c8' }
+          name: '主频强度', type: 'scatter',
+          data: data.filter(item => item.secondary === '主频强度').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#f58231' }
         },
         {
-          name: '主频强度',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '主频强度').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#f58231' }
+          name: '趋势强度', type: 'scatter',
+          data: data.filter(item => item.secondary === '趋势强度').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#0082c8' }
         },
         {
-          name: '样本均衡性',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '样本均衡性').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#911eb4' }
+          name: '样本均衡性', type: 'scatter',
+          data: data.filter(item => item.secondary === '样本均衡性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#911eb4' }
         },
         {
-          name: '标签一致性',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '标签一致性').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#006010ff' }
+          name: '标签一致性', type: 'scatter',
+          data: data.filter(item => item.secondary === '标签一致性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#006010ff' }
         },
         {
-          name: '时序平稳性',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '时序平稳性').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#ec70d1ff' }
+          name: '数据完整性', type: 'scatter',
+          data: data.filter(item => item.secondary === '数据完整性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#6bd7b8ff' }
         },
         {
-          name: '时间特征完备度',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '时间特征完备度').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#4a85c4ff' }
+          name: '时间特征完备度', type: 'scatter',
+          data: data.filter(item => item.secondary === '时间特征完备度').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#4a85c4ff' }
         },
         {
-          name: '领域知识完备性',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '领域知识完备性').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#6bd7b8ff' }
+          name: '时序平稳性', type: 'scatter',
+          data: data.filter(item => item.secondary === '时序平稳性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#ec70d1ff' }
         },
         {
-          name: '领域知识多样性',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '领域知识多样性').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#ee6565ff' }
+          name: '领域知识完整性', type: 'scatter',
+          data: data.filter(item => item.secondary === '领域知识完整性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#ecb85cff' }
         },
-         {
-          name: '特征独立性',
-          type: 'scatter',
-          data: data.filter(item => item.secondary === '特征独立性').map(item => ({
-            value: [item.importance * 2 - 1, item.problem * 2 - 1],
-            name: item.secondary,
-            importance: item.importance,
-            problem: item.problem,
-            urgency: item.urgency,
-            symbolSize: item.urgency * 200 + 10
-          })),
-          itemStyle: { color: '#070009ff' }
+        {
+          name: '领域知识多样性', type: 'scatter',
+          data: data.filter(item => item.secondary === '领域知识多样性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#ee6565ff' }
         },
+        {
+          name: '特征独立性', type: 'scatter',
+          data: data.filter(item => item.secondary === '特征独立性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#070009ff' }
+        }
       ] 
     };
 

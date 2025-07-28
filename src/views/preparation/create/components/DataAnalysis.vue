@@ -150,7 +150,7 @@
         <div
           v-if="routeId === '2' && chartType === 'eisenhower'"
           id="eisenhower-matrix"
-          style="width: 100%; height: 400px"
+          style="width: 100%; height: 410px"
         ></div>
       </div>
 
@@ -1092,7 +1092,7 @@ export default defineComponent({
 
   /* 添加下一步按钮样式 */
   .next-step-action {
-    margin-bottom: 100px;
+    margin-bottom: 0px;
     display: flex;
     justify-content: flex-end;
   }
