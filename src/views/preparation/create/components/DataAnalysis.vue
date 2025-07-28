@@ -316,6 +316,11 @@ export default defineComponent({
 
     // 靶点分析数据
     const targetData = reactive({
+      // Internet部分字段
+      "configDiversity": 0,
+      "dataVolume": 0,
+      "chartTypeBalance": 0,
+      // Energy部分字段
       "领域知识完整性": 0,
       "时间特征完备度": 0,
       "时间粒度覆盖率": 0,
@@ -335,6 +340,11 @@ export default defineComponent({
 
     // 靶点解释数据
     const targetExplanations = reactive<Record<string, TargetExplanation>>({
+      // Internet部分字段
+      "configDiversity": { title: "配置项多样性", score: 0, content: "" },
+      "dataVolume": { title: "数据量", score: 0, content: "" },
+      "chartTypeBalance": { title: "图表类型均衡性", score: 0, content: "" },
+      // Energy部分字段
       "领域知识完整性": { title: "领域知识完整性", score: 0, content: "" },
       "时间特征完备度": { title: "时间特征完备度", score: 0, content: "" },
       "时间粒度覆盖率": { title: "时间粒度覆盖率", score: 0, content: "" },
@@ -498,18 +508,52 @@ export default defineComponent({
 
     // 计算指标点在靶图上的位置
     const getIndicatorStyle = (key: string, value: number) => {
-      // 15个靶点均匀分布在圆周上
+      // 分情况：id=1时3个靶点分布在圆的不同方向，id=2时12个靶点按值分布在圆上
+      const mainTargetKeys = ['configDiversity', 'dataVolume', 'chartTypeBalance'];
       const keys = Object.keys(targetData);
       const idx = keys.indexOf(key);
-      const angle = (360 / keys.length) * idx;
-      const distancePercent = 100 - value;
-      const radians = (angle * Math.PI) / 180;
-      const x = 50 + (Math.cos(radians) * distancePercent) / 2;
-      const y = 50 + (Math.sin(radians) * distancePercent) / 2;
-      return {
-        left: `${x}%`,
-        top: `${y}%`,
-      };
+      // @ts-ignore
+      if (routeId.value === '1' && mainTargetKeys.includes(key)) {
+        // 3个靶点始终按主key顺序分布于正上方、左下、右下
+        const mainAngles = [-90, 150, 30];
+        const mainIdx = mainTargetKeys.indexOf(key);
+        const angle = mainAngles[mainIdx >= 0 ? mainIdx : 0];
+        const minRadius = 20; // 最小半径
+        const maxRadius = 40; // 最大半径
+        const radius = minRadius + ((maxRadius - minRadius) * value) / 100;
+        const radians = (angle * Math.PI) / 180;
+        const x = 50 + Math.cos(radians) * radius;
+        const y = 50 + Math.sin(radians) * radius;
+        return {
+          left: `${x}%`,
+          top: `${y}%`,
+        };
+      } else if (routeId.value === '2' && keys.length === 12) {
+        // 12个靶点按值分布在圆上
+        const angle = (360 / 12) * idx - 90; // 使第一个在正上方
+        // value越小越靠近圆心，越大越靠近边缘
+        const minRadius = 20; // 最小半径
+        const maxRadius = 40; // 最大半径
+        const radius = minRadius + ((maxRadius - minRadius) * value) / 100;
+        const radians = (angle * Math.PI) / 180;
+        const x = 50 + Math.cos(radians) * radius;
+        const y = 50 + Math.sin(radians) * radius;
+        return {
+          left: `${x}%`,
+          top: `${y}%`,
+        };
+      } else {
+        // 默认均匀分布
+        const angle = (360 / keys.length) * idx - 90;
+        const distancePercent = 100 - value;
+        const radians = (angle * Math.PI) / 180;
+        const x = 50 + (Math.cos(radians) * distancePercent) / 2;
+        const y = 50 + (Math.sin(radians) * distancePercent) / 2;
+        return {
+          left: `${x}%`,
+          top: `${y}%`,
+        };
+      }
     };
 
     // 处理窗口大小变化
@@ -536,9 +580,13 @@ export default defineComponent({
           if (data.metrics[key] !== undefined) {
             targetData[key as keyof typeof targetData] = data.metrics[key];
           }
-          if (data.explanations[key]) {
+          // 优先使用API返回的解释，否则使用默认说明
+          if (data.explanations[key] && data.explanations[key].trim() !== "") {
             targetExplanations[key].score = data.metrics[key] || 0;
             targetExplanations[key].content = data.explanations[key];
+          } else if (routeId.value === "2") {
+            // Energy靶点默认说明（可根据实际需求补充或优化）
+            targetExplanations[key].content = `暂无详细说明，请检查数据源或联系管理员。`;
           }
         });
         // 默认选择第一个靶点
