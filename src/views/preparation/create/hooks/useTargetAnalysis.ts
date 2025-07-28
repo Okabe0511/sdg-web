@@ -170,9 +170,15 @@ const updateFinalTargetData = () => {
   finalData = (mockTargetAnalysisResponse as Record<string, any>)[id]?.final || (mockTargetAnalysisResponse as Record<string, any>)["internet"].final;
 
   // 更新靶点数据
-  updateTargetData("configDiversity", finalData.configDiversity);
-  updateTargetData("dataVolume", finalData.dataVolume);
-  updateTargetData("chartTypeBalance", finalData.chartTypeBalance);
+  if (id === "energy") {
+    Object.keys(finalData).forEach((key) => {
+      updateTargetData(key, finalData[key]);
+    });
+  } else {
+    updateTargetData("configDiversity", finalData.configDiversity);
+    updateTargetData("dataVolume", finalData.dataVolume);
+    updateTargetData("chartTypeBalance", finalData.chartTypeBalance);
+  }
 
     // 不再添加最终结果的数据系列
     // 仅更新图表

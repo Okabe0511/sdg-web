@@ -125,6 +125,7 @@ import DatasetHeader from "/@/components/DatasetHeader/index.vue";
 import { useDataExport } from "../hooks/useDataExport";
 import { useRoute, useRouter } from "vue-router";
 import dataMetrics from  "/@/mock/dataMetrics.json"
+import targetAnalysisResponse from '/@/mock/targetAnalysisResponse.json';
 export interface SecondaryMetrics {
   [key: string]: number;
 }
@@ -159,16 +160,52 @@ export default defineComponent({
       return route.params.id?.toString() || "1";
     });
 
+    // energy 9 项靶点指标 key
+    const energyKeys = [
+      "领域知识完整性",
+      "时间特征完备度",
+      "时间粒度覆盖率",
+      "时序平稳性",
+      "领域知识多样性",
+      "季节性强度",
+      "主频强度",
+      "特征独立性",
+      "样本均衡性"
+    ];
+
     // 根据任务ID选择对应的制备后指标数据（task1->Internet, task2->energy）
     const currentMetrics = computed(() => {
-      const key = taskId.value === '1' ? 'Internet' : 'energy';
-      return dataMetrics.preparedMetrics[key] || {};
+      if (taskId.value === '1') {
+        return dataMetrics.preparedMetrics['Internet'] || {};
+      } else {
+        const energyMetrics: Record<string, number> = {};
+        const mockData = targetAnalysisResponse.energy;
+        const metrics = mockData.metrics as Record<string, {before:number, after:number}>;
+        for (const k of energyKeys) {
+          energyMetrics[k] = (metrics as any)[k]?.after ?? 0;
+        }
+        return energyMetrics;
+      }
+    });
+
+    // energy 靶点指标为 9 项，取 before 分数
+    const originalMetrics = computed(() => {
+      if (taskId.value === '1') {
+        return dataMetrics.originalMetrics['Internet'] || {};
+      } else {
+        const energyMetrics: Record<string, number> = {};
+        const mockData = targetAnalysisResponse.energy;
+        const metrics = mockData.metrics as Record<string, {before:number, after:number}>;
+        for (const k of energyKeys) {
+          energyMetrics[k] = (metrics as any)[k]?.before ?? 0;
+        }
+        return energyMetrics;
+      }
     });
 
     // 使用数据导出钩子
     const {
       qualityChartRef,
-      originalMetrics,
       volumeMetrics,
       initChart,
       formatPercent,

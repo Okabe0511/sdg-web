@@ -11,13 +11,13 @@
             <div class="target-circle circle-2"></div>
             <div class="target-circle circle-3"></div>
 
-            <!-- 三个指标点 -->
+            <!-- 动态靶点渲染 -->
             <div
               class="target-indicator"
-              v-for="(item, key) in targetData"
+              v-for="key in displayedTargetKeys"
               :key="key"
               :class="{ active: selectedTargetKey === key }"
-              :style="getIndicatorStyle(key, item)"
+              :style="getIndicatorStyle(key, targetData[key as keyof typeof targetData])"
               @click="selectTarget(key)"
             >
               <div class="indicator-marker">
@@ -49,24 +49,24 @@
                 </div>
                 <div class="tooltip-value">
                   <span class="label">权重:</span>
-                  <span class="value">{{ formatScore(item) }}</span>
+                  <span class="value">{{ formatScore(targetData[key as keyof typeof targetData]) }}</span>
                 </div>
                 <div class="tooltip-value" v-if="key === 'configDiversity'">
                   <span class="label">多样性:</span>
                   <span class="value">{{
-                    item > 70 ? "严重靶点" : item > 40 ? "中等靶点" : "轻度靶点"
+                    targetData[key as keyof typeof targetData] > 70 ? "严重靶点" : targetData[key as keyof typeof targetData] > 40 ? "中等靶点" : "轻度靶点"
                   }}</span>
                 </div>
                 <div class="tooltip-value" v-if="key === 'dataVolume'">
                   <span class="label">数据量:</span>
                   <span class="value">{{
-                    item > 70 ? "严重靶点" : item > 40 ? "中等靶点" : "轻度靶点"
+                    targetData[key as keyof typeof targetData] > 70 ? "严重靶点" : targetData[key as keyof typeof targetData] > 40 ? "中等靶点" : "轻度靶点"
                   }}</span>
                 </div>
                 <div class="tooltip-value" v-if="key === 'chartTypeBalance'">
                   <span class="label">均衡性:</span>
                   <span class="value">{{
-                    item > 70 ? "严重靶点" : item > 40 ? "中等靶点" : "轻度靶点"
+                    targetData[key as keyof typeof targetData] > 70 ? "严重靶点" : targetData[key as keyof typeof targetData] > 40 ? "中等靶点" : "轻度靶点"
                   }}</span>
                 </div>
               </div>
@@ -242,6 +242,7 @@ import {
   watch,
   nextTick,
   PropType,
+  computed,
 } from "vue";
 import { message } from "ant-design-vue";
 import { RightOutlined, EditOutlined } from "@ant-design/icons-vue";
@@ -315,9 +316,18 @@ export default defineComponent({
 
     // 靶点分析数据
     const targetData = reactive({
-      configDiversity: 0,
-      dataVolume: 0,
-      chartTypeBalance: 0,
+      "领域知识完整性": 0,
+      "时间特征完备度": 0,
+      "时间粒度覆盖率": 0,
+      "时序平稳性": 0,
+      "领域知识多样性": 0,
+      "季节性强度": 0,
+      "主频强度": 0,
+      "特征独立性": 0,
+      "样本均衡性": 0,
+      "趋势强度": 0,
+      "数据完整性": 0,
+      "标签一致性": 0
     });
 
     // 用于记录删除的靶点
@@ -325,9 +335,18 @@ export default defineComponent({
 
     // 靶点解释数据
     const targetExplanations = reactive<Record<string, TargetExplanation>>({
-      configDiversity: { title: "配置项多样性", score: 0, content: "" },
-      dataVolume: { title: "数据量", score: 0, content: "" },
-      chartTypeBalance: { title: "图表类型均衡性", score: 0, content: "" },
+      "领域知识完整性": { title: "领域知识完整性", score: 0, content: "" },
+      "时间特征完备度": { title: "时间特征完备度", score: 0, content: "" },
+      "时间粒度覆盖率": { title: "时间粒度覆盖率", score: 0, content: "" },
+      "时序平稳性": { title: "时序平稳性", score: 0, content: "" },
+      "领域知识多样性": { title: "领域知识多样性", score: 0, content: "" },
+      "季节性强度": { title: "季节性强度", score: 0, content: "" },
+      "主频强度": { title: "主频强度", score: 0, content: "" },
+      "特征独立性": { title: "特征独立性", score: 0, content: "" },
+      "样本均衡性": { title: "样本均衡性", score: 0, content: "" },
+      "趋势强度": { title: "趋势强度", score: 0, content: "" },
+      "数据完整性": { title: "数据完整性", score: 0, content: "" },
+      "标签一致性": { title: "标签一致性", score: 0, content: "" },
     });
 
     // 当前选中的靶点
@@ -339,6 +358,38 @@ export default defineComponent({
     const currentEditValue = ref(0);
     const newTargetValue = ref(0);
     const deleteConfirmVisible = ref(false);
+
+    // 3个主靶点key
+    const mainTargetKeys = [
+      "configDiversity",
+      "dataVolume",
+      "chartTypeBalance",
+    ];
+    // 12个energy靶点key（全部中文）
+    const energyTargetKeys = [
+      "领域知识完整性",
+      "时间特征完备度",
+      "时间粒度覆盖率",
+      "时序平稳性",
+      "领域知识多样性",
+      "季节性强度",
+      "主频强度",
+      "特征独立性",
+      "样本均衡性",
+      "趋势强度",
+      "数据完整性",
+      "标签一致性",
+    ];
+
+    // 计算当前页面应显示的靶点key
+    const displayedTargetKeys = computed(() => {
+      if (routeId.value === "1") {
+        return mainTargetKeys;
+      } else if (routeId.value === "2") {
+        return energyTargetKeys;
+      }
+      return [];
+    });
 
     // 打开编辑弹窗
     const openEditDialog = (key: string) => {
@@ -429,27 +480,32 @@ export default defineComponent({
         configDiversity: "data-panel_line",
         dataVolume: "database",
         chartTypeBalance: "chart",
+        timeGranularityCoverage: "clock-circle",
+        seasonalityStrength: "calendar",
+        trendStrength: "line-chart",
+        mainFrequencyStrength: "bar-chart",
+        sampleBalance: "pie-chart",
+        dataCompleteness: "check-circle",
+        labelConsistency: "tag",
+        sequenceStability: "swap",
+        temporalFeatureCompleteness: "hourglass",
+        domainKnowledgeDiversity: "bulb",
+        domainKnowledgeIntegrity: "safety",
+        featureIndependence: "disconnect",
       };
       return iconMap[key] || "flag";
     };
 
     // 计算指标点在靶图上的位置
     const getIndicatorStyle = (key: string, value: number) => {
-      // 根据三个指标的位置，设置不同的角度
-      const angles: Record<string, number> = {
-        configDiversity: 30, // 右上
-        dataVolume: 150, // 左上
-        chartTypeBalance: 270, // 下方
-      };
-
-      // 计算离靶心的距离，当值为100时在靶心(0%)，当值为0时在靶边缘(100%)
+      // 15个靶点均匀分布在圆周上
+      const keys = Object.keys(targetData);
+      const idx = keys.indexOf(key);
+      const angle = (360 / keys.length) * idx;
       const distancePercent = 100 - value;
-
-      const angle = angles[key];
       const radians = (angle * Math.PI) / 180;
-      const x = 50 + (Math.cos(radians) * distancePercent) / 2; // 除以2使得最大范围不超过边界
+      const x = 50 + (Math.cos(radians) * distancePercent) / 2;
       const y = 50 + (Math.sin(radians) * distancePercent) / 2;
-
       return {
         left: `${x}%`,
         top: `${y}%`,
@@ -475,30 +531,18 @@ export default defineComponent({
         const response = await getTargetAnalysis();
         const data = response.data;
 
-        // 更新靶点分析数据
-        targetData.configDiversity = data.metrics.configDiversity;
-        targetData.dataVolume = data.metrics.dataVolume;
-        targetData.chartTypeBalance = data.metrics.chartTypeBalance;
-
-        // 更新靶点解释数据
-        targetExplanations.configDiversity = {
-          title: "配置项多样性",
-          score: data.metrics.configDiversity,
-          content: data.explanations.configDiversity,
-        };
-        targetExplanations.dataVolume = {
-          title: "数据量",
-          score: data.metrics.dataVolume,
-          content: data.explanations.dataVolume,
-        };
-        targetExplanations.chartTypeBalance = {
-          title: "图表类型均衡性",
-          score: data.metrics.chartTypeBalance,
-          content: data.explanations.chartTypeBalance,
-        };
-
+        // 更新靶点分析数据和解释
+        Object.keys(targetData).forEach((key) => {
+          if (data.metrics[key] !== undefined) {
+            targetData[key as keyof typeof targetData] = data.metrics[key];
+          }
+          if (data.explanations[key]) {
+            targetExplanations[key].score = data.metrics[key] || 0;
+            targetExplanations[key].content = data.explanations[key];
+          }
+        });
         // 默认选择第一个靶点
-        selectedTargetKey.value = "configDiversity";
+        selectedTargetKey.value = Object.keys(targetData)[0];
         isAnalysisEnd.value = true;
         return true;
       } catch (error) {
@@ -680,6 +724,7 @@ export default defineComponent({
       deleteTarget,
       legendItems,
       routeId,
+      displayedTargetKeys,
     };
   },
 });

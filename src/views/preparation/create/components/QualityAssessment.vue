@@ -1,6 +1,8 @@
 <template>
   <div class="quality-section">
-    <h2>数据质量评估</h2>
+    <a-affix :offset-top="0">
+      <h2>数据质量评估</h2>
+    </a-affix>
     <div v-if="visible" class="quality-content">
       <div ref="radarChartRef" class="radar-chart"></div>
       <div class="quality-tips">
@@ -358,7 +360,10 @@ export default defineComponent({
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: calc(100% - 40px);
+  height: 700px; // 固定高度，可根据实际页面调整
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
 
   h2 {
     margin-top: 0;
@@ -374,6 +379,8 @@ export default defineComponent({
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    border-radius: 8px;
+    overflow: hidden;
 
     .radar-chart {
       flex: 1;

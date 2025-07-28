@@ -80,17 +80,17 @@
           <div class="metric-content">
             <div class="metric-label">关系表数量</div>
             <div class="metric-value">
-              {{ metrics.dataPairs }}
+              {{ metrics.codeCount }}
               <span
                 class="growth-rate"
-                :class="{ positive: metrics.dataPairsGrowth > 0 }"
+                :class="{ positive: metrics.codeCountGrowth > 0 }"
               >
-                {{ formatGrowth(metrics.dataPairsGrowth) }}
+                {{ formatGrowth(metrics.codeCountGrowth) }}
                 <Icon
-                  v-if="metrics.dataPairsGrowth !== 0"
-                  :name="metrics.dataPairsGrowth > 0 ? 'arrow-up' : 'arrow-down'"
+                  v-if="metrics.codeCountGrowth !== 0"
+                  :name="metrics.codeCountGrowth > 0 ? 'arrow-up' : 'arrow-down'"
                 />
-                <span v-if="metrics.dataPairsGrowth === 0">-</span>
+                <span v-if="metrics.codeCountGrowth === 0">-</span>
               </span>
             </div>
           </div>
