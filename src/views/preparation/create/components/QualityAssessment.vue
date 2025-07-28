@@ -18,11 +18,16 @@
             {{ qualityExplanations.dataVolume }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">{{ getMetricName('sampleCount') }}：</span>
-              <span class="metric-value">{{
-                formatValue(secondaryMetrics.sampleCount)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -37,17 +42,16 @@
             {{ qualityExplanations.dataAlignment }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">{{ getMetricName('imageRenderMatch') }}：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.imageRenderMatch)
-              }}</span>
-            </div>
-            <div class="secondary-metric-item">
-              <span class="metric-label">{{ getMetricName('missingRate') }}：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.missingRate)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -62,17 +66,16 @@
             {{ qualityExplanations.dataRedundancy }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">{{ getMetricName('codeRedundancy') }}：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.codeRedundancy)
-              }}</span>
-            </div>
-            <div class="secondary-metric-item">
-              <span class="metric-label">{{ getMetricName('imageRedundancy') }}：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.imageRedundancy)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -87,17 +90,16 @@
             {{ qualityExplanations.diversityBalance }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">{{ getMetricName('chartTypeBalance') }}：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.chartTypeBalance)
-              }}</span>
-            </div>
-            <div class="secondary-metric-item">
-              <span class="metric-label">{{ getMetricName('configDiversity') }}：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.configDiversity)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -112,17 +114,16 @@
             {{ qualityExplanations.codeQuality }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">{{ getMetricName('syntaxDetection') }}：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.syntaxDetection)
-              }}</span>
-            </div>
-            <div class="secondary-metric-item">
-              <span class="metric-label">{{ getMetricName('configCompleteness') }}：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.configCompleteness)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -136,8 +137,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, PropType } from "vue";
+import { defineComponent, ref, onMounted, watch, PropType, computed } from "vue";
+import { useRoute } from "vue-router";
 import * as echarts from "echarts";
+import mockDataMetrics from "/@/mock/dataMetrics.json";
 import {
   QualityMetrics,
   SecondaryMetrics,
@@ -172,6 +175,20 @@ export default defineComponent({
   },
   emits: ["update:selectedQualityMetric"],
   setup(props, { emit }) {
+    // 获取当前路由
+    const route = useRoute();
+    // 获取当前数据集类型
+    const getType = () => {
+      const id = Number(route.params.id ?? route.query.taskId);
+      return id === 2 ? "energy" : "Internet";
+    };
+    // 获取当前一级指标对应的二级指标数组
+    const secondaryMetricMap = mockDataMetrics.secondaryMetricMap as Record<string, Record<string, string[]>>;
+    const currentSecondaryMetrics = computed<string[]>(() => {
+      const type = getType();
+      const metric = props.selectedQualityMetric;
+      return secondaryMetricMap[type]?.[metric] || [];
+    });
     const radarChartRef = ref<HTMLElement | null>(null);
     let radarChart: echarts.ECharts | null = null;
 
@@ -328,6 +345,8 @@ export default defineComponent({
       formatPercent,
       formatValue,
       getMetricName,
+      currentSecondaryMetrics,
+      secondaryMetrics: props.secondaryMetrics as unknown as Record<string, number>,
     };
   },
 });

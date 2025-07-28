@@ -17,12 +17,18 @@ export interface SecondaryMetrics {
   syntaxDetection: number; // 语法检测
   configCompleteness: number; // 配置项完整性检测
   sampleCount: number; // 数据量
+  imageCount: number; // 图像数量
   imageRenderMatch: number; // 图像与渲染截图匹配度
   missingRate: number; // 缺失率
   chartTypeBalance: number; // 图表类型均衡性
   configDiversity: number; // 配置项多样性
   codeRedundancy: number; // 代码重复性
   imageRedundancy: number; // 图像重复性
+  timeGranularityCoverage: number; // 时间粒度覆盖率（energy专用）
+  seasonalityStrength: number; // 季节性强度（energy专用）
+  trendStrength: number; // 趋势强度（energy专用）
+  mainFrequencyStrength: number; // 主频强度（energy专用）
+  sampleBalance: number; // 样本均衡性（energy专用）
 }
 
 export const useQualityAssessment = () => {
@@ -35,17 +41,23 @@ export const useQualityAssessment = () => {
     codeQuality: 0,
   });
 
-  // 二级指标数据
+  // 二级指标数据（包含Internet和energy所有指标）
   const secondaryMetrics = reactive<SecondaryMetrics>({
     syntaxDetection: 0,
     configCompleteness: 0,
     sampleCount: 0,
+    imageCount: 0,
     imageRenderMatch: 0,
     missingRate: 0,
     chartTypeBalance: 0,
     configDiversity: 0,
     codeRedundancy: 0,
     imageRedundancy: 0,
+    timeGranularityCoverage: 0,
+    seasonalityStrength: 0,
+    trendStrength: 0,
+    mainFrequencyStrength: 0,
+    sampleBalance: 0,
   });
 
   // 当前选中的质量指标
@@ -67,20 +79,15 @@ export const useQualityAssessment = () => {
       const metrics = response.data;
 
       // 更新质量指标
-      Object.assign(qualityMetrics, metrics.primaryMetrics || metrics);
+      Object.assign(qualityMetrics, metrics.primaryMetrics || metrics.qualityPrimaryMetrics || metrics);
 
-      // 更新二级指标数据
+      // 更新所有二级指标数据（自动遍历赋值，支持新增字段）
       if (metrics.secondaryMetrics) {
-        Object.assign(secondaryMetrics, {
-          syntaxDetection: metrics.secondaryMetrics.syntaxDetection || 0,
-          configCompleteness: metrics.secondaryMetrics.configCompleteness || 0,
-          sampleCount: metrics.secondaryMetrics.sampleCount || 0,
-          imageRenderMatch: metrics.secondaryMetrics.imageRenderMatch || 0,
-          missingRate: metrics.secondaryMetrics.missingRate || 0,
-          chartTypeBalance: metrics.secondaryMetrics.chartTypeBalance || 0,
-          configDiversity: metrics.secondaryMetrics.configDiversity || 0,
-          codeRedundancy: metrics.secondaryMetrics.codeRedundancy || 0,
-          imageRedundancy: metrics.secondaryMetrics.imageRedundancy || 0,
+        const sm = secondaryMetrics as Record<string, number>;
+        Object.keys(sm).forEach(key => {
+          if (key in metrics.secondaryMetrics) {
+            sm[key] = metrics.secondaryMetrics[key];
+          }
         });
       }
 
@@ -91,7 +98,15 @@ export const useQualityAssessment = () => {
   };
 
   // 加载质量评估说明
-
+  const loadQualityExplanations = async (taskType: "Internet" | "energy" = "Internet") => {
+    try {
+      const response = await getQualityExplanations(taskType);
+      Object.assign(qualityExplanations, response.data);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
 
   return {
     qualityMetrics,
@@ -99,5 +114,6 @@ export const useQualityAssessment = () => {
     qualityExplanations,
     selectedQualityMetric,
     loadQualityMetrics,
+    loadQualityExplanations,
   };
 };

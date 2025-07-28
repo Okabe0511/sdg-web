@@ -8,17 +8,18 @@ import { useRoute } from 'vue-router';
  */
 export const getTargetAnalysis = async () => {
   const route = useRoute();
-  const taskId = route.params.id; // 从路由参数获取taskId
+  let id = String(route.params.id || "internet");
+  if (id === "1") id = "internet";
+  if (id === "2") id = "energy";
 
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
-    // 根据taskId返回对应的数据集
-    const responseData = mockTargetAnalysisResponse[taskId as keyof typeof mockTargetAnalysisResponse] 
-      || mockTargetAnalysisResponse.default;
-    
+    // 根据id返回对应的数据集
+    const responseData = mockTargetAnalysisResponse[id as keyof typeof mockTargetAnalysisResponse] 
+      || mockTargetAnalysisResponse["internet"];
     return Promise.resolve({ data: responseData });
   }
-  
-  // 实际环境中调用真实接口（带taskId参数）
-  return http.get(`/target/analysis/${taskId}`);
+
+  // 实际环境中调用真实接口（带id参数）
+  return http.get(`/target/analysis/${id}`);
 };

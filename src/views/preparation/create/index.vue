@@ -61,6 +61,7 @@ export default defineComponent({
       qualityExplanations,
       selectedQualityMetric,
       loadQualityMetrics,
+      loadQualityExplanations,
     } = useQualityAssessment();
     const { analysisInProgress, startAnalysis, stopAnalysis } =
       useDataAnalysis();
@@ -196,6 +197,13 @@ export default defineComponent({
     const handleStartDataDescription = () => {
       modulesVisible.datasetDescription = true;
       loadQualityMetrics(taskId.value || 0);
+      
+      // 根据taskId确定任务类型并加载对应的explanations
+      let taskType: "Internet" | "energy" = "Internet";
+      if (String(taskId.value) === '1') taskType = 'Internet';
+      else if (String(taskId.value) === '2') taskType = 'energy';
+      loadQualityExplanations(taskType);
+      
       setCurrentStep(1);
     };
 

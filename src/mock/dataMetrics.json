@@ -60,6 +60,22 @@
       "codeCountGrowth": 0
     }
   },
+  "qualityPrimaryMetrics": {
+    "Internet": {
+      "codeQuality": 8.13,
+      "dataVolume": 4.44,
+      "dataAlignment": 7.8,
+      "diversityBalance": 3.55,
+      "dataRedundancy": 70
+    },
+    "energy": {
+      "codeQuality": 75.21,
+      "dataVolume": 88.12,
+      "dataAlignment": 60.5,
+      "diversityBalance": 55.33,
+      "dataRedundancy": 40
+    }
+  },
   "originalMetrics": {
     "Internet": {
       "syntaxDetection": 85.6,
@@ -74,8 +90,14 @@
     },
     "energy": {
       "syntaxDetection": 111,
-      "configCompleteness": 222,
+      "configCompleteness": 224,
       "sampleCount": 442,
+      "imageCount": 1800,
+      "timeGranularityCoverage": 85,
+      "seasonalityStrength": 60,
+      "trendStrength": 75,
+      "mainFrequencyStrength": 80,
+      "sampleBalance": 70,
       "imageRenderMatch": 286,
       "missingRate": 712,
       "chartTypeBalance": 625,
@@ -100,6 +122,12 @@
       "syntaxDetection": 120.0,
       "configCompleteness": 250.0,
       "sampleCount": 500.0,
+      "imageCount": 1800.0,
+      "timeGranularityCoverage": 90,
+      "seasonalityStrength": 65,
+      "trendStrength": 78,
+      "mainFrequencyStrength": 85,
+      "sampleBalance": 75,
       "imageRenderMatch": 320.0,
       "missingRate": 800.0,
       "chartTypeBalance": 700.0,
@@ -113,6 +141,7 @@
       "syntaxDetection": "语法检测通过率",
       "configCompleteness": "配置项完整性",
       "sampleCount": "样本数量",
+      "imageCount": "图像数量",
       "imageRenderMatch": "图像与渲染截图匹配度",
       "missingRate": "缺失率",
       "chartTypeBalance": "图表类型均衡性",
@@ -124,6 +153,12 @@
       "syntaxDetection": "语法检测通过率-能耗",
       "configCompleteness": "配置项完整性-能耗",
       "sampleCount": "样本数量-能耗",
+      "imageCount": "图像数量-能耗",
+      "timeGranularityCoverage": "时间粒度覆盖率",
+      "seasonalityStrength": "季节性强度",
+      "trendStrength": "趋势强度",
+      "mainFrequencyStrength": "主频强度",
+      "sampleBalance": "样本均衡性",
       "imageRenderMatch": "图像与渲染截图匹配度-能耗",
       "missingRate": "缺失率-能耗",
       "chartTypeBalance": "图表类型均衡性-能耗",
@@ -166,5 +201,43 @@
       }
     ]
     
+  },
+  "explanations": {
+    "Internet": {
+      "codeQuality": "用于衡量数据集中代码样本的正确性、规范性与可读性。低质量代码会干扰模型学习，导致生成结果不准确或结构混乱。",
+      "dataVolume": "用于衡量训练数据量的丰富程度，规模不足会限制模型对模式的学习与泛化，影响生成质量与鲁棒性。",
+      "dataAlignment": "用于衡量多模态数据集中不同模态之间样本对应关系准确性与一致性。对齐错误会直接影响多模态模型的学习效果，导致性能下降甚至产生误导性的预测结果。",
+      "diversityBalance": "用于衡量数据集中各类样本的分布均衡性。分布失衡会导致模型偏向高频样本，影响泛化能力与预测准确性。",
+      "dataRedundancy": "用于衡量数据集中重复样本的比例。高重复性会降低数据多样性，限制模型学习效果，易导致过拟合与性能下降。"
+    },
+    "energy": {
+      "codeQuality": "用于衡量数据集中代码样本的正确性、规范性与可读性。低质量代码会干扰模型学习，导致生成结果不准确或结构混乱。",
+      "dataVolume": "用于衡量训练数据量的丰富程度，规模不足会限制模型对模式的学习与泛化，影响生成质量与鲁棒性。",
+      "dataAlignment": "用于衡量多模态数据集中不同模态之间样本对应关系准确性与一致性。对齐错误会直接影响多模态模型的学习效果，导致性能下降甚至产生误导性的预测结果。",
+      "diversityBalance": "用于衡量数据集中各类样本的分布均衡性。分布失衡会导致模型偏向高频样本，影响泛化能力与预测准确性。",
+      "dataRedundancy": "用于衡量数据集中重复样本的比例。高重复性会降低数据多样性，限制模型学习效果，易导致过拟合与性能下降。"
+    }
+  },
+  "secondaryMetricMap": {
+    "Internet": {
+      "dataVolume": ["sampleCount"],
+      "dataAlignment": ["imageRenderMatch", "missingRate"],
+      "dataRedundancy": ["codeRedundancy", "imageRedundancy"],
+      "diversityBalance": ["chartTypeBalance", "configDiversity"],
+      "codeQuality": ["syntaxDetection", "configCompleteness"]
+    },
+    "energy": {
+      "dataVolume": [
+        "timeGranularityCoverage",
+        "seasonalityStrength",
+        "trendStrength",
+        "mainFrequencyStrength",
+        "sampleBalance"
+      ],
+      "dataAlignment": ["imageRenderMatch", "missingRate"],
+      "dataRedundancy": ["codeRedundancy", "imageRedundancy"],
+      "diversityBalance": ["chartTypeBalance", "configDiversity"],
+      "codeQuality": ["syntaxDetection", "configCompleteness"]
+    }
   }
 }

@@ -3,6 +3,7 @@ import * as echarts from "echarts";
 import { useRoute } from 'vue-router';
 import radardata from '/@/mock/radarData.json';
 import finalTargetData from '/@/mock/targetData.json';
+import mockTargetAnalysisResponse from '/@/mock/targetAnalysisResponse.json';
 
 let radarDataList = radardata.internet;
 
@@ -19,23 +20,30 @@ export const useTargetAnalysis = () => {
   const radarChartRef = ref<HTMLElement | null>(null);
   let radarChart: echarts.ECharts | null = null;
 
-  // 靶点相关
+  // 靶点相关，original从mock/targetAnalysisResponse.json获取
+  // 根据页面id动态获取original和current数据集
+  const getTargetData = () => {
+    let id = String(route.params.id || "internet");
+    if (id === "1") id = "internet";
+    if (id === "2") id = "energy";
+    const mockData = (mockTargetAnalysisResponse as Record<string, any>)[id] || (mockTargetAnalysisResponse as Record<string, any>)["internet"];
+    return {
+      original: {
+        configDiversity: mockData.metrics?.configDiversity ?? 0,
+        dataVolume: mockData.metrics?.dataVolume ?? 0,
+        chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+      },
+      current: {
+        configDiversity: mockData.metrics?.configDiversity ?? 0,
+        dataVolume: mockData.metrics?.dataVolume ?? 0,
+        chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+      }
+    };
+  };
   const targetData: {
     original: Record<string, number>;
     current: Record<string, number>;
-  } = // 使用Record类型来定义靶点数据的结构
-    reactive({
-      original: {
-        configDiversity: 70.02,
-        dataVolume: 64.63,
-        chartTypeBalance: 53.23,
-      },
-      current: {
-        configDiversity: 99.02,
-        dataVolume: 64.63,
-        chartTypeBalance: 53.23,
-      },
-    });
+  } = reactive(getTargetData());
 
   const selectedTargetKey = ref("configDiversity");
 
@@ -147,13 +155,10 @@ export const useTargetAnalysis = () => {
 const updateFinalTargetData = () => {
   // 根据任务ID选择最终数据
   let finalData;
-  if (taskId === "1") {
-    finalData = finalTargetData.FinalData1;
-  } else if (taskId === "2") {
-    finalData = finalTargetData.FinalData2;
-  } else {
-    finalData = finalTargetData.FinalDataDefault;
-  }
+  let id = String(taskId || "internet");
+  if (id === "1") id = "internet";
+  if (id === "2") id = "energy";
+  finalData = (mockTargetAnalysisResponse as Record<string, any>)[id]?.final || (mockTargetAnalysisResponse as Record<string, any>)["internet"].final;
 
   // 更新靶点数据
   updateTargetData("configDiversity", finalData.configDiversity);
