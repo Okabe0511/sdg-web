@@ -126,7 +126,7 @@ export const useWorkflow = () => {
       setTimeout(() => {
         workflow.steps[index].isCompleted = true;
         executeStep(index + 1);
-      }, 4500);
+      }, 2420);
     };
 
     executeStep(0);

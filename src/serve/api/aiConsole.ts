@@ -40,7 +40,7 @@ const simulateStream = (
             });
             index++;
             wordIndex = 0;
-            const delay = 1000;
+            const delay = 500; // 减少到0.5秒，加快REQUEST消息间隔
             setTimeout(sendNextMessage, delay);
             return;
           }
@@ -51,8 +51,15 @@ const simulateStream = (
             });
             index++;
             wordIndex = 0;
-            const delay = 1000;
+            const delay = 500; // 减少到0.5秒，加快RESPONSE消息间隔
             setTimeout(sendNextMessage, delay);
+            return;
+          }
+          if (message.event === "DELAY") {
+            // 处理延迟事件，不向UI发送任何内容，只是等待指定时间
+            index++;
+            const customDelay = parseInt(message.data) || 2000; // 从data中读取延迟时间，默认2秒
+            setTimeout(sendNextMessage, customDelay);
             return;
           }
           if (wordIndex < word.length) {
@@ -61,7 +68,7 @@ const simulateStream = (
               data: word[wordIndex],
             });
             wordIndex++;
-            setTimeout(() => typedWord(word), 50); // 模拟打字延迟
+            setTimeout(() => typedWord(word), 30); // 加快打字速度到30毫秒
           } else {
             wordIndex = 0;
             index++;
@@ -70,7 +77,7 @@ const simulateStream = (
               type: message.event,
               data: "\n", // 换行符表示消息结束
             });
-            const delay = 100;
+            const delay = 50; // 减少到50毫秒，加快消息间隔
             setTimeout(sendNextMessage, delay);
           }
         };

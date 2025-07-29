@@ -83,7 +83,7 @@ export const useEisenhowerMatrix = () => {
         top: '15%',
         bottom: '0%',
         containLabel: true,
-        width: '50%', // x轴长度
+        width: '70%', // x轴长度
         height: '70%' // y轴长度与x轴一致
       },
       tooltip: {

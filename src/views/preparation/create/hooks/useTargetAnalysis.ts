@@ -30,47 +30,19 @@ export const useTargetAnalysis = () => {
     console.log("获取靶点数据，当前ID:", id);
     const mockData = (mockTargetAnalysisResponse as Record<string, any>)[id] || (mockTargetAnalysisResponse as Record<string, any>)["internet"];
     if (id === "energy") {
-      // energy 返回 12 个指标，名称与数据集一致
-      // return {
-      //   original: {
-      //     domainKnowledgeIntegrity: mockData.metrics?.domainKnowledgeIntegrity ?? 0,
-      //     temporalFeatureCompleteness: mockData.metrics?.temporalFeatureCompleteness ?? 0,
-      //     timeGranularityCoverage: mockData.metrics?.timeGranularityCoverage ?? 0,
-      //     sequenceStability: mockData.metrics?.sequenceStability ?? 0,
-      //     domainKnowledgeDiversity: mockData.metrics?.domainKnowledgeDiversity ?? 0,
-      //     seasonalityStrength: mockData.metrics?.seasonalityStrength ?? 0,
-      //     mainFrequencyStrength: mockData.metrics?.mainFrequencyStrength ?? 0,
-      //     featureIndependence: mockData.metrics?.featureIndependence ?? 0,
-      //     sampleBalance: mockData.metrics?.sampleBalance ?? 0,
-      //     trendStrength: mockData.metrics?.trendStrength ?? 0,
-      //     dataCompleteness: mockData.metrics?.dataCompleteness ?? 0,
-      //     labelConsistency: mockData.metrics?.labelConsistency ?? 0,
-      //   },
-      //   current: {
-      //     domainKnowledgeIntegrity: mockData.metrics?.domainKnowledgeIntegrity ?? 0,
-      //     temporalFeatureCompleteness: mockData.metrics?.temporalFeatureCompleteness ?? 0,
-      //     timeGranularityCoverage: mockData.metrics?.timeGranularityCoverage ?? 0,
-      //     sequenceStability: mockData.metrics?.sequenceStability ?? 0,
-      //     domainKnowledgeDiversity: mockData.metrics?.domainKnowledgeDiversity ?? 0,
-      //     seasonalityStrength: mockData.metrics?.seasonalityStrength ?? 0,
-      //     mainFrequencyStrength: mockData.metrics?.mainFrequencyStrength ?? 0,
-      //     featureIndependence: mockData.metrics?.featureIndependence ?? 0,
-      //     sampleBalance: mockData.metrics?.sampleBalance ?? 0,
-      //     trendStrength: mockData.metrics?.trendStrength ?? 0,
-      //     dataCompleteness: mockData.metrics?.dataCompleteness ?? 0,
-      //     labelConsistency: mockData.metrics?.labelConsistency ?? 0,
-      //   }
-      // };
+      // energy 返回前 4 个指标
       return {
         original: {
-          configDiv: mockData.metrics?.configDiversity ?? 0,
-          dataVolume: mockData.metrics?.dataVolume ?? 0,
-          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+          domainKnowledgeIntegrity: mockData.metrics?.domainKnowledgeIntegrity ?? 0,
+          temporalFeatureCompleteness: mockData.metrics?.temporalFeatureCompleteness ?? 0,
+          timeGranularityCoverage: mockData.metrics?.timeGranularityCoverage ?? 0,
+          sequenceStability: mockData.metrics?.sequenceStability ?? 0,
         },
         current: {
-          configDiv: mockData.metrics?.configDiversity ?? 0,
-          dataVolume: mockData.metrics?.dataVolume ?? 0,
-          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+          domainKnowledgeIntegrity: mockData.metrics?.domainKnowledgeIntegrity ?? 0,
+          temporalFeatureCompleteness: mockData.metrics?.temporalFeatureCompleteness ?? 0,
+          timeGranularityCoverage: mockData.metrics?.timeGranularityCoverage ?? 0,
+          sequenceStability: mockData.metrics?.sequenceStability ?? 0,
         }
       };
     } else {
@@ -88,10 +60,7 @@ export const useTargetAnalysis = () => {
       };
     }
   };
-  const targetData: {
-    original: Record<string, number>;
-    current: Record<string, number>;
-  } = reactive(getTargetData());
+  const targetData = reactive(getTargetData());
 
   // 动态设置 selectedTargetKey，energy 默认第一个指标
   const defaultKey = Object.keys(targetData.original)[0] || "configDiversity";
@@ -108,22 +77,49 @@ export const useTargetAnalysis = () => {
   // 更新靶点数据
   const updateTargetData = (key: string, value: number) => {
     // 确保不超过100
-    targetData.current[key] = Math.min(100, value);
+    if (targetData.current && key in targetData.current) {
+      (targetData.current as any)[key] = Math.min(100, value);
+    }
   };
 
   // 获取指标点在靶图上的位置
   const getIndicatorStyle = (key: string, value: number) => {
-    // 均匀分布靶点，参考 DataAnalysis.vue 实现
-    const keys = Object.keys(targetData.original);
-    const keysLength = keys.length;
-    const idx = keys.indexOf(key);
-    // 角度均匀分布，起始为顶部（-90度）
-    const angle = (360 / keysLength) * idx - 90;
-    // 距离靶心百分比，100分在最外圈，0分在靶心
-    const distancePercent = 100 - value;
+    // 根据数据集类型设置不同的角度分布
+    let angles: Record<string, number>;
+    
+    const taskIdString = String(taskId);
+    if (taskIdString === "2") {
+      // energy 数据集 - 4 个指标均匀分布 (360/4 = 90度间隔)
+      angles = {
+        domainKnowledgeIntegrity: 0,         // 顶部
+        temporalFeatureCompleteness: 90,     // 右侧
+        timeGranularityCoverage: 180,        // 底部
+        sequenceStability: 270,              // 左侧
+      };
+    } else {
+      // internet 数据集 - 3 个指标分布
+      angles = {
+        configDiversity: 30,     // 右上
+        dataVolume: 150,         // 左上
+        chartTypeBalance: 270,   // 下方
+      };
+    }
+
+    // 计算离靶心的距离 (100 - value) / 100 * 40 + 10
+    // 分数越高越靠近靶心，最低10%，最高50%
+    const distancePercent = ((100 - value) / 100) * 40 + 10;
+
+    // 转换为角度和距离
+    const angle = angles[key];
+    if (angle === undefined) {
+      console.warn(`未找到指标 ${key} 的角度配置`);
+      return { left: '50%', top: '50%' };
+    }
+    
     const radians = (angle * Math.PI) / 180;
-    const x = 50 + (Math.cos(radians) * distancePercent) / 2;
-    const y = 50 + (Math.sin(radians) * distancePercent) / 2;
+    const x = 50 + Math.cos(radians) * distancePercent;
+    const y = 50 + Math.sin(radians) * distancePercent;
+
     return {
       left: `${x}%`,
       top: `${y}%`,
@@ -217,18 +213,9 @@ const updateFinalTargetData = () => {
 
   // 更新靶点数据
   if (id === "energy") {
-    updateTargetData("domainKnowledgeIntegrity", finalData.domainKnowledgeIntegrity);
-    updateTargetData("temporalFeatureCompleteness", finalData.temporalFeatureCompleteness);
-    updateTargetData("timeGranularityCoverage", finalData.timeGranularityCoverage);
-    updateTargetData("sequenceStability", finalData.sequenceStability);
-    updateTargetData("domainKnowledgeDiversity", finalData.domainKnowledgeDiversity);
-    updateTargetData("seasonalityStrength", finalData.seasonalityStrength);
-    updateTargetData("mainFrequencyStrength", finalData.mainFrequencyStrength);
-    updateTargetData("featureIndependence", finalData.featureIndependence);
-    updateTargetData("sampleBalance", finalData.sampleBalance);
-    updateTargetData("trendStrength", finalData.trendStrength);
-    updateTargetData("dataCompleteness", finalData.dataCompleteness);
-    updateTargetData("labelConsistency", finalData.labelConsistency);
+    Object.keys(finalData).forEach((key) => {
+      updateTargetData(key, finalData[key]);
+    });
   } else {
     updateTargetData("configDiversity", finalData.configDiversity);
     updateTargetData("dataVolume", finalData.dataVolume);
@@ -262,18 +249,18 @@ const updateFinalTargetData = () => {
         itemWidth: 12,
         itemHeight: 9,
       },
-      return {
-        original: {
-          configDiversity: mockData.metrics?.configDiversity ?? 0,
-          dataVolume: mockData.metrics?.dataVolume ?? 0,
-          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
-        },
-        current: {
-          configDiversity: mockData.metrics?.configDiversity ?? 0,
-          dataVolume: mockData.metrics?.dataVolume ?? 0,
-          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
-        }
-      };
+      radar: {
+        indicator: [
+          { name: "数据量", max: 100 },
+          { name: "数据表示质量", max: 100 },
+          { name: "数据冗余", max: 100 },
+          { name: "数据上下文质量", max: 100 },
+          { name: "数据内在质量", max: 100 },
+        ],
+        triggerEvent: true,
+        axisName: {
+          color: "#666",
+          fontSize: 12,
           fontWeight: 500,
         },
         center: ["50%", "50%"],

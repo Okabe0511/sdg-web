@@ -344,16 +344,16 @@ export default defineComponent({
       "configDiversity": { title: "配置项多样性", score: 0, content: "" },
       "dataVolume": { title: "数据量", score: 0, content: "" },
       "chartTypeBalance": { title: "图表类型均衡性", score: 0, content: "" },
-      // Energy部分字段（全部英文 key，title 为中文）
+      // Energy部分字段（全部英文 key，title 为中文）- 修正标题名称
       "domainKnowledgeIntegrity": { title: "领域知识完整性", score: 0, content: "" },
-      "temporalFeatureCompleteness": { title: "时间特征完备度", score: 0, content: "" },
-      "timeGranularityCoverage": { title: "时间粒度覆盖率", score: 0, content: "" },
-      "sequenceStability": { title: "时序平稳性", score: 0, content: "" },
+      "temporalFeatureCompleteness": { title: "时间特征完整性", score: 0, content: "" },
+      "timeGranularityCoverage": { title: "时间粒度覆盖度", score: 0, content: "" },
+      "sequenceStability": { title: "序列稳定性", score: 0, content: "" },
       "domainKnowledgeDiversity": { title: "领域知识多样性", score: 0, content: "" },
       "seasonalityStrength": { title: "季节性强度", score: 0, content: "" },
       "mainFrequencyStrength": { title: "主频强度", score: 0, content: "" },
       "featureIndependence": { title: "特征独立性", score: 0, content: "" },
-      "sampleBalance": { title: "样本均衡性", score: 0, content: "" },
+      "sampleBalance": { title: "样本平衡性", score: 0, content: "" },
       "trendStrength": { title: "趋势强度", score: 0, content: "" },
       "dataCompleteness": { title: "数据完整性", score: 0, content: "" },
       "labelConsistency": { title: "标签一致性", score: 0, content: "" },
@@ -375,30 +375,28 @@ export default defineComponent({
       "dataVolume",
       "chartTypeBalance",
     ];
-    // 12个energy靶点key（全部英文）
+    // 12个energy靶点key（全部英文）- 修改为前4个
     const energyTargetKeys = [
       "domainKnowledgeIntegrity",
       "temporalFeatureCompleteness",
       "timeGranularityCoverage",
       "sequenceStability",
-      "domainKnowledgeDiversity",
-      "seasonalityStrength",
-      "mainFrequencyStrength",
-      "featureIndependence",
-      "sampleBalance",
-      "trendStrength",
-      "dataCompleteness",
-      "labelConsistency",
     ];
 
     // 计算当前页面应显示的靶点key
     const displayedTargetKeys = computed(() => {
+      let baseKeys: string[] = [];
       if (routeId.value === "1") {
-        return mainTargetKeys;
+        baseKeys = mainTargetKeys;
       } else if (routeId.value === "2") {
-        return energyTargetKeys;
+        baseKeys = energyTargetKeys;
       }
-      return [];
+      
+      // 过滤掉已删除的靶点，并且确保靶点在targetData中存在
+      return baseKeys.filter(key => 
+        !deletedTargets.value.includes(key) && 
+        key in targetData
+      );
     });
 
     // 打开编辑弹窗
@@ -443,6 +441,12 @@ export default defineComponent({
 
     // 确认删除靶点
     const confirmDeleteTarget = () => {
+      // 检查是否至少保留一个靶点
+      const remainingKeys = displayedTargetKeys.value.filter(key => key !== currentEditTarget.value);
+      if (remainingKeys.length === 0) {
+        message.warning("至少需要保留一个靶点");
+        return;
+      }
       deleteConfirmVisible.value = true;
     };
 
@@ -451,9 +455,6 @@ export default defineComponent({
       if (currentEditTarget.value) {
         // 记录已删除的靶点
         deletedTargets.value.push(currentEditTarget.value);
-
-        // 从数据中删除该靶点
-        delete targetData[currentEditTarget.value as keyof typeof targetData];
 
         message.success(
           `${
@@ -466,7 +467,7 @@ export default defineComponent({
         // 如果删除的是当前选中的靶点，则选择另一个靶点
         if (selectedTargetKey.value === currentEditTarget.value) {
           // 找到一个未删除的靶点作为新的选中项
-          const availableKeys = Object.keys(targetData);
+          const availableKeys = displayedTargetKeys.value;
           if (availableKeys.length > 0) {
             selectedTargetKey.value = availableKeys[0];
           }
@@ -508,17 +509,16 @@ export default defineComponent({
 
     // 计算指标点在靶图上的位置
     const getIndicatorStyle = (key: string, value: number) => {
-      // 根据页面id赋值keyslength
-      let keysLength = 0;
-      if (routeId.value === '1') {
-        keysLength = 3;
-      } else if (routeId.value === '2') {
-        keysLength = 12;
-      } else {
-        keysLength = Object.keys(targetData).length;
+      // 根据当前显示的靶点key列表来计算位置
+      const currentKeys = displayedTargetKeys.value;
+      const keysLength = currentKeys.length;
+      const idx = currentKeys.indexOf(key);
+      
+      // 如果找不到key，返回默认位置
+      if (idx === -1) {
+        return { left: '50%', top: '50%' };
       }
-      const keys = Object.keys(targetData);
-      const idx = keys.indexOf(key);
+      
       // 所有靶点均采用默认均匀分布
       const angle = (360 / keysLength) * idx - 90;
       const distancePercent = 100 - value;
@@ -544,6 +544,22 @@ export default defineComponent({
       }
     };
 
+    // 中英文说明映射表
+    const explanationKeyMapping: Record<string, string> = {
+      "domainKnowledgeIntegrity": "领域知识完整性",
+      "temporalFeatureCompleteness": "时间特征完备度", 
+      "timeGranularityCoverage": "时间粒度覆盖率",
+      "sequenceStability": "时序平稳性",
+      "domainKnowledgeDiversity": "领域知识多样性",
+      "seasonalityStrength": "季节性强度",
+      "mainFrequencyStrength": "主频强度",
+      "featureIndependence": "特征独立性",
+      "sampleBalance": "样本均衡性",
+      "trendStrength": "趋势强度",
+      "dataCompleteness": "数据完整性",
+      "labelConsistency": "标签一致性"
+    };
+
     // 加载靶点分析数据
     const loadTargetAnalysis = async () => {
       try {
@@ -555,20 +571,32 @@ export default defineComponent({
           if (data.metrics[key] !== undefined) {
             targetData[key as keyof typeof targetData] = data.metrics[key];
           }
-          // 优先使用API返回的解释，否则energy用领域知识完整性的解释
+          
+          // 更新解释内容，优先使用API返回的解释
+          let explanationContent = "";
+          
+          // 首先尝试用英文key获取解释
           if (data.explanations[key] && data.explanations[key].trim() !== "") {
-            targetExplanations[key].score = data.metrics[key] || 0;
-            targetExplanations[key].content = data.explanations[key];
-          } else if (routeId.value === '2') {
-            // energy部分默认用领域知识完整性的解释和标题
-            targetExplanations[key].content = data.explanations["领域知识完整性"] || `暂无详细说明，请检查数据源或联系管理员。`;
-            targetExplanations[key].title = "领域知识完整性";
-          } else {
-            targetExplanations[key].content = `暂无详细说明，请检查数据源或联系管理员。`;
+            explanationContent = data.explanations[key];
+          } 
+          // 如果没有找到，尝试用中文key获取解释（Energy数据集的情况）
+          else if (explanationKeyMapping[key] && data.explanations[explanationKeyMapping[key]]) {
+            explanationContent = data.explanations[explanationKeyMapping[key]];
+          } 
+          // 最后使用默认说明
+          else {
+            explanationContent = `暂无详细说明，请检查数据源或联系管理员。`;
           }
+          
+          targetExplanations[key].score = data.metrics[key] || 0;
+          targetExplanations[key].content = explanationContent;
         });
-        // 默认选择第一个靶点
-        selectedTargetKey.value = Object.keys(targetData)[0];
+        
+        // 默认选择第一个可显示的靶点
+        const availableKeys = displayedTargetKeys.value;
+        if (availableKeys.length > 0) {
+          selectedTargetKey.value = availableKeys[0];
+        }
         isAnalysisEnd.value = true;
         return true;
       } catch (error) {

@@ -144,7 +144,8 @@
                 </div>
 
                 <!-- 在展示算子参数的区域下方添加代价评估数据 -->
-                <template v-if="step.costEvaluation">
+                <!-- 代价评估暂时隐藏 -->
+                <!-- <template v-if="step.costEvaluation">
                   <div class="step-cost-evaluation">
                     <div class="evaluation-title">代价评估：</div>
                     <div class="evaluation-content">
@@ -168,7 +169,7 @@
                       </div>
                     </div>
                   </div>
-                </template>
+                </template> -->
 
                 <!-- <div
                   class="step-preview"
@@ -279,7 +280,7 @@
                   class="target-indicator original"
                   v-for="key in Object.keys(targetData.original)"
                   :key="`original-${key}`"
-                  :style="getIndicatorStyle(key, targetData.original[key])"
+                  :style="getIndicatorStyle(key, (targetData.original as any)[key])"
                 >
                   <div class="indicator-marker">
                     <div class="line-top"></div>
@@ -294,7 +295,7 @@
                   class="target-indicator current"
                   v-for="key in Object.keys(targetData.current)"
                   :key="`current-${key}`"
-                  :style="getIndicatorStyle(key, targetData.current[key])"
+                  :style="getIndicatorStyle(key, (targetData.current as any)[key])"
                   @click="selectTarget(key)"
                 >
                   <div class="indicator-marker">
@@ -312,13 +313,13 @@
                     <div class="tooltip-value">
                       <span class="label">原始得分:</span>
                       <span class="value">{{
-                        formatScore(targetData.original[key])
+                        formatScore((targetData.original as any)[key])
                       }}</span>
                     </div>
                     <div class="tooltip-value">
                       <span class="label">当前得分:</span>
                       <span class="value">{{
-                        formatScore(targetData.current[key])
+                        formatScore((targetData.current as any)[key])
                       }}</span>
                     </div>
                   </div>
@@ -680,9 +681,16 @@ export default defineComponent({
 
     // 靶点解释数据
     const targetExplanations = reactive<Record<string, TargetExplanation>>({
+      // internet 数据集指标
       configDiversity: { title: "配置项多样性", score: 0, content: "" },
       dataVolume: { title: "数据量", score: 0, content: "" },
       chartTypeBalance: { title: "图表类型均衡性", score: 0, content: "" },
+      
+      // energy 数据集指标（前4个）
+      domainKnowledgeIntegrity: { title: "领域知识完整性", score: 0, content: "" },
+      temporalFeatureCompleteness: { title: "时间特征完整性", score: 0, content: "" },
+      timeGranularityCoverage: { title: "时间粒度覆盖度", score: 0, content: "" },
+      sequenceStability: { title: "序列稳定性", score: 0, content: "" },
     });
 
     // 格式化分数
