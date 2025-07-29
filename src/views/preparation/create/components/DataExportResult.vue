@@ -160,44 +160,42 @@ export default defineComponent({
       return route.params.id?.toString() || "1";
     });
 
-    // energy 9 项靶点指标 key
+    // energy 靶点指标 key（与 mock 数据一致，全部英文 key）
     const energyKeys = [
-      "领域知识完整性",
-      "时间特征完备度",
-      "时间粒度覆盖率",
-      "时序平稳性",
-      "领域知识多样性",
-      "季节性强度",
-      "主频强度",
-      "特征独立性",
-      "样本均衡性"
+      "domainKnowledgeIntegrity",
+      "temporalFeatureCompleteness",
+      "timeGranularityCoverage",
+      "sequenceStability",
+      "domainKnowledgeDiversity",
+      "seasonalityStrength",
+      "mainFrequencyStrength",
+      "featureIndependence",
+      "sampleBalance"
     ];
 
-    // 根据任务ID选择对应的制备后指标数据（task1->Internet, task2->energy）
+    // 根据任务ID选择对应的制备后指标数据（task1->internet, task2->energy）
     const currentMetrics = computed(() => {
       if (taskId.value === '1') {
         return dataMetrics.preparedMetrics['Internet'] || {};
       } else {
         const energyMetrics: Record<string, number> = {};
-        const mockData = targetAnalysisResponse.energy;
-        const metrics = mockData.metrics as Record<string, {before:number, after:number}>;
+        const energyData = dataMetrics.preparedMetrics['energy'];
         for (const k of energyKeys) {
-          energyMetrics[k] = (metrics as any)[k]?.after ?? 0;
+          energyMetrics[k] = energyData[k as keyof typeof energyData] ?? 0;
         }
         return energyMetrics;
       }
     });
 
-    // energy 靶点指标为 9 项，取 before 分数
+    // energy 靶点指标为 9 项，取原始分数
     const originalMetrics = computed(() => {
       if (taskId.value === '1') {
         return dataMetrics.originalMetrics['Internet'] || {};
       } else {
         const energyMetrics: Record<string, number> = {};
-        const mockData = targetAnalysisResponse.energy;
-        const metrics = mockData.metrics as Record<string, {before:number, after:number}>;
+        const energyData = dataMetrics.originalMetrics['energy'];
         for (const k of energyKeys) {
-          energyMetrics[k] = (metrics as any)[k]?.before ?? 0;
+          energyMetrics[k] = energyData[k as keyof typeof energyData] ?? 0;
         }
         return energyMetrics;
       }

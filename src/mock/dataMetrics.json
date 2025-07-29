@@ -24,7 +24,7 @@
       {
         "label": "关系表数量",
         "key": "codeCount",
-        "value": 1500,
+        "value": 507,
         "previousValue": 138
       }
     ]
@@ -97,20 +97,18 @@
       "codeRedundancy": 100.0
     },
     "energy": {
-      "syntaxDetection": 120.0,
-      "configCompleteness": 250.0,
-      "sampleCount": 500.0,
-      "imageCount": 1800.0,
-      "timeGranularityCoverage": 20.0,
-      "seasonalityStrength": 65,
-      "trendStrength": 78,
-      "mainFrequencyStrength": 85,
-      "sampleBalance": 75,
-      "imageRenderMatch": 320.0,
-      "missingRate": 800.0,
-      "chartTypeBalance": 700.0,
-      "configDiversity": 500.0,
-      "codeRedundancy": 200.0
+      "timeGranularityCoverage": 60.0,
+      "seasonalityStrength": 56.49,
+      "trendStrength": 51.13,
+      "mainFrequencyStrength": 73.95,
+      "sampleBalance": 94.78,
+      "dataCompleteness": 100.0,
+      "labelConsistency": 90.72,
+      "sequenceStability": 59.68,
+      "temporalFeatureCompleteness": 64.85,
+      "domainKnowledgeDiversity": 88.88,
+      "domainKnowledgeIntegrity": 54.16,
+      "featureIndependence": 59.92
     }
   },
   "metricNameMap": {
@@ -137,8 +135,7 @@
       "temporalFeatureCompleteness": "时间特征完备度",
       "domainKnowledgeDiversity": "领域知识多样性",
       "domainKnowledgeIntegrity": "领域知识完整性",
-      "featureIndependence": "特征独立性",
-      "chartTypeBalance": "图表类型均衡性"
+      "featureIndependence": "特征独立性"
     }
   },
   "chartSeriesData": {
@@ -161,14 +158,14 @@
     "energy": [
       {
         "name": "原始数据",
-        "value": [50.44, 88.8, 80, 43.55, 99.13],
+        "value": [58.58, 0, 63.19, 42.36, 95.20],
         "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
         "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
         "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
       },
       {
         "name": "制备后数据",
-        "value": [120.0, 75.11, 81.28, 71.68, 103.77],
+        "value":  [67.27, 32.73, 47.69, 71.53, 95.36],
         "itemStyle": { "color": "#f56c6c" },
         "lineStyle": { "color": "#f56c6c" },
         "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }

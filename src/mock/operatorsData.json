@@ -5,116 +5,164 @@
       "name": "基于图像生成代码算子",
       "description": "面向智能数据可视化场景设计的先进数据制备算子，基于大规模视觉-语言模型（VLMs）。能够在图像存在模糊、缺失、变形等情况下，推测用户设计意图，合理补全缺省信息。",
       "parameters": "",
-      "costEvaluation": {
-        "resourceCost": 20.9,
-        "timeCost": 348.39,
-        "qualityContribution": 176.43
-      },
-      "datasetSize": {
-        "dataPairs": 664,
-        "imageCount": 666,
-        "codeCount": 664
-      }
+      "costEvaluation": { "resourceCost": 20.9, "timeCost": 348.39, "qualityContribution": 176.43 },
+      "datasetSize": { "dataPairs": 664, "imageCount": 666, "codeCount": 664 }
     },
     {
       "id": 2,
       "name": "代码扰动算子",
       "description": "面向代码生成与优化场景设计的高阶数据制备算子，旨在通过引入随机扰动机制，结合语法树解析、语义保持与控制噪声注入技术系统性地提升代码样本的多样性与鲁棒性。",
       "parameters": "mutation_prob: 1, mutation_range: 0.5",
-      "costEvaluation": {
-        "resourceCost": 0.0002,
-        "timeCost": 0.24,
-        "qualityContribution": 153.42
-      },
-      "datasetSize": {
-        "dataPairs": 1305,
-        "imageCount": 780,
-        "codeCount": 1305
-      }
+      "costEvaluation": { "resourceCost": 0.0002, "timeCost": 0.24, "qualityContribution": 153.42 },
+      "datasetSize": { "dataPairs": 1305, "imageCount": 780, "codeCount": 1305 }
     },
     {
       "id": 3,
       "name": "图像加噪算子",
       "description": "面向图像数据制备过程的增强算子，旨在模拟真实世界场景中不可控噪声对图像内容的干扰。支持可配置的噪声参数空间，包括噪声强度、注入概率、内容分布与布局策略等。",
       "parameters": "add_watermark: True, water_count: 25, add_noise: True, add_text: True, text_count: 15",
-      "costEvaluation": {
-        "resourceCost": 0.01,
-        "timeCost": 5.3,
-        "qualityContribution": 42.8
-      },
-      "datasetSize": {
-        "dataPairs": 640,
-        "imageCount": 640,
-        "codeCount": 592
-      }
+      "costEvaluation": { "resourceCost": 0.01, "timeCost": 5.3, "qualityContribution": 42.8 },
+      "datasetSize": { "dataPairs": 640, "imageCount": 640, "codeCount": 592 }
     },
     {
       "id": 4,
       "name": "配置项修复算子",
       "description": "面向配置项数据质量提升的增强算子，旨在修复因抓取、标注或生成过程导致的配置项缺失、错误或不规范问题。",
       "parameters": "",
-      "costEvaluation": {
-        "resourceCost": 0.0001,
-        "timeCost": 0.11,
-        "qualityContribution": 10.68
-      },
-      "datasetSize": {
-        "dataPairs": 640,
-        "imageCount": 580,
-        "codeCount": 592
-      }
+      "costEvaluation": { "resourceCost": 0.0001, "timeCost": 0.11, "qualityContribution": 10.68 },
+      "datasetSize": { "dataPairs": 640, "imageCount": 580, "codeCount": 592 }
     },
     {
       "id": 5,
       "name": "配置多样性增强算子",
       "description": "面向配置项数据制备过程的增强算子，旨在通过插入不影响主要图表语义的辅助配置项，扩大模型接触的配置项种类与组合方式，提升生成模型的表达覆盖能力。",
       "parameters": "probability: 0.5",
-      "costEvaluation": {
-        "resourceCost": 3.76,
-        "timeCost": 85.08,
-        "qualityContribution": 1115.07
-      },
-      "datasetSize": {
-        "dataPairs": 664,
-        "imageCount":600,
-        "codeCount": 616
-      }
+      "costEvaluation": { "resourceCost": 3.76, "timeCost": 85.08, "qualityContribution": 1115.07 },
+      "datasetSize": { "dataPairs": 664, "imageCount":600, "codeCount": 616 }
     },
     {
       "id": 6,
       "name": "基于代码生成图像算子",
       "description": "面向智能数据可视化场景设计的数据制备算子，基于配置代码自动渲染图表并截取图像。可用于构建高质量图文对齐样本，提升图像到代码模型的监督信号一致性与图表视觉还原能力。",
       "parameters": "",
-      "costEvaluation": {
-        "resourceCost": 0.05,
-        "timeCost": 53.61,
-        "qualityContribution": 274.35
-      },
-      "datasetSize": {
-        "dataPairs": 1305,
-        "imageCount": 1300,
-        "codeCount": 1305
-      }
+      "costEvaluation": { "resourceCost": 0.05, "timeCost": 53.61, "qualityContribution": 274.35 },
+      "datasetSize": { "dataPairs": 1305, "imageCount": 1300, "codeCount": 1305 }
     },
     {
       "id": 7,
       "name": "语法修复算子",
       "description": "面向语法质量提升的语法修复算子，旨在自动识别并纠正配置代码中的语法错误与格式异常。支持缺失字段补全、属性名纠正、结构嵌套修复等操作，提升训练数据的可解析性与模型学习的稳定性。",
       "parameters": "",
-      "costEvaluation": {
-        "resourceCost": 23.4,
-        "timeCost": 409.13,
-        "qualityContribution": 55.69
-      },
-      "datasetSize": {
-        "dataPairs": 640,
-        "imageCount": 580,
-        "codeCount": 598
-      }
+      "costEvaluation": { "resourceCost": 23.4, "timeCost": 409.13, "qualityContribution": 55.69 },
+      "datasetSize": { "dataPairs": 640, "imageCount": 580, "codeCount": 598 }
+    },
+    {
+      "id": 8,
+      "name": "样本多粒度采样算子",
+      "description": "面向时序数据制备过程的样本生成算子，旨在从不同时间粒度(15min/30min/1h)进行下采样得到多个粒度的时间序列，再经插值算法得到原始长度的新样本，实现样本量的增加。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 0.1047, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 180 }
+    },
+    {
+      "id": 9,
+      "name": "周期性增强算子",
+      "description": "面向时序数据制备过程的样本生成算子，旨在使用STL算法提取目标变量序列的周期项作为新样本的目标变量序列，得到新的样本，实现样本量的增加。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 16.1359, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 492 }
+    },
+    {
+      "id": 10,
+      "name": "趋势性增强算子",
+      "description": "面向时序数据制备过程的样本生成算子，旨在使用STL算法提取目标变量序列的趋势项作为新样本的目标变量序列，得到新的样本，实现样本量的增加。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 16.5443, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 388 }
+    },
+    {
+      "id": 11,
+      "name": "主频提取增强算子",
+      "description": "面向时序数据制备过程的样本生成算子，旨在借助傅里叶变换对特征序列进行分解，提取时序的主要频率作为新样本的变量序列，获得新的样本，实现样本量的增加。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 1.6169, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 284 }
+    },
+    {
+      "id": 12,
+      "name": "数据缺失值填充算子",
+      "description": "面向数据缺失情况的缺失值填充算子，旨在使用SAITS缺失值填补模型处理时序数据缺失值，根据观测到的数据推断并填充缺失值，实现数据完整性的提升。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 3.5756, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 104 }
+    },
+    {
+      "id": 13,
+      "name": "标签冲突校准算子",
+      "description": "面向提升数据质量的标签冲突一致性算子，旨在通过众数计算实现多数投票机制，当多个标签列对同一实体标注存在冲突时，以出现次数最多的标签作为最终结果，解决标签不一致的问题。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 14.6680, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 104 }
+    },
+    {
+      "id": 14,
+      "name": "时序平稳化算子",
+      "description": "面向提升数据表示质量的平稳化算子，旨在通过对每次的输入模型的样本进行归一化操作仅保留其均值和方差等统计特征，并在模型输出后进行去归一化操作，恢复原有数据的统计分布，使模型每次对符合标准分布的样本进行处理。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 0.2857, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 507 }
+    },
+    {
+      "id": 15,
+      "name": "稀缺样本生成算子",
+      "description": "面向提升样本均衡性的稀缺样本生成算子，旨在使用异常检测算法发现存在明显极端情况的稀缺样本，采用样本生成算法获得新的样本，使存在极端情况的样本量与正常情况样本量占比保持平衡。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 1.5852, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 552 }
+    },
+    {
+      "id": 16,
+      "name": "领域知识迁移算子",
+      "description": "面向提升数据质量的领域知识迁移算子，旨在通过对比当前领域在类似应用场景下的情况，若当前场景缺少但其他场景中存在的重要信息，将会向当前场景进行迁移，实现数据质量的增强。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 5.2013, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 104 }
+    },
+    {
+      "id": 17,
+      "name": "领域知识引入算子",
+      "description": "面向提升数据质量的领域知识引入算子，旨在将相同领域的知识信息转换为时序特征引入，以协变量的形式提升数据质量，进而辅助下游任务。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 0.3713, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 104 }
+    },
+    {
+      "id": 18,
+      "name": "时间特征增强算子",
+      "description": "面向提升数据表示质量的时间特征增强算子，旨在从时间戳列派生出多种精细化的时间特征包括：月、日、星期、小时、分钟等基础时间单位；是否为法定节假日；以及基于地理位置计算的太阳高度角和方位角，以协变量的形式添入时序数据中，增强数据表示。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 2.1720, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 104 }
+    },
+    {
+      "id": 19,
+      "name": "冗余样本消除算子",
+      "description": "面向提升样本均衡性的冗余样本消除算子，旨在通过聚类算法去除样本数量过多的类别的样本数量，使不同类别的样本数量保持平衡。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 0.1858, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 507 }
+    },
+    {
+      "id": 20,
+      "name": "冗余特征消除算子",
+      "description": "面向提升特征独立性的冗余特征消除算子，旨在分析协变量的特征之间的相关性、对目标变量特征的重要性等反映冗余程度的信息，移除冗余特征，提升特征间的独立性。",
+      "parameters": "",
+      "costEvaluation": { "resourceCost": 0, "timeCost": 68.4340, "qualityContribution": 0 },
+      "datasetSize": { "codeCount": 507 }
     }
   ],
   "recommendWorkflows": {
     "Internet": [4, 7, 5, 1, 2, 6],
-    "energy": [7, 4, 3, 1, 5, 6]
+    "energy": [12, 16, 17, 18, 13, 8, 11, 10, 9, 15, 19, 20, 14]
   }
 }

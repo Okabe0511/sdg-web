@@ -320,19 +320,19 @@ export default defineComponent({
       "configDiversity": 0,
       "dataVolume": 0,
       "chartTypeBalance": 0,
-      // Energy部分字段
-      "领域知识完整性": 0,
-      "时间特征完备度": 0,
-      "时间粒度覆盖率": 0,
-      "时序平稳性": 0,
-      "领域知识多样性": 0,
-      "季节性强度": 0,
-      "主频强度": 0,
-      "特征独立性": 0,
-      "样本均衡性": 0,
-      "趋势强度": 0,
-      "数据完整性": 0,
-      "标签一致性": 0
+      // Energy部分字段（全部英文 key）
+      "domainKnowledgeIntegrity": 0,
+      "temporalFeatureCompleteness": 0,
+      "timeGranularityCoverage": 0,
+      "sequenceStability": 0,
+      "domainKnowledgeDiversity": 0,
+      "seasonalityStrength": 0,
+      "mainFrequencyStrength": 0,
+      "featureIndependence": 0,
+      "sampleBalance": 0,
+      "trendStrength": 0,
+      "dataCompleteness": 0,
+      "labelConsistency": 0
     });
 
     // 用于记录删除的靶点
@@ -344,19 +344,19 @@ export default defineComponent({
       "configDiversity": { title: "配置项多样性", score: 0, content: "" },
       "dataVolume": { title: "数据量", score: 0, content: "" },
       "chartTypeBalance": { title: "图表类型均衡性", score: 0, content: "" },
-      // Energy部分字段
-      "领域知识完整性": { title: "领域知识完整性", score: 0, content: "" },
-      "时间特征完备度": { title: "时间特征完备度", score: 0, content: "" },
-      "时间粒度覆盖率": { title: "时间粒度覆盖率", score: 0, content: "" },
-      "时序平稳性": { title: "时序平稳性", score: 0, content: "" },
-      "领域知识多样性": { title: "领域知识多样性", score: 0, content: "" },
-      "季节性强度": { title: "季节性强度", score: 0, content: "" },
-      "主频强度": { title: "主频强度", score: 0, content: "" },
-      "特征独立性": { title: "特征独立性", score: 0, content: "" },
-      "样本均衡性": { title: "样本均衡性", score: 0, content: "" },
-      "趋势强度": { title: "趋势强度", score: 0, content: "" },
-      "数据完整性": { title: "数据完整性", score: 0, content: "" },
-      "标签一致性": { title: "标签一致性", score: 0, content: "" },
+      // Energy部分字段（全部英文 key，title 为中文）
+      "domainKnowledgeIntegrity": { title: "领域知识完整性", score: 0, content: "" },
+      "temporalFeatureCompleteness": { title: "时间特征完备度", score: 0, content: "" },
+      "timeGranularityCoverage": { title: "时间粒度覆盖率", score: 0, content: "" },
+      "sequenceStability": { title: "时序平稳性", score: 0, content: "" },
+      "domainKnowledgeDiversity": { title: "领域知识多样性", score: 0, content: "" },
+      "seasonalityStrength": { title: "季节性强度", score: 0, content: "" },
+      "mainFrequencyStrength": { title: "主频强度", score: 0, content: "" },
+      "featureIndependence": { title: "特征独立性", score: 0, content: "" },
+      "sampleBalance": { title: "样本均衡性", score: 0, content: "" },
+      "trendStrength": { title: "趋势强度", score: 0, content: "" },
+      "dataCompleteness": { title: "数据完整性", score: 0, content: "" },
+      "labelConsistency": { title: "标签一致性", score: 0, content: "" },
     });
 
     // 当前选中的靶点
@@ -375,20 +375,20 @@ export default defineComponent({
       "dataVolume",
       "chartTypeBalance",
     ];
-    // 12个energy靶点key（全部中文）
+    // 12个energy靶点key（全部英文）
     const energyTargetKeys = [
-      "领域知识完整性",
-      "时间特征完备度",
-      "时间粒度覆盖率",
-      "时序平稳性",
-      "领域知识多样性",
-      "季节性强度",
-      "主频强度",
-      "特征独立性",
-      "样本均衡性",
-      "趋势强度",
-      "数据完整性",
-      "标签一致性",
+      "domainKnowledgeIntegrity",
+      "temporalFeatureCompleteness",
+      "timeGranularityCoverage",
+      "sequenceStability",
+      "domainKnowledgeDiversity",
+      "seasonalityStrength",
+      "mainFrequencyStrength",
+      "featureIndependence",
+      "sampleBalance",
+      "trendStrength",
+      "dataCompleteness",
+      "labelConsistency",
     ];
 
     // 计算当前页面应显示的靶点key
@@ -508,52 +508,27 @@ export default defineComponent({
 
     // 计算指标点在靶图上的位置
     const getIndicatorStyle = (key: string, value: number) => {
-      // 分情况：id=1时3个靶点分布在圆的不同方向，id=2时12个靶点按值分布在圆上
-      const mainTargetKeys = ['configDiversity', 'dataVolume', 'chartTypeBalance'];
+      // 根据页面id赋值keyslength
+      let keysLength = 0;
+      if (routeId.value === '1') {
+        keysLength = 3;
+      } else if (routeId.value === '2') {
+        keysLength = 12;
+      } else {
+        keysLength = Object.keys(targetData).length;
+      }
       const keys = Object.keys(targetData);
       const idx = keys.indexOf(key);
-      // @ts-ignore
-      if (routeId.value === '1' && mainTargetKeys.includes(key)) {
-        // 3个靶点始终按主key顺序分布于正上方、左下、右下
-        const mainAngles = [-90, 150, 30];
-        const mainIdx = mainTargetKeys.indexOf(key);
-        const angle = mainAngles[mainIdx >= 0 ? mainIdx : 0];
-        const minRadius = 20; // 最小半径
-        const maxRadius = 40; // 最大半径
-        const radius = minRadius + ((maxRadius - minRadius) * value) / 100;
-        const radians = (angle * Math.PI) / 180;
-        const x = 50 + Math.cos(radians) * radius;
-        const y = 50 + Math.sin(radians) * radius;
-        return {
-          left: `${x}%`,
-          top: `${y}%`,
-        };
-      } else if (routeId.value === '2' && keys.length === 12) {
-        // 12个靶点按值分布在圆上
-        const angle = (360 / 12) * idx - 90; // 使第一个在正上方
-        // value越小越靠近圆心，越大越靠近边缘
-        const minRadius = 20; // 最小半径
-        const maxRadius = 40; // 最大半径
-        const radius = minRadius + ((maxRadius - minRadius) * value) / 100;
-        const radians = (angle * Math.PI) / 180;
-        const x = 50 + Math.cos(radians) * radius;
-        const y = 50 + Math.sin(radians) * radius;
-        return {
-          left: `${x}%`,
-          top: `${y}%`,
-        };
-      } else {
-        // 默认均匀分布
-        const angle = (360 / keys.length) * idx - 90;
-        const distancePercent = 100 - value;
-        const radians = (angle * Math.PI) / 180;
-        const x = 50 + (Math.cos(radians) * distancePercent) / 2;
-        const y = 50 + (Math.sin(radians) * distancePercent) / 2;
-        return {
-          left: `${x}%`,
-          top: `${y}%`,
-        };
-      }
+      // 所有靶点均采用默认均匀分布
+      const angle = (360 / keysLength) * idx - 90;
+      const distancePercent = 100 - value;
+      const radians = (angle * Math.PI) / 180;
+      const x = 50 + (Math.cos(radians) * distancePercent) / 2;
+      const y = 50 + (Math.sin(radians) * distancePercent) / 2;
+      return {
+        left: `${x}%`,
+        top: `${y}%`,
+      };
     };
 
     // 处理窗口大小变化
@@ -580,12 +555,15 @@ export default defineComponent({
           if (data.metrics[key] !== undefined) {
             targetData[key as keyof typeof targetData] = data.metrics[key];
           }
-          // 优先使用API返回的解释，否则使用默认说明
+          // 优先使用API返回的解释，否则energy用领域知识完整性的解释
           if (data.explanations[key] && data.explanations[key].trim() !== "") {
             targetExplanations[key].score = data.metrics[key] || 0;
             targetExplanations[key].content = data.explanations[key];
-          } else if (routeId.value === "2") {
-            // Energy靶点默认说明（可根据实际需求补充或优化）
+          } else if (routeId.value === '2') {
+            // energy部分默认用领域知识完整性的解释和标题
+            targetExplanations[key].content = data.explanations["领域知识完整性"] || `暂无详细说明，请检查数据源或联系管理员。`;
+            targetExplanations[key].title = "领域知识完整性";
+          } else {
             targetExplanations[key].content = `暂无详细说明，请检查数据源或联系管理员。`;
           }
         });

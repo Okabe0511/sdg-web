@@ -27,19 +27,36 @@ export const useTargetAnalysis = () => {
     let id = String(route.params.id || "internet");
     if (id === "1") id = "internet";
     if (id === "2") id = "energy";
+    console.log("获取靶点数据，当前ID:", id);
     const mockData = (mockTargetAnalysisResponse as Record<string, any>)[id] || (mockTargetAnalysisResponse as Record<string, any>)["internet"];
-    return {
-      original: {
-        configDiversity: mockData.metrics?.configDiversity ?? 0,
-        dataVolume: mockData.metrics?.dataVolume ?? 0,
-        chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
-      },
-      current: {
-        configDiversity: mockData.metrics?.configDiversity ?? 0,
-        dataVolume: mockData.metrics?.dataVolume ?? 0,
-        chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
-      }
-    };
+    if (id === "energy") {
+      // energy 也返回和 internet 一样的 key 结构
+      return {
+        original: {
+          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          dataVolume: mockData.metrics?.dataVolume ?? 0,
+          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+        },
+        current: {
+          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          dataVolume: mockData.metrics?.dataVolume ?? 0,
+          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+        }
+      };
+    } else {
+      return {
+        original: {
+          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          dataVolume: mockData.metrics?.dataVolume ?? 0,
+          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+        },
+        current: {
+          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          dataVolume: mockData.metrics?.dataVolume ?? 0,
+          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+        }
+      };
+    }
   };
   const targetData: {
     original: Record<string, number>;
@@ -166,7 +183,7 @@ const updateFinalTargetData = () => {
   let finalData;
   let id = String(taskId || "internet");
   if (id === "1") id = "internet";
-  if (id === "2") id = "energy";
+  if (id === "2") id = "internet";
   finalData = (mockTargetAnalysisResponse as Record<string, any>)[id]?.final || (mockTargetAnalysisResponse as Record<string, any>)["internet"].final;
 
   // 更新靶点数据

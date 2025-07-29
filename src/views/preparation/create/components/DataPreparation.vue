@@ -64,46 +64,26 @@
                     {{ operator.description }}
                   </div>
                   <div class="operator-image">
-                    <img
-                      v-if="operator.name === '基于图像生成代码算子'"
-                      :src="Operator1"
-                      alt="算子图示"
-                    />
-                    <img
-                      v-if="operator.name === '代码扰动算子'"
-                      :src="Operator2"
-                      alt="算子图示"
-                    />
-                    <img
-                      v-if="operator.name === '图像加噪算子'"
-                      :src="Operator3"
-                      alt="算子图示"
-                    />
-                    <img
-                      v-if="operator.name === '配置项修复算子'"
-                      :src="Operator4"
-                      alt="算子图示"
-                    />
-                    <img
-                      v-if="operator.name === '配置多样性增强算子'"
-                      :src="Operator5"
-                      alt="算子图示"
-                    />
-                    <img
-                      v-if="operator.name === '基于代码生成图像算子'"
-                      :src="Operator6"
-                      alt="算子图示"
-                    />
-                    <img
-                      v-if="operator.name === '语法修复算子'"
-                      :src="Operator7"
-                      alt="算子图示"
-                    />
-                    <img
-                      v-if="operator.name === '数据去重算子'"
-                      :src="Operator8"
-                      alt="算子图示"
-                    />
+                    <img v-if="operator.name === '基于图像生成代码算子'" :src="Operator1" alt="算子图示" />
+                    <img v-if="operator.name === '代码扰动算子'" :src="Operator2" alt="算子图示" />
+                    <img v-if="operator.name === '图像加噪算子'" :src="Operator3" alt="算子图示" />
+                    <img v-if="operator.name === '配置项修复算子'" :src="Operator4" alt="算子图示" />
+                    <img v-if="operator.name === '配置多样性增强算子'" :src="Operator5" alt="算子图示" />
+                    <img v-if="operator.name === '基于代码生成图像算子'" :src="Operator6" alt="算子图示" />
+                    <img v-if="operator.name === '语法修复算子'" :src="Operator7" alt="算子图示" />
+                    <img v-if="operator.name === '样本多粒度采样算子'" :src="Operator9" alt="算子图示" />
+                    <img v-if="operator.name === '周期性增强算子'" :src="Operator10" alt="算子图示" />
+                    <img v-if="operator.name === '趋势性增强算子'" :src="Operator11" alt="算子图示" />
+                    <img v-if="operator.name === '主频提取增强算子'" :src="Operator12" alt="算子图示" />
+                    <img v-if="operator.name === '数据缺失值填充算子'" :src="Operator13" alt="算子图示" />
+                    <img v-if="operator.name === '标签冲突校准算子'" :src="Operator14" alt="算子图示" />
+                    <img v-if="operator.name === '时序平稳化算子'" :src="Operator15" alt="算子图示" />
+                    <img v-if="operator.name === '稀缺样本生成算子'" :src="Operator16" alt="算子图示" />
+                    <img v-if="operator.name === '领域知识迁移算子'" :src="Operator17" alt="算子图示" />
+                    <img v-if="operator.name === '领域知识引入算子'" :src="Operator18" alt="算子图示" />
+                    <img v-if="operator.name === '时间特征增强算子'" :src="Operator19" alt="算子图示" />
+                    <img v-if="operator.name === '冗余样本消除算子'" :src="Operator20" alt="算子图示" />
+                    <img v-if="operator.name === '冗余特征消除算子'" :src="Operator21" alt="算子图示" />
                   </div>
                 </div>
                 <div
@@ -567,7 +547,21 @@ import Operator5 from "/@/assets/images/operators/operator-5.png";
 import Operator6 from "/@/assets/images/operators/operator-6.png";
 import Operator7 from "/@/assets/images/operators/operator-7.png";
 import Operator8 from "/@/assets/images/operators/operator-8.png";
+import Operator9 from "/@/assets/images/operators/operator-9.png";
+import Operator10 from "/@/assets/images/operators/operator-10.png";
+import Operator11 from "/@/assets/images/operators/operator-11.png";
+import Operator12 from "/@/assets/images/operators/operator-12.png";
+import Operator13 from "/@/assets/images/operators/operator-13.png";
+import Operator14 from "/@/assets/images/operators/operator-14.png";
+import Operator15 from "/@/assets/images/operators/operator-15.png";
+import Operator16 from "/@/assets/images/operators/operator-16.png";
+import Operator17 from "/@/assets/images/operators/operator-17.png";
+import Operator18 from "/@/assets/images/operators/operator-18.png";
+import Operator19 from "/@/assets/images/operators/operator-19.png";
+import Operator20 from "/@/assets/images/operators/operator-20.png";
+import Operator21 from "/@/assets/images/operators/operator-21.png";
 import { Operator } from "/@/serve/api/operators";
+
 
 interface TargetExplanation {
   title: string;
@@ -894,6 +888,19 @@ export default defineComponent({
       Operator6,
       Operator7,
       Operator8,
+      Operator9,
+      Operator10,
+      Operator11,
+      Operator12,
+      Operator13,
+      Operator14,
+      Operator15,
+      Operator16,
+      Operator17,
+      Operator18,
+      Operator19,
+      Operator20,
+      Operator21,
 
       // 添加搜索相关项
       searchKeyword,
