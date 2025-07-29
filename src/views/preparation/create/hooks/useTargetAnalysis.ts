@@ -30,15 +30,45 @@ export const useTargetAnalysis = () => {
     console.log("获取靶点数据，当前ID:", id);
     const mockData = (mockTargetAnalysisResponse as Record<string, any>)[id] || (mockTargetAnalysisResponse as Record<string, any>)["internet"];
     if (id === "energy") {
-      // energy 也返回和 internet 一样的 key 结构
+      // energy 返回 12 个指标，名称与数据集一致
+      // return {
+      //   original: {
+      //     domainKnowledgeIntegrity: mockData.metrics?.domainKnowledgeIntegrity ?? 0,
+      //     temporalFeatureCompleteness: mockData.metrics?.temporalFeatureCompleteness ?? 0,
+      //     timeGranularityCoverage: mockData.metrics?.timeGranularityCoverage ?? 0,
+      //     sequenceStability: mockData.metrics?.sequenceStability ?? 0,
+      //     domainKnowledgeDiversity: mockData.metrics?.domainKnowledgeDiversity ?? 0,
+      //     seasonalityStrength: mockData.metrics?.seasonalityStrength ?? 0,
+      //     mainFrequencyStrength: mockData.metrics?.mainFrequencyStrength ?? 0,
+      //     featureIndependence: mockData.metrics?.featureIndependence ?? 0,
+      //     sampleBalance: mockData.metrics?.sampleBalance ?? 0,
+      //     trendStrength: mockData.metrics?.trendStrength ?? 0,
+      //     dataCompleteness: mockData.metrics?.dataCompleteness ?? 0,
+      //     labelConsistency: mockData.metrics?.labelConsistency ?? 0,
+      //   },
+      //   current: {
+      //     domainKnowledgeIntegrity: mockData.metrics?.domainKnowledgeIntegrity ?? 0,
+      //     temporalFeatureCompleteness: mockData.metrics?.temporalFeatureCompleteness ?? 0,
+      //     timeGranularityCoverage: mockData.metrics?.timeGranularityCoverage ?? 0,
+      //     sequenceStability: mockData.metrics?.sequenceStability ?? 0,
+      //     domainKnowledgeDiversity: mockData.metrics?.domainKnowledgeDiversity ?? 0,
+      //     seasonalityStrength: mockData.metrics?.seasonalityStrength ?? 0,
+      //     mainFrequencyStrength: mockData.metrics?.mainFrequencyStrength ?? 0,
+      //     featureIndependence: mockData.metrics?.featureIndependence ?? 0,
+      //     sampleBalance: mockData.metrics?.sampleBalance ?? 0,
+      //     trendStrength: mockData.metrics?.trendStrength ?? 0,
+      //     dataCompleteness: mockData.metrics?.dataCompleteness ?? 0,
+      //     labelConsistency: mockData.metrics?.labelConsistency ?? 0,
+      //   }
+      // };
       return {
         original: {
-          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          configDiv: mockData.metrics?.configDiversity ?? 0,
           dataVolume: mockData.metrics?.dataVolume ?? 0,
           chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
         },
         current: {
-          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          configDiv: mockData.metrics?.configDiversity ?? 0,
           dataVolume: mockData.metrics?.dataVolume ?? 0,
           chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
         }
@@ -63,12 +93,17 @@ export const useTargetAnalysis = () => {
     current: Record<string, number>;
   } = reactive(getTargetData());
 
-  const selectedTargetKey = ref("configDiversity");
+  // 动态设置 selectedTargetKey，energy 默认第一个指标
+  const defaultKey = Object.keys(targetData.original)[0] || "configDiversity";
+  const selectedTargetKey = ref(defaultKey);
 
   // 选择靶点
   const selectTarget = (key: string) => {
     selectedTargetKey.value = key;
   };
+
+  // 获取所有靶点 key，供页面/组件遍历
+  const targetKeys = () => Object.keys(targetData.original);
 
   // 更新靶点数据
   const updateTargetData = (key: string, value: number) => {
@@ -78,23 +113,17 @@ export const useTargetAnalysis = () => {
 
   // 获取指标点在靶图上的位置
   const getIndicatorStyle = (key: string, value: number) => {
-    // 根据三个指标的位置，设置不同的角度
-    const angles = {
-      configDiversity: 30, // 右上
-      dataVolume: 150, // 左上
-      chartTypeBalance: 270, // 下方
-    };
-
-    // 计算离靶心的距离 (100 - value) / 100 * 40 + 10
-    // 分数越高越靠近靶心，最低10%，最高50%
-    const distancePercent = ((100 - value) / 100) * 40 + 10;
-
-    // 转换为角度和距离
-    const angle = angles[key as keyof typeof angles];
+    // 均匀分布靶点，参考 DataAnalysis.vue 实现
+    const keys = Object.keys(targetData.original);
+    const keysLength = keys.length;
+    const idx = keys.indexOf(key);
+    // 角度均匀分布，起始为顶部（-90度）
+    const angle = (360 / keysLength) * idx - 90;
+    // 距离靶心百分比，100分在最外圈，0分在靶心
+    const distancePercent = 100 - value;
     const radians = (angle * Math.PI) / 180;
-    const x = 50 + Math.cos(radians) * distancePercent;
-    const y = 50 + Math.sin(radians) * distancePercent;
-
+    const x = 50 + (Math.cos(radians) * distancePercent) / 2;
+    const y = 50 + (Math.sin(radians) * distancePercent) / 2;
     return {
       left: `${x}%`,
       top: `${y}%`,
@@ -183,14 +212,23 @@ const updateFinalTargetData = () => {
   let finalData;
   let id = String(taskId || "internet");
   if (id === "1") id = "internet";
-  if (id === "2") id = "internet";
+  if (id === "2") id = "energy";
   finalData = (mockTargetAnalysisResponse as Record<string, any>)[id]?.final || (mockTargetAnalysisResponse as Record<string, any>)["internet"].final;
 
   // 更新靶点数据
   if (id === "energy") {
-    Object.keys(finalData).forEach((key) => {
-      updateTargetData(key, finalData[key]);
-    });
+    updateTargetData("domainKnowledgeIntegrity", finalData.domainKnowledgeIntegrity);
+    updateTargetData("temporalFeatureCompleteness", finalData.temporalFeatureCompleteness);
+    updateTargetData("timeGranularityCoverage", finalData.timeGranularityCoverage);
+    updateTargetData("sequenceStability", finalData.sequenceStability);
+    updateTargetData("domainKnowledgeDiversity", finalData.domainKnowledgeDiversity);
+    updateTargetData("seasonalityStrength", finalData.seasonalityStrength);
+    updateTargetData("mainFrequencyStrength", finalData.mainFrequencyStrength);
+    updateTargetData("featureIndependence", finalData.featureIndependence);
+    updateTargetData("sampleBalance", finalData.sampleBalance);
+    updateTargetData("trendStrength", finalData.trendStrength);
+    updateTargetData("dataCompleteness", finalData.dataCompleteness);
+    updateTargetData("labelConsistency", finalData.labelConsistency);
   } else {
     updateTargetData("configDiversity", finalData.configDiversity);
     updateTargetData("dataVolume", finalData.dataVolume);
@@ -224,18 +262,18 @@ const updateFinalTargetData = () => {
         itemWidth: 12,
         itemHeight: 9,
       },
-      radar: {
-        indicator: [
-          { name: "数据量", max: 100 },
-          { name: "数据表示质量", max: 100 },
-          { name: "数据冗余", max: 100 },
-          { name: "数据上下文质量", max: 100 },
-          { name: "数据内在质量", max: 100 },
-        ],
-        triggerEvent: true,
-        axisName: {
-          color: "#666",
-          fontSize: 12,
+      return {
+        original: {
+          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          dataVolume: mockData.metrics?.dataVolume ?? 0,
+          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+        },
+        current: {
+          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          dataVolume: mockData.metrics?.dataVolume ?? 0,
+          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+        }
+      };
           fontWeight: 500,
         },
         center: ["50%", "50%"],
@@ -297,6 +335,7 @@ const updateFinalTargetData = () => {
     addOperatorData, // 导出新添加的方法
     radarDataSeries, // 导出数据系列
     updateFinalTargetData, // 导出新增的方法
+    targetKeys, // 新增：供页面/组件遍历靶点 key
   };
 };
 
