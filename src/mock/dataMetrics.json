@@ -30,18 +30,6 @@
     ]
     
   },
-  "primaryMetrics": {
-    "Internet": {
-      "dataPairs": 640,
-      "imageCount": 580,
-      "codeCount": 592
-    },
-    "energy": {
-      "dataPairs": 610,
-      "imageCount": 530,
-      "codeCount": 200
-    }
-  },
   "qualityPrimaryMetrics": {
     "Internet": {
       "codeQuality": 89.13,
