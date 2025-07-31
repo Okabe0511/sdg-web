@@ -1,7 +1,7 @@
 <template>
   <div class="dataset-header">
     <div class="dataset-title">
-      <h1>{{ pageId === '2' ? 'ECharts多模态数据集（关系表）' : 'ECharts多模态数据集（图像+程序代码）' }}</h1>
+      <h1>{{ pageId === '2' ? '电价预测数据集（关系表）' : 'ECharts多模态数据集（图像+程序代码）' }}</h1>
     </div>
     <div class="dataset-metrics">
       <div v-if="pageId === '1'" class="metrics-row">
