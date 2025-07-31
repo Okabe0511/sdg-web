@@ -177,6 +177,28 @@
       "dataRedundancy": "用于衡量数据集的简洁与高效性。它从样本均衡性和特征独立性两个层面进行评估。高冗余度的数据，如样本分布严重不均，或特征之间高度相关，意味着数据中存在大量重复、无效的信息，这不仅会使模型学习产生偏见，还会降低训练效率。"
     }
   },
+  
+  "datasets": {
+    "Internet": [
+      {
+        "dataType": "图像",
+        "dataAmount": 580,
+        "dataSize": "19.2MB"
+      },
+      {
+        "dataType": "代码",
+        "dataAmount": 592,
+        "dataSize": "2.6MB"
+      }
+    ],
+    "energy": [
+      {
+        "dataType": "关系表",
+        "dataAmount": 138,
+        "dataSize": "5.52MB"
+      }
+    ]
+  },
   "secondaryMetricMap": {
     "Internet": {
       "dataVolume": ["sampleCount"],
