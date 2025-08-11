@@ -27,23 +27,63 @@ onMounted(async () => {
   const after = await fetchJson('/public/after.json');
   const trueVals = await fetchJson('/public/true.json');
   const option = {
-    title: { text: '电价预测任务预测效果对比', left: 'center' },
+    title: { text: '电价预测任务验证', left: 'center' },
     tooltip: { trigger: 'axis' },
-    legend: {
-      data: [
-        '基准数据集训练模型预测结果',
-        '制备数据集训练模型预测结果',
-        '真实电价'
-      ],
-      top: 30
-    },
+    legend: { data: ['基准数据模型预测', '制备后数据模型预测', '真实数据'], top: 30 },
     grid: { left: 40, right: 40, top: 80, bottom: 40 },
-    xAxis: { type: 'category', data: trueVals.map((_: number, i: number) => i) },
-    yAxis: { type: 'value' },
+    xAxis: { type: 'category', data: trueVals.map((_: number, i: number) => i), show: false },
+    yAxis: { type: 'value', min: -200, max: 1000 },
+    dataZoom: [
+      {
+        show: true,
+        realtime: true,
+        start: 0,
+        end: 40,
+        xAxisIndex: 0,
+        zoomLock: true // 只允许拖动，不允许缩放
+      },
+      {
+        type: 'inside',
+        realtime: true,
+        start: 0,
+        end: 40,
+        xAxisIndex: 0,
+      }
+    ],
     series: [
-      { name: '基准数据集训练模型预测结果', type: 'line', data: before, color: '#EE799F', smooth: true, lineStyle: { width: 1 } },
-      { name: '制备数据集训练模型预测结果', type: 'line', data: after, color: '#0000EE', smooth: true, lineStyle: { width: 1 } },
-      { name: '真实电价', type: 'line', data: trueVals, color: '#f58231', smooth: true, lineStyle: { width: 1 } }
+      { 
+        name: '基准数据模型预测', 
+        type: 'line', 
+        data: before, 
+        color: '#fabed4', 
+        smooth: true, 
+        showSymbol: false,
+        lineStyle: { 
+          width: 1 
+        } 
+      },
+      { 
+        name: '制备后数据模型预测', 
+        type: 'line', 
+        data: after, 
+        color: '#42d4f4', 
+        smooth: true, 
+        showSymbol: false,
+        lineStyle: { 
+          width: 1 
+        } 
+      },
+      { 
+        name: '真实数据', 
+        type: 'line', 
+        data: trueVals, 
+        color: '#f58231', 
+        smooth: true, 
+        showSymbol: false,
+        lineStyle: { 
+          width: 1 
+        } 
+      }
     ]
   };
   if (chartRef.value) {

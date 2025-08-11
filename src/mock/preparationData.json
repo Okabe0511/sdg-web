@@ -2,43 +2,19 @@
   "tasks": [
     {
       "id": 1,
-      "name": "设备数据集处理任务",
+      "name": "ECharts代码生成任务",
       "createTime": "2023-06-15 14:30:22",
       "fileCount": 12,
       "dataCount": 5834,
-      "status": "completed"
-    },
-    {
-      "id": 2,
-      "name": "用户行为数据集处理",
-      "createTime": "2023-06-18 09:15:37",
-      "fileCount": 8,
-      "dataCount": 3421,
-      "status": "running"
-    },
-    {
-      "id": 3,
-      "name": "智能家居数据预处理",
-      "createTime": "2023-06-20 16:45:12",
-      "fileCount": 15,
-      "dataCount": 7612,
-      "status": "completed"
-    },
-    {
-      "id": 4,
-      "name": "气象传感器数据集成",
-      "createTime": "2023-06-22 11:20:45",
-      "fileCount": 6,
-      "dataCount": 2180,
       "status": "unconfigured"
     },
     {
-      "id": 5,
-      "name": "工业设备监控数据分析",
-      "createTime": "2023-06-24 08:55:30",
-      "fileCount": 10,
-      "dataCount": 4905,
-      "status": "running"
+      "id": 2,
+      "name": "电价预测任务",
+      "createTime": "2023-06-18 09:15:37",
+      "fileCount": 8,
+      "dataCount": 3421,
+      "status": "unconfigured"
     }
   ],
   "monitorData": {

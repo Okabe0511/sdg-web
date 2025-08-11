@@ -162,7 +162,7 @@ export default defineComponent({
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   padding: 20px;
   width: 100%;
-  height: calc(120vh - 0px);
+  height: calc(90vh - 0px);
   display: flex;
   align-items: center;
   justify-content: center;

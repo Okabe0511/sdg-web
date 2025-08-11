@@ -122,7 +122,7 @@ export const useEisenhowerMatrix = () => {
         padding: 0
       },
       xAxis: {
-        name: '重要性',
+        name: '靶点危害性',
         nameLocation: 'middle',
         nameGap: 30,
         nameTextStyle: { fontSize: 16 },
@@ -136,7 +136,7 @@ export const useEisenhowerMatrix = () => {
         }
       },
       yAxis: {
-        name: '问题严重性',
+        name: ' 靶点显著性',
         nameLocation: 'middle',
         nameGap: 40,
         nameTextStyle: { fontSize: 16 },
