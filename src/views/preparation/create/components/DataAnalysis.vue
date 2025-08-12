@@ -11,13 +11,13 @@
             <div class="target-circle circle-2"></div>
             <div class="target-circle circle-3"></div>
 
-            <!-- 三个指标点 -->
+            <!-- 动态靶点渲染 -->
             <div
               class="target-indicator"
-              v-for="(item, key) in targetData"
+              v-for="key in displayedTargetKeys"
               :key="key"
               :class="{ active: selectedTargetKey === key }"
-              :style="getIndicatorStyle(key, item)"
+              :style="getIndicatorStyle(key, targetData[key as keyof typeof targetData])"
               @click="selectTarget(key)"
             >
               <div class="indicator-marker">
@@ -49,24 +49,24 @@
                 </div>
                 <div class="tooltip-value">
                   <span class="label">权重:</span>
-                  <span class="value">{{ formatScore(item) }}</span>
+                  <span class="value">{{ formatScore(targetData[key as keyof typeof targetData]) }}</span>
                 </div>
                 <div class="tooltip-value" v-if="key === 'configDiversity'">
                   <span class="label">多样性:</span>
                   <span class="value">{{
-                    item > 70 ? "严重靶点" : item > 40 ? "中等靶点" : "轻度靶点"
+                    targetData[key as keyof typeof targetData] > 70 ? "严重靶点" : targetData[key as keyof typeof targetData] > 40 ? "中等靶点" : "轻度靶点"
                   }}</span>
                 </div>
                 <div class="tooltip-value" v-if="key === 'dataVolume'">
                   <span class="label">数据量:</span>
                   <span class="value">{{
-                    item > 70 ? "严重靶点" : item > 40 ? "中等靶点" : "轻度靶点"
+                    targetData[key as keyof typeof targetData] > 70 ? "严重靶点" : targetData[key as keyof typeof targetData] > 40 ? "中等靶点" : "轻度靶点"
                   }}</span>
                 </div>
                 <div class="tooltip-value" v-if="key === 'chartTypeBalance'">
                   <span class="label">均衡性:</span>
                   <span class="value">{{
-                    item > 70 ? "严重靶点" : item > 40 ? "中等靶点" : "轻度靶点"
+                    targetData[key as keyof typeof targetData] > 70 ? "严重靶点" : targetData[key as keyof typeof targetData] > 40 ? "中等靶点" : "轻度靶点"
                   }}</span>
                 </div>
               </div>
@@ -103,39 +103,55 @@
 
       <div class="additional-analysis">
         <div class="analysis-controls">
+          <!-- 根据routeId显示不同的图表切换按钮 -->
           <a-radio-group
             v-model:value="chartType"
             button-style="solid"
             size="small"
+            v-if="routeId === '1'"
           >
             <a-radio-button value="heatmap">微观</a-radio-button>
             <a-radio-button value="analysis">聚合</a-radio-button>
           </a-radio-group>
+        
         </div>
 
-        <div
-          v-show="chartType === 'heatmap'"
-          id="main"
-          style="width: 100%; height: 350px"
-        ></div>
-
-        <div v-show="chartType === 'analysis'" class="histogram-container">
+        <!-- 热力图和柱状图容器 - 仅routeId为1时显示 -->
+        <template v-if="routeId === '1'">
           <div
-            v-if="histogramData && histogramData.histogramData"
-            class="histogram-grid"
+            v-show="chartType === 'heatmap'"
+            id="main"
+            style="width: 100%; height: 380px"
+          ></div>
+
+          <div
+            v-show="chartType === 'analysis'"
+            class="histogram-container"
           >
             <div
-              v-for="(_, index) in histogramData.histogramData"
-              :key="index"
-              class="histogram-item"
-              ref="histogramChartRefs"
-            ></div>
+              v-if="histogramData && histogramData.histogramData"
+              class="histogram-grid"
+            >
+              <div
+                v-for="(_, index) in histogramData.histogramData"
+                :key="index"
+                class="histogram-item"
+                ref="histogramChartRefs"
+              ></div>
+            </div>
+            <div v-else class="loading-charts">
+              <a-spin />
+              <div>正在加载分析图表...</div>
+            </div>
           </div>
-          <div v-else class="loading-charts">
-            <a-spin />
-            <div>正在加载分析图表...</div>
-          </div>
-        </div>
+        </template>
+
+        <!-- 艾森豪威尔矩阵容器 - 仅routeId为2时显示 -->
+        <div
+          v-if="routeId === '2' && chartType === 'eisenhower'"
+          id="eisenhower-matrix"
+          style="width: 100%; height: 410px"
+        ></div>
       </div>
 
       <!-- 添加下一步按钮 -->
@@ -226,12 +242,15 @@ import {
   watch,
   nextTick,
   PropType,
+  computed,
 } from "vue";
 import { message } from "ant-design-vue";
 import { RightOutlined, EditOutlined } from "@ant-design/icons-vue";
-import { useHeatmapChart } from "/@/views/preparation/create/hooks/useHeatmapChart";
-import { useHistogramCharts } from "/@/views/preparation/create/hooks/useHistogramCharts";
+import { useHeatmapChart } from "../hooks/useHeatmapChart";
+import { useHistogramCharts } from "../hooks/useHistogramCharts";
+import { useEisenhowerMatrix } from "../hooks/useEisenhowerMatrix";
 import { getTargetAnalysis } from "/@/serve/api/targetAnalysis";
+import { useRoute } from 'vue-router'; 
 
 interface TargetExplanation {
   title: string;
@@ -249,6 +268,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    taskid: {
+      type: Number,
+      default: 1,
+    },
     onNextStep: {
       type: Function as PropType<() => void>,
       required: false,
@@ -256,18 +279,21 @@ export default defineComponent({
   },
   emits: ["next-step"],
   setup(props, { emit }) {
-    // 原有部分保持不变
-    const chartType = ref("heatmap"); // 默认显示热力图
+    const route = useRoute();
+    const routeId = ref(route.params.id as string);
+    const chartType = ref(
+      routeId.value === '1' ? "heatmap" : "eisenhower"
+    );  
     const histogramChartRefs = ref<HTMLElement[]>([]);
     const isAnalysisEnd = ref(false);
 
     // 使用热力图钩子
     const {
-      chartLoaded,
+      chartLoaded: heatmapLoaded,
       initHeatmap,
-      disposeChart,
-      resizeChart,
-      handleResize: resizeHeatmap,
+      disposeChart: disposeHeatmap,
+      resizeChart: resizeHeatmap,
+      handleResize: resizeHeatmapHandler,
     } = useHeatmapChart();
 
     // 使用柱状图钩子
@@ -280,11 +306,33 @@ export default defineComponent({
       handleResize: resizeHistograms,
     } = useHistogramCharts();
 
+    // 使用艾森豪威尔矩阵钩子
+    const {
+      chartLoaded: eisenhowerLoaded,
+      initEisenhowerMatrix,
+      disposeChart: disposeEisenhower,
+      resizeChart: resizeEisenhower,
+    } = useEisenhowerMatrix();
+
     // 靶点分析数据
     const targetData = reactive({
-      configDiversity: 0,
-      dataVolume: 0,
-      chartTypeBalance: 0,
+      // Internet部分字段
+      "configDiversity": 0,
+      "dataVolume": 0,
+      "chartTypeBalance": 0,
+      // Energy部分字段（全部英文 key）
+      "domainKnowledgeIntegrity": 0,
+      "temporalFeatureCompleteness": 0,
+      "timeGranularityCoverage": 0,
+      "sequenceStability": 0,
+      "domainKnowledgeDiversity": 0,
+      "seasonalityStrength": 0,
+      "mainFrequencyStrength": 0,
+      "featureIndependence": 0,
+      "sampleBalance": 0,
+      "trendStrength": 0,
+      "dataCompleteness": 0,
+      "labelConsistency": 0
     });
 
     // 用于记录删除的靶点
@@ -292,9 +340,23 @@ export default defineComponent({
 
     // 靶点解释数据
     const targetExplanations = reactive<Record<string, TargetExplanation>>({
-      configDiversity: { title: "配置项多样性", score: 0, content: "" },
-      dataVolume: { title: "数据量", score: 0, content: "" },
-      chartTypeBalance: { title: "图表类型均衡性", score: 0, content: "" },
+      // Internet部分字段
+      "configDiversity": { title: "配置项多样性", score: 0, content: "" },
+      "dataVolume": { title: "数据量", score: 0, content: "" },
+      "chartTypeBalance": { title: "图表类型均衡性", score: 0, content: "" },
+      // Energy部分字段（全部英文 key，title 为中文）- 修正标题名称
+      "domainKnowledgeIntegrity": { title: "领域知识完整性", score: 0, content: "" },
+      "temporalFeatureCompleteness": { title: "时间特征完整性", score: 0, content: "" },
+      "timeGranularityCoverage": { title: "时间粒度覆盖度", score: 0, content: "" },
+      "sequenceStability": { title: "序列稳定性", score: 0, content: "" },
+      "domainKnowledgeDiversity": { title: "领域知识多样性", score: 0, content: "" },
+      "seasonalityStrength": { title: "季节性强度", score: 0, content: "" },
+      "mainFrequencyStrength": { title: "主频强度", score: 0, content: "" },
+      "featureIndependence": { title: "特征独立性", score: 0, content: "" },
+      "sampleBalance": { title: "样本平衡性", score: 0, content: "" },
+      "trendStrength": { title: "趋势强度", score: 0, content: "" },
+      "dataCompleteness": { title: "数据完整性", score: 0, content: "" },
+      "labelConsistency": { title: "标签一致性", score: 0, content: "" },
     });
 
     // 当前选中的靶点
@@ -306,6 +368,36 @@ export default defineComponent({
     const currentEditValue = ref(0);
     const newTargetValue = ref(0);
     const deleteConfirmVisible = ref(false);
+
+    // 3个主靶点key
+    const mainTargetKeys = [
+      "configDiversity",
+      "dataVolume",
+      "chartTypeBalance",
+    ];
+    // 12个energy靶点key（全部英文）- 修改为前4个
+    const energyTargetKeys = [
+      "domainKnowledgeIntegrity",
+      "temporalFeatureCompleteness",
+      "timeGranularityCoverage",
+      "sequenceStability",
+    ];
+
+    // 计算当前页面应显示的靶点key
+    const displayedTargetKeys = computed(() => {
+      let baseKeys: string[] = [];
+      if (routeId.value === "1") {
+        baseKeys = mainTargetKeys;
+      } else if (routeId.value === "2") {
+        baseKeys = energyTargetKeys;
+      }
+      
+      // 过滤掉已删除的靶点，并且确保靶点在targetData中存在
+      return baseKeys.filter(key => 
+        !deletedTargets.value.includes(key) && 
+        key in targetData
+      );
+    });
 
     // 打开编辑弹窗
     const openEditDialog = (key: string) => {
@@ -349,6 +441,12 @@ export default defineComponent({
 
     // 确认删除靶点
     const confirmDeleteTarget = () => {
+      // 检查是否至少保留一个靶点
+      const remainingKeys = displayedTargetKeys.value.filter(key => key !== currentEditTarget.value);
+      if (remainingKeys.length === 0) {
+        message.warning("至少需要保留一个靶点");
+        return;
+      }
       deleteConfirmVisible.value = true;
     };
 
@@ -357,9 +455,6 @@ export default defineComponent({
       if (currentEditTarget.value) {
         // 记录已删除的靶点
         deletedTargets.value.push(currentEditTarget.value);
-
-        // 从数据中删除该靶点
-        delete targetData[currentEditTarget.value as keyof typeof targetData];
 
         message.success(
           `${
@@ -372,7 +467,7 @@ export default defineComponent({
         // 如果删除的是当前选中的靶点，则选择另一个靶点
         if (selectedTargetKey.value === currentEditTarget.value) {
           // 找到一个未删除的靶点作为新的选中项
-          const availableKeys = Object.keys(targetData);
+          const availableKeys = displayedTargetKeys.value;
           if (availableKeys.length > 0) {
             selectedTargetKey.value = availableKeys[0];
           }
@@ -396,27 +491,40 @@ export default defineComponent({
         configDiversity: "data-panel_line",
         dataVolume: "database",
         chartTypeBalance: "chart",
+        timeGranularityCoverage: "clock-circle",
+        seasonalityStrength: "calendar",
+        trendStrength: "line-chart",
+        mainFrequencyStrength: "bar-chart",
+        sampleBalance: "pie-chart",
+        dataCompleteness: "check-circle",
+        labelConsistency: "tag",
+        sequenceStability: "swap",
+        temporalFeatureCompleteness: "hourglass",
+        domainKnowledgeDiversity: "bulb",
+        domainKnowledgeIntegrity: "safety",
+        featureIndependence: "disconnect",
       };
       return iconMap[key] || "flag";
     };
 
     // 计算指标点在靶图上的位置
     const getIndicatorStyle = (key: string, value: number) => {
-      // 根据三个指标的位置，设置不同的角度
-      const angles: Record<string, number> = {
-        configDiversity: 30, // 右上
-        dataVolume: 150, // 左上
-        chartTypeBalance: 270, // 下方
-      };
-
-      // 计算离靶心的距离，当值为100时在靶心(0%)，当值为0时在靶边缘(100%)
+      // 根据当前显示的靶点key列表来计算位置
+      const currentKeys = displayedTargetKeys.value;
+      const keysLength = currentKeys.length;
+      const idx = currentKeys.indexOf(key);
+      
+      // 如果找不到key，返回默认位置
+      if (idx === -1) {
+        return { left: '50%', top: '50%' };
+      }
+      
+      // 所有靶点均采用默认均匀分布
+      const angle = (360 / keysLength) * idx - 90;
       const distancePercent = 100 - value;
-
-      const angle = angles[key];
       const radians = (angle * Math.PI) / 180;
-      const x = 50 + (Math.cos(radians) * distancePercent) / 2; // 除以2使得最大范围不超过边界
+      const x = 50 + (Math.cos(radians) * distancePercent) / 2;
       const y = 50 + (Math.sin(radians) * distancePercent) / 2;
-
       return {
         left: `${x}%`,
         top: `${y}%`,
@@ -425,11 +533,31 @@ export default defineComponent({
 
     // 处理窗口大小变化
     const handleWindowResize = () => {
-      if (chartType.value === "heatmap") {
-        resizeHeatmap();
-      } else if (chartType.value === "analysis") {
-        resizeHistograms();
+      if (routeId.value === '1') {
+        if (chartType.value === "heatmap") {
+          resizeHeatmapHandler();
+        } else if (chartType.value === "analysis") {
+          resizeHistograms();
+        }
+      } else if (routeId.value === '2') {
+        resizeEisenhower();
       }
+    };
+
+    // 中英文说明映射表
+    const explanationKeyMapping: Record<string, string> = {
+      "domainKnowledgeIntegrity": "领域知识完整性",
+      "temporalFeatureCompleteness": "时间特征完备度", 
+      "timeGranularityCoverage": "时间粒度覆盖率",
+      "sequenceStability": "时序平稳性",
+      "domainKnowledgeDiversity": "领域知识多样性",
+      "seasonalityStrength": "季节性强度",
+      "mainFrequencyStrength": "主频强度",
+      "featureIndependence": "特征独立性",
+      "sampleBalance": "样本均衡性",
+      "trendStrength": "趋势强度",
+      "dataCompleteness": "数据完整性",
+      "labelConsistency": "标签一致性"
     };
 
     // 加载靶点分析数据
@@ -438,30 +566,37 @@ export default defineComponent({
         const response = await getTargetAnalysis();
         const data = response.data;
 
-        // 更新靶点分析数据
-        targetData.configDiversity = data.metrics.configDiversity;
-        targetData.dataVolume = data.metrics.dataVolume;
-        targetData.chartTypeBalance = data.metrics.chartTypeBalance;
-
-        // 更新靶点解释数据
-        targetExplanations.configDiversity = {
-          title: "配置项多样性",
-          score: data.metrics.configDiversity,
-          content: data.explanations.configDiversity,
-        };
-        targetExplanations.dataVolume = {
-          title: "数据量",
-          score: data.metrics.dataVolume,
-          content: data.explanations.dataVolume,
-        };
-        targetExplanations.chartTypeBalance = {
-          title: "图表类型均衡性",
-          score: data.metrics.chartTypeBalance,
-          content: data.explanations.chartTypeBalance,
-        };
-
-        // 默认选择第一个靶点
-        selectedTargetKey.value = "configDiversity";
+        // 更新靶点分析数据和解释
+        Object.keys(targetData).forEach((key) => {
+          if (data.metrics[key] !== undefined) {
+            targetData[key as keyof typeof targetData] = data.metrics[key];
+          }
+          
+          // 更新解释内容，优先使用API返回的解释
+          let explanationContent = "";
+          
+          // 首先尝试用英文key获取解释
+          if (data.explanations[key] && data.explanations[key].trim() !== "") {
+            explanationContent = data.explanations[key];
+          } 
+          // 如果没有找到，尝试用中文key获取解释（Energy数据集的情况）
+          else if (explanationKeyMapping[key] && data.explanations[explanationKeyMapping[key]]) {
+            explanationContent = data.explanations[explanationKeyMapping[key]];
+          } 
+          // 最后使用默认说明
+          else {
+            explanationContent = `暂无详细说明，请检查数据源或联系管理员。`;
+          }
+          
+          targetExplanations[key].score = data.metrics[key] || 0;
+          targetExplanations[key].content = explanationContent;
+        });
+        
+        // 默认选择第一个可显示的靶点
+        const availableKeys = displayedTargetKeys.value;
+        if (availableKeys.length > 0) {
+          selectedTargetKey.value = availableKeys[0];
+        }
         isAnalysisEnd.value = true;
         return true;
       } catch (error) {
@@ -470,20 +605,35 @@ export default defineComponent({
       }
     };
 
+    // 初始化图表
+    const initCharts = async () => {
+      if (routeId.value === '1') {
+        if (chartType.value === "heatmap") {
+          initHeatmap();
+        } else if (chartType.value === "analysis") {
+          await loadHistogramData();
+          nextTick(() => {
+            if (histogramChartRefs.value.length > 0) {
+              setChartRefs(histogramChartRefs.value);
+              initHistogramCharts();
+            }
+          });
+        }
+      } else if (routeId.value === '2') {
+        // 确保艾森豪威尔矩阵正确初始化
+        if (chartType.value === "eisenhower") {
+          await initEisenhowerMatrix();
+        }
+      }
+    };
+
     // 组件挂载时加载数据
     onMounted(async () => {
       // 加载靶点分析数据
       await loadTargetAnalysis();
 
-      // 加载柱状图数据
-      await loadHistogramData();
-
-      // 加载初始图表
-      if (props.visible) {
-        if (chartType.value === "heatmap") {
-          initHeatmap();
-        }
-      }
+      // 初始化图表
+      await initCharts();
 
       // 添加窗口大小变化监听
       window.addEventListener("resize", handleWindowResize);
@@ -492,33 +642,31 @@ export default defineComponent({
     // 在组件销毁前清理资源
     onBeforeUnmount(() => {
       window.removeEventListener("resize", handleWindowResize);
-      disposeChart();
+      disposeHeatmap();
       disposeHistogramCharts();
+      disposeEisenhower();
     });
+
+    // 监听路由参数变化
+    watch(
+      () => route.params.id,
+      (newId) => {
+        routeId.value = newId as string;
+        // 根据新的routeId设置默认的chartType
+        chartType.value = routeId.value === '1' ? "heatmap" : "eisenhower";
+        // 重新初始化图表
+        initCharts();
+      }
+    );
 
     // 监听可见性变化，重新渲染图表
     watch(
       () => props.visible,
       (isVisible) => {
         if (isVisible) {
-          if (chartType.value === "heatmap") {
-            // 页面显示时，确保图表正确渲染
-            setTimeout(() => {
-              if (chartLoaded.value) {
-                resizeChart();
-              } else {
-                initHeatmap();
-              }
-            }, 300);
-          } else if (chartType.value === "analysis") {
-            // 初始化柱状图
-            nextTick(() => {
-              if (histogramChartRefs.value.length > 0) {
-                setChartRefs(histogramChartRefs.value);
-                initHistogramCharts();
-              }
-            });
-          }
+          setTimeout(() => {
+            initCharts();
+          }, 300);
         }
       }
     );
@@ -529,27 +677,39 @@ export default defineComponent({
       async (newType) => {
         if (!props.visible) return;
 
-        if (newType === "heatmap") {
-          setTimeout(() => {
-            if (chartLoaded.value) {
-              resizeChart();
-            } else {
-              initHeatmap();
+        if (routeId.value === '1') {
+          if (newType === "heatmap") {
+            setTimeout(() => {
+              if (heatmapLoaded.value) {
+                resizeHeatmap();
+              } else {
+                initHeatmap();
+              }
+            }, 100);
+          } else if (newType === "analysis") {
+            // 确保数据已加载
+            if (!histogramData.value) {
+              await loadHistogramData();
             }
-          }, 100);
-        } else if (newType === "analysis") {
-          // 确保数据已加载
-          if (!histogramData.value) {
-            await loadHistogramData();
-          }
 
-          // 等待DOM更新后初始化图表
-          nextTick(() => {
-            if (histogramChartRefs.value.length > 0) {
-              setChartRefs(histogramChartRefs.value);
-              initHistogramCharts();
-            }
-          });
+            // 等待DOM更新后初始化图表
+            nextTick(() => {
+              if (histogramChartRefs.value.length > 0) {
+                setChartRefs(histogramChartRefs.value);
+                initHistogramCharts();
+              }
+            });
+          }
+        } else if (routeId.value === '2') {
+          if (newType === "eisenhower") {
+            setTimeout(() => {
+              if (eisenhowerLoaded.value) {
+                resizeEisenhower();
+              } else {
+                initEisenhowerMatrix();
+              }
+            }, 100);
+          }
         }
       }
     );
@@ -561,7 +721,8 @@ export default defineComponent({
         if (
           refs.length > 0 &&
           chartType.value === "analysis" &&
-          props.visible
+          props.visible &&
+          routeId.value === '1'
         ) {
           setChartRefs(refs);
           initHistogramCharts();
@@ -615,14 +776,15 @@ export default defineComponent({
       cancelTargetEdit,
       confirmDeleteTarget,
       deleteTarget,
-      legendItems, // 新增返回值
+      legendItems,
+      routeId,
+      displayedTargetKeys,
     };
   },
 });
 </script>
 
 <style lang="less" scoped>
-/* 保留原有样式 */
 .analysis-section {
   height: 100%;
   background-color: #fff;
@@ -924,7 +1086,7 @@ export default defineComponent({
     }
 
     .additional-analysis {
-      min-height: 350px;
+      min-height: 405px;
 
       .analysis-controls {
         display: flex;
@@ -984,7 +1146,7 @@ export default defineComponent({
 
   /* 添加下一步按钮样式 */
   .next-step-action {
-    margin-top: 20px;
+    margin-bottom: 0px;
     display: flex;
     justify-content: flex-end;
   }

@@ -5,6 +5,7 @@ import { LeftOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 // 导入任务详情 API
 import { getTaskDetail } from "/@/serve/api/preparation";
+import dataMetrics from '/@/mock/dataMetrics.json';
 
 // 引入拆分出的组件
 import ProgressSteps from "./components/ProgressSteps.vue";
@@ -60,6 +61,7 @@ export default defineComponent({
       qualityExplanations,
       selectedQualityMetric,
       loadQualityMetrics,
+      loadQualityExplanations,
     } = useQualityAssessment();
     const { analysisInProgress, startAnalysis, stopAnalysis } =
       useDataAnalysis();
@@ -161,6 +163,15 @@ export default defineComponent({
       }
     };
 
+    // 计算当前页面 id
+    const getMetricNameMap = () => {
+      let id = '';
+      if (String(taskId.value) === '1') id = 'Internet';
+      else if (String(taskId.value) === '2') id = 'energy';
+      else id = 'Internet';
+      return (dataMetrics.metricNameMap as Record<string, Record<string, string>>)[id] || {};
+    };
+
     // 处理下一步的函数
     const handleNextStep = () => {
       if (currentStep.value === 3) {
@@ -186,6 +197,13 @@ export default defineComponent({
     const handleStartDataDescription = () => {
       modulesVisible.datasetDescription = true;
       loadQualityMetrics(taskId.value || 0);
+      
+      // 根据taskId确定任务类型并加载对应的explanations
+      let taskType: "Internet" | "energy" = "Internet";
+      if (String(taskId.value) === '1') taskType = 'Internet';
+      else if (String(taskId.value) === '2') taskType = 'energy';
+      loadQualityExplanations(taskType);
+      
       setCurrentStep(1);
     };
 
@@ -270,6 +288,7 @@ export default defineComponent({
       // 新增的处理下一步的函数
       handleNextStep,
       handleCompletePreparation,
+      getMetricNameMap,
     };
   },
 });
@@ -312,6 +331,7 @@ export default defineComponent({
               :secondary-metrics="secondaryMetrics"
               :quality-explanations="qualityExplanations"
               :selected-quality-metric="selectedQualityMetric"
+              :metric-name-map="getMetricNameMap()"
               @update:selected-quality-metric="selectedQualityMetric = $event"
             />
           </div>

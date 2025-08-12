@@ -1,6 +1,8 @@
 <template>
   <div class="quality-section">
-    <h2>数据质量评估</h2>
+    <a-affix :offset-top="0">
+      <h2>数据质量评估</h2>
+    </a-affix>
     <div v-if="visible" class="quality-content">
       <div ref="radarChartRef" class="radar-chart"></div>
       <div class="quality-tips">
@@ -18,11 +20,16 @@
             {{ qualityExplanations.dataVolume }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">数据量：</span>
-              <span class="metric-value">{{
-                formatValue(secondaryMetrics.sampleCount)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -37,17 +44,16 @@
             {{ qualityExplanations.dataAlignment }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">图像与渲染截图匹配度：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.imageRenderMatch)
-              }}</span>
-            </div>
-            <div class="secondary-metric-item">
-              <span class="metric-label">缺失率：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.missingRate)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -62,17 +68,16 @@
             {{ qualityExplanations.dataRedundancy }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">代码重复性：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.codeRedundancy)
-              }}</span>
-            </div>
-            <div class="secondary-metric-item">
-              <span class="metric-label">图像重复性：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.imageRedundancy)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -87,17 +92,16 @@
             {{ qualityExplanations.diversityBalance }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">图表类型均衡性：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.chartTypeBalance)
-              }}</span>
-            </div>
-            <div class="secondary-metric-item">
-              <span class="metric-label">配置项多样性：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.configDiversity)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -112,17 +116,16 @@
             {{ qualityExplanations.codeQuality }}
           </div>
           <div class="secondary-metrics">
-            <div class="secondary-metric-item">
-              <span class="metric-label">语法检测通过率：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.syntaxDetection)
-              }}</span>
-            </div>
-            <div class="secondary-metric-item">
-              <span class="metric-label">配置项完整性：</span>
-              <span class="metric-value">{{
-                formatPercent(secondaryMetrics.configCompleteness)
-              }}</span>
+            <div v-for="key in currentSecondaryMetrics" :key="key" class="secondary-metric-item">
+              <span class="metric-label">{{ getMetricName(key) }}：</span>
+              <span class="metric-value">
+                <template v-if="['sampleCount', 'imageCount'].includes(key)">
+                  {{ formatValue(secondaryMetrics[key]) }}
+                </template>
+                <template v-else>
+                  {{ formatPercent(secondaryMetrics[key]) }}
+                </template>
+              </span>
             </div>
           </div>
         </div>
@@ -136,8 +139,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, PropType } from "vue";
+import { defineComponent, ref, onMounted, watch, PropType, computed } from "vue";
+import { useRoute } from "vue-router";
 import * as echarts from "echarts";
+import mockDataMetrics from "/@/mock/dataMetrics.json";
 import {
   QualityMetrics,
   SecondaryMetrics,
@@ -165,9 +170,27 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    metricNameMap: {
+      type: Object as PropType<Record<string, string>>,
+      required: true,
+    },
   },
   emits: ["update:selectedQualityMetric"],
   setup(props, { emit }) {
+    // 获取当前路由
+    const route = useRoute();
+    // 获取当前数据集类型
+    const getType = () => {
+      const id = Number(route.params.id ?? route.query.taskId);
+      return id === 2 ? "energy" : "Internet";
+    };
+    // 获取当前一级指标对应的二级指标数组
+    const secondaryMetricMap = mockDataMetrics.secondaryMetricMap as Record<string, Record<string, string[]>>;
+    const currentSecondaryMetrics = computed<string[]>(() => {
+      const type = getType();
+      const metric = props.selectedQualityMetric;
+      return secondaryMetricMap[type]?.[metric] || [];
+    });
     const radarChartRef = ref<HTMLElement | null>(null);
     let radarChart: echarts.ECharts | null = null;
 
@@ -180,6 +203,11 @@ export default defineComponent({
     const formatValue = (value: number) => {
       if (!value) return "0";
       return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    // 动态获取指标中文名
+    const getMetricName = (key: string) => {
+      return props.metricNameMap?.[key] || key;
     };
 
     const initRadarChart = () => {
@@ -318,6 +346,9 @@ export default defineComponent({
       radarChartRef,
       formatPercent,
       formatValue,
+      getMetricName,
+      currentSecondaryMetrics,
+      secondaryMetrics: props.secondaryMetrics as unknown as Record<string, number>,
     };
   },
 });
@@ -329,7 +360,10 @@ export default defineComponent({
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: calc(100% - 40px);
+  height: 700px; // 固定高度，可根据实际页面调整
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
 
   h2 {
     margin-top: 0;
@@ -345,6 +379,8 @@ export default defineComponent({
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    border-radius: 8px;
+    overflow: hidden;
 
     .radar-chart {
       flex: 1;

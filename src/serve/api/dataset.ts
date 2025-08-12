@@ -1,5 +1,5 @@
 import http from "..";
-import mockDatasetResponse from "/@/mock/datasetResponse.json";
+import mockDataMetrics from "/@/mock/dataMetrics.json";
 import { DatasetInfo } from "/@/views/preparation/create/hooks/useDatasets";
 
 /**
@@ -7,12 +7,14 @@ import { DatasetInfo } from "/@/views/preparation/create/hooks/useDatasets";
  * @param taskId 任务ID
  * @returns 数据集信息
  */
-export const getDatasetInfo = async (taskId: number) => {
-  // 在开发环境中使用mock数据
+export const getDatasetInfo = async (taskId: any) => {
   if (import.meta.env.DEV) {
-    return Promise.resolve({ data: mockDatasetResponse.datasets });
+    let key = taskId.id;
+    if (key === 1 || key === '1') key = 'Internet';
+    else if (key === 2 || key === '2') key = 'energy';
+    const data = (mockDataMetrics.datasets as any)[key];
+    return Promise.resolve({ data });
   }
-  // 实际环境中调用真实接口
   return http.get(`/dataset/info/${taskId}`);
 };
 
@@ -29,7 +31,7 @@ export const createDataset = async (config: any) => {
     return Promise.resolve({
       data: {
         success: true,
-        datasets: mockDatasetResponse.datasets,
+        datasets: mockDataMetrics.datasets,
       },
     });
   }

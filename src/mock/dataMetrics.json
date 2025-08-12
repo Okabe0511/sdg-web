@@ -1,0 +1,236 @@
+{
+  "volumeMetrics": {
+    "Internet": [
+      {
+        "label": "数据对数量",
+        "key": "dataPairs",
+        "value": 1305,
+        "previousValue": 640
+      },
+      {
+        "label": "图像数量",
+        "key": "imageCount",
+        "value": 1302,
+        "previousValue": 580
+      },
+      {
+        "label": "程序代码数量",
+        "key": "codeCount",
+        "value": 1300,
+        "previousValue": 592
+      }
+    ],
+    "energy": [
+      {
+        "label": "关系表数量",
+        "key": "codeCount",
+        "value": 507,
+        "previousValue": 138
+      }
+    ]
+    
+  },
+  "qualityPrimaryMetrics": {
+    "Internet": {
+      "codeQuality": 89.13,
+      "dataVolume": 40.44,
+      "dataAlignment": 78.8,
+      "diversityBalance": 33.55,
+      "dataRedundancy": 70
+    },
+    "energy": {
+      "codeQuality": 95.20,
+      "dataVolume": 58.58,
+      "dataAlignment": 0,
+      "diversityBalance": 42.36,
+      "dataRedundancy": 63.19
+    }
+  },
+  "originalMetrics": {
+    "Internet": {
+      "syntaxDetection": 84.5,
+      "configCompleteness": 93.7,
+      "sampleCount": 44.44,
+      "imageRenderMatch": 82.6,
+      "missingRate": 75.0,
+      "chartTypeBalance": 66.7,
+      "configDiversity": 0.4,
+      "codeRedundancy": 70.0,
+      "imageRedundancy": 70.0
+    },
+    "energy": {
+      "timeGranularityCoverage": 20.0,
+      "seasonalityStrength": 57.37,
+      "trendStrength": 57.37,
+      "mainFrequencyStrength": 70.01,
+      "sampleBalance": 88.15,
+      "dataCompleteness": 98.25,
+      "labelConsistency": 92.16,
+      "sequenceStability": 0.00,
+      "temporalFeatureCompleteness": 0.00,
+      "domainKnowledgeDiversity": 55.55,
+      "domainKnowledgeIntegrity": 29.16,
+      "featureIndependence": 38.23
+    }
+  },
+  "preparedMetrics": {
+    "Internet": {
+      "syntaxDetection": 100.0,
+      "configCompleteness": 98.5,
+      "sampleCount": 100.0,
+      "imageRenderMatch": 95.2,
+      "missingRate": 80.1,
+      "chartTypeBalance": 80.5,
+      "configDiversity": 60.0,
+      "codeRedundancy": 100.0
+    },
+    "energy": {
+      "timeGranularityCoverage": 60.0,
+      "seasonalityStrength": 56.49,
+      "trendStrength": 51.13,
+      "mainFrequencyStrength": 73.95,
+      "sampleBalance": 94.78,
+      "dataCompleteness": 100.0,
+      "labelConsistency": 90.72,
+      "sequenceStability": 59.68,
+      "temporalFeatureCompleteness": 64.85,
+      "domainKnowledgeDiversity": 88.88,
+      "domainKnowledgeIntegrity": 54.16,
+      "featureIndependence": 59.92
+    }
+  },
+  "metricNameMap": {
+    "Internet": {
+      "syntaxDetection": "语法检测通过率",
+      "configCompleteness": "配置项完整性",
+      "sampleCount": "样本数量",
+      "imageCount": "图像数量",
+      "imageRenderMatch": "图像与渲染截图匹配度",
+      "missingRate": "缺失率",
+      "chartTypeBalance": "图表类型均衡性",
+      "configDiversity": "配置项多样性",
+      "codeRedundancy": "代码重复性"
+    },
+    "energy": {
+      "timeGranularityCoverage": "时间粒度覆盖率",
+      "seasonalityStrength": "季节性强度",
+      "trendStrength": "趋势强度",
+      "mainFrequencyStrength": "主频强度",
+      "sampleBalance": "样本均衡性",
+      "dataCompleteness": "数据完整性",
+      "labelConsistency": "标签一致性",
+      "sequenceStability": "时序平稳性",
+      "temporalFeatureCompleteness": "时间特征完备度",
+      "domainKnowledgeDiversity": "领域知识多样性",
+      "domainKnowledgeIntegrity": "领域知识完整性",
+      "featureIndependence": "特征独立性"
+    }
+  },
+  "chartSeriesData": {
+    "Internet": [
+      {
+        "name": "原始数据",
+        "value": [40.44, 78.8, 70, 33.55, 89.13],
+        "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
+      },
+      {
+        "name": "制备后数据",
+        "value": [100.0, 65.11, 71.28, 61.68, 93.77],
+        "itemStyle": { "color": "#f56c6c" },
+        "lineStyle": { "color": "#f56c6c" },
+        "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
+      }
+    ],
+    "energy": [
+      {
+        "name": "原始数据",
+        "value": [58.58, 0, 63.19, 42.36, 95.20],
+        "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
+        "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
+      },
+      {
+        "name": "制备后数据",
+        "value":  [67.27, 32.73, 47.69, 71.53, 95.36],
+        "itemStyle": { "color": "#f56c6c" },
+        "lineStyle": { "color": "#f56c6c" },
+        "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
+      }
+    ]
+    
+  },
+  "explanations": {
+    "Internet": {
+      "codeQuality": "用于衡量数据集中代码样本的正确性、规范性与可读性。低质量代码会干扰模型学习，导致生成结果不准确或结构混乱。",
+      "dataVolume": "用于衡量训练数据量的丰富程度，规模不足会限制模型对模式的学习与泛化，影响生成质量与鲁棒性。",
+      "dataAlignment": "用于衡量多模态数据集中不同模态之间样本对应关系准确性与一致性。对齐错误会直接影响多模态模型的学习效果，导致性能下降甚至产生误导性的预测结果。",
+      "diversityBalance": "用于衡量数据集中各类样本的分布均衡性。分布失衡会导致模型偏向高频样本，影响泛化能力与预测准确性。",
+      "dataRedundancy": "用于衡量数据集中重复样本的比例。高重复性会降低数据多样性，限制模型学习效果，易导致过拟合与性能下降。"
+    },
+    "energy": {
+      "codeQuality": "用于衡量数据本身的准确性与可靠性。它重点评估数据的完整性与标签的一致性。大量的数据缺失或标签错误会误导模型的学习，导致预测结果不准确、不可靠。",
+      "dataVolume": "用于衡量时间序列数据中模式与行为的丰富程度。它不仅评估数据记录的总量，更深入地考察数据是否具备多样的时间粒度，以及其中蕴含的趋势与季节性等核心模式是否清晰显著。数据量评分低，意味着数据可能缺乏足够的复杂度与变化，这将阻碍模型学习到泛化的规律，从而影响预测的鲁棒性。",
+      "dataAlignment": "用于衡量数据在格式与统计特征上是否适用于时序模型。它评估信号的平稳性以及时间特征的完备度等关键特性。数据表示质量差，意味着数据未处于最优的分析状态，可能需要大量预处理工作，若处理不当则会损害模型的性能。",
+      "diversityBalance": "用于衡量数据集对真实世界问题领域的描述是否全面。它通过引入领域知识，评估现有特征是否覆盖了多样化的影响因素，以及是否包含了领域专家认为的关键驱动变量。上下文质量得分低，表明数据集可能缺失了关键的背景信息，限制了模型对序列背后驱动因素的理解，从而降低其预测能力。",
+      "dataRedundancy": "用于衡量数据集的简洁与高效性。它从样本均衡性和特征独立性两个层面进行评估。高冗余度的数据，如样本分布严重不均，或特征之间高度相关，意味着数据中存在大量重复、无效的信息，这不仅会使模型学习产生偏见，还会降低训练效率。"
+    }
+  },
+  
+  "datasets": {
+    "Internet": [
+      {
+        "dataType": "图像",
+        "dataAmount": 580,
+        "dataSize": "19.2MB"
+      },
+      {
+        "dataType": "代码",
+        "dataAmount": 592,
+        "dataSize": "2.6MB"
+      }
+    ],
+    "energy": [
+      {
+        "dataType": "关系表",
+        "dataAmount": 138,
+        "dataSize": "5.52MB"
+      }
+    ]
+  },
+  "secondaryMetricMap": {
+    "Internet": {
+      "dataVolume": ["sampleCount"],
+      "dataAlignment": ["imageRenderMatch", "missingRate"],
+      "dataRedundancy": ["codeRedundancy", "imageRedundancy"],
+      "diversityBalance": ["chartTypeBalance", "configDiversity"],
+      "codeQuality": ["syntaxDetection", "configCompleteness"]
+    },
+    "energy": {
+      "dataVolume": [
+        "timeGranularityCoverage",
+        "seasonalityStrength",
+        "trendStrength",
+        "mainFrequencyStrength",
+        "sampleBalance"
+      ],
+      "codeQuality": [
+        "dataCompleteness",
+        "labelConsistency"
+      ],
+      "dataAlignment": [
+        "sequenceStability",
+        "temporalFeatureCompleteness"
+      ],
+      "diversityBalance": [
+        "domainKnowledgeDiversity",
+        "domainKnowledgeIntegrity"
+      ],
+      "dataRedundancy": [
+        "sampleBalance",
+        "featureIndependence"
+      ]
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import http from "..";
 import mockQualityResponse from "/@/mock/qualityResponse.json";
+import mockDataMetrics from "/@/mock/dataMetrics.json";
 import {
   QualityMetrics,
   SecondaryMetrics,
@@ -13,13 +14,25 @@ import {
 export const getQualityMetrics = async (taskId: number) => {
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
-    // 直接返回整个mock对象，包含primaryMetrics和secondaryMetrics
-    return Promise.resolve({
-      data: {
-        primaryMetrics: mockQualityResponse.primaryMetrics,
-        secondaryMetrics: mockQualityResponse.secondaryMetrics,
-      },
-    });
+    if (taskId === 1) {
+      const data = {
+        primaryMetrics: mockDataMetrics.qualityPrimaryMetrics["Internet"],
+        secondaryMetrics: mockDataMetrics.originalMetrics["Internet"],
+      };
+      return Promise.resolve({ data });
+    } else if (taskId === 2) {
+      const data = {
+        primaryMetrics: mockDataMetrics.qualityPrimaryMetrics["energy"],
+        secondaryMetrics: mockDataMetrics.originalMetrics["energy"],
+      };
+      return Promise.resolve({ data });
+    } else {
+      const data = {
+        primaryMetrics: mockDataMetrics.qualityPrimaryMetrics["Internet"],
+        secondaryMetrics: mockDataMetrics.originalMetrics["Internet"],
+      };
+      return Promise.resolve({ data });
+    }
   }
   // 实际环境中调用真实接口
   return http.get(`/quality/metrics/${taskId}`);
@@ -27,13 +40,14 @@ export const getQualityMetrics = async (taskId: number) => {
 
 /**
  * 获取质量评估详细说明
+ * @param taskType 任务类型，默认为"Internet"
  * @returns 质量评估说明
  */
-export const getQualityExplanations = async () => {
+export const getQualityExplanations = async (taskType: "Internet" | "energy" = "Internet") => {
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
-    return Promise.resolve({ data: mockQualityResponse.explanations });
+    return Promise.resolve({ data: mockDataMetrics.explanations[taskType] });
   }
   // 实际环境中调用真实接口
-  return http.get("/quality/explanations");
+  return http.get(`/quality/explanations/${taskType}`);
 };

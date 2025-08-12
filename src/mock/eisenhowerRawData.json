@@ -1,0 +1,19 @@
+{
+  "main":{
+    "2": [
+        { "primary": "数据量", "secondary": "时间粒度覆盖率", "importance": 0.300, "problem": 0.800, "urgency": 0.240, "score": 20.000 },
+        { "primary": "数据量", "secondary": "季节性强度", "importance": 0.300, "problem": 0.426, "urgency": 0.128, "score": 57.376 },
+        { "primary": "数据量", "secondary": "主频强度", "importance": 0.250, "problem": 0.256, "urgency": 0.064, "score": 74.384 },
+        { "primary": "数据量", "secondary": "趋势强度", "importance": 0.050, "problem": 0.426, "urgency": 0.021, "score": 57.376 },
+        { "primary": "数据量", "secondary": "样本均衡性", "importance": 0.100, "problem": 0.118, "urgency": 0.012, "score": 88.152 },
+        { "primary": "数据内在质量", "secondary": "标签一致性", "importance": 0.100, "problem": 0.070, "urgency": 0.007, "score": 92.974 },
+        { "primary": "数据内在质量", "secondary": "数据完整性", "importance": 0.900, "problem": 0.000, "urgency": 0.000, "score": 100.000 },
+        { "primary": "数据表示质量", "secondary": "时间特征完备度", "importance": 0.400, "problem": 1.000, "urgency": 0.400, "score": 0.000 },
+        { "primary": "数据表示质量", "secondary": "时序平稳性", "importance": 0.600, "problem": 0.306, "urgency": 0.183, "score": 69.434 },
+        { "primary": "数据上下文质量", "secondary": "领域知识完整性", "importance": 0.700, "problem": 0.708, "urgency": 0.496, "score": 29.167 },
+        { "primary": "数据上下文质量", "secondary": "领域知识多样性", "importance": 0.300, "problem": 0.444, "urgency": 0.133, "score": 55.556 },
+        { "primary": "数据冗余", "secondary": "特征独立性", "importance": 0.600, "problem": 0.272, "urgency": 0.163, "score": 72.754 },
+        { "primary": "数据冗余", "secondary": "样本均衡性", "importance": 0.400, "problem": 0.118, "urgency": 0.047, "score": 88.152 }
+    ]
+  }
+}

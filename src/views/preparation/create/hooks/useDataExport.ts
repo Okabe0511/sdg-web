@@ -1,6 +1,8 @@
 import { ref, onMounted, onBeforeUnmount, reactive } from "vue";
 import * as echarts from "echarts";
 import { message } from "ant-design-vue";
+import { useRoute } from 'vue-router';
+import dataMetrics from '/@/mock/dataMetrics.json';
 
 export interface DataMetrics {
   [key: string]: number;
@@ -22,48 +24,44 @@ export const useDataExport = () => {
   // 图表引用和实例
   const qualityChartRef = ref<HTMLElement | null>(null);
   let qualityChart: echarts.ECharts | null = null;
-
-  // 原始指标数据
-  const originalMetrics = {
-    syntaxDetection: 84.53,
-    configCompleteness: 93.74,
-    sampleCount: 40.44,
-    imageRenderMatch: 82.6,
-    missingRate: 75,
-    chartTypeBalance: 66.65,
-    configDiversity: 0.44,
-    codeRedundancy: 70,
-    imageRedundancy: 70,
+  const route = useRoute();
+  let taskId = route.params.id as string;
+  if (taskId === '1') taskId = 'Internet';
+  else if (taskId === '2') taskId = 'energy';
+  
+  // 获取数据指标
+  const getMetrics = (id: string) => {
+    const metrics = dataMetrics.volumeMetrics[id as keyof typeof dataMetrics.volumeMetrics];
+    return JSON.parse(JSON.stringify(metrics)); // 深拷贝避免污染原始数据
   };
 
-  // 数据量指标
-  const volumeMetrics = reactive<VolumeMetric[]>([
-    {
-      label: "数据对数量",
-      key: "dataPairs",
-      value: 1305,
-      previousValue: 640,
-      growthRate: 0,
-    },
-    {
-      label: "图像数量",
-      key: "imageCount",
-      value: 1302,
-      previousValue: 580,
-      growthRate: 0,
-    },
-    {
-      label: "程序代码数量",
-      key: "codeCount",
-      value: 1305,
-      previousValue: 592,
-      growthRate: 0,
-    },
-  ]);
+  // 获取原始指标
+  const getOriginalMetrics = (id: string) => {
+    return dataMetrics.originalMetrics[id as keyof typeof dataMetrics.originalMetrics];
+  };
+  // 获取制备后指标
+  const getPreparedMetrics = (id: string) => {
+    return dataMetrics.preparedMetrics[id as keyof typeof dataMetrics.preparedMetrics];
+  };
 
-  // 初始化计算增长率
+  // 获取图表数据
+  const getChartSeriesData = (id: string) => {
+    return dataMetrics.chartSeriesData[id as keyof typeof dataMetrics.chartSeriesData];
+  };
+
+  // 原始指标数据
+  const originalMetrics = reactive(getOriginalMetrics(taskId));
+  // 制备后指标数据
+  const preparedMetrics = reactive(getPreparedMetrics(taskId));
+  
+  // 数据量指标
+  const volumeMetrics = reactive<VolumeMetric[]>(getMetrics(taskId));
+  
+  // 初始化计算增长率（全部与最初原始数据比较）
   const initVolumeMetrics = () => {
+    // 获取原始数据（即 recommendWorkflows 的第一个算子或 dataMetrics.json 的 previousValue）
     volumeMetrics.forEach((metric) => {
+      // 以 previousValue 作为原始基准
       metric.growthRate = calculateGrowthRate(
         metric.previousValue,
         metric.value
@@ -83,10 +81,13 @@ export const useDataExport = () => {
   };
 
   // 计算提升率
-  const getImprovementRate = (key: string, secondaryMetrics: DataMetrics) => {
+  // 默认对比 originalMetrics 和 preparedMetrics
+  const getImprovementRate = (key: string, currentMetrics?: DataMetrics) => {
     const original = originalMetrics[key as keyof typeof originalMetrics] || 0;
-    const current = secondaryMetrics[key] || 0;
-
+    // 如果传入 currentMetrics，则用其，否则默认用 preparedMetrics
+    const current = currentMetrics
+      ? currentMetrics[key as keyof typeof currentMetrics] || 0
+      : (preparedMetrics[key as keyof typeof preparedMetrics] || 0);
     if (original === 0) return 0;
     return ((current - original) / original) * 100;
   };
@@ -98,21 +99,12 @@ export const useDataExport = () => {
     return `${prefix}${value.toFixed(1)}%`;
   };
 
-  // 获取指标名称
+  // 获取指标名称（根据页面id动态获取）
   const getMetricName = (key: string): string => {
-    const nameMap: Record<string, string> = {
-      syntaxDetection: "语法检测通过率",
-      configCompleteness: "配置项完整性",
-      sampleCount: "样本数量",
-      imageRenderMatch: "图像与渲染截图匹配度",
-      missingRate: "缺失率",
-      chartTypeBalance: "图表类型均衡性",
-      configDiversity: "配置项多样性",
-      codeRedundancy: "代码重复性",
-      imageRedundancy: "图像重复性",
-    };
-
-    return nameMap[key] || key;
+    // 只允许 'Internet' 或 'energy'，否则 fallback
+    const id = (taskId === 'Internet' || taskId === 'energy') ? taskId : 'Internet';
+    const metricNameMap = (dataMetrics.metricNameMap as Record<string, Record<string, string>>)[id] || {};
+    return metricNameMap[key] || key;
   };
 
   // 初始化雷达图
@@ -144,28 +136,11 @@ export const useDataExport = () => {
         center: ["50%", "50%"],
         radius: "60%",
       },
-      series: [
-        {
-          name: "数据质量评估",
-          type: "radar",
-          data: [
-            {
-              name: "原始数据",
-              value: [40.44, 78.8, 70, 33.55, 89.13],
-              itemStyle: { color: "rgba(0, 155, 164, 0.8)" },
-              lineStyle: { color: "rgba(0, 155, 164, 0.8)" },
-              areaStyle: { color: "rgba(0, 155, 164, 0.2)" },
-            },
-            {
-              name: "制备后数据",
-              value: [100.0, 65.11, 71.28, 61.68, 93.77],
-              itemStyle: { color: "#f56c6c" },
-              lineStyle: { color: "#f56c6c" },
-              areaStyle: { color: "rgba(245, 108, 108, 0.2)" },
-            },
-          ],
-        },
-      ],
+      series: [{
+        name: "数据质量评估",
+        type: "radar",
+        data: getChartSeriesData(taskId)
+      }]
     };
 
     qualityChart.setOption(option);
@@ -213,6 +188,7 @@ export const useDataExport = () => {
   return {
     qualityChartRef,
     originalMetrics,
+    preparedMetrics,
     volumeMetrics,
     initChart,
     formatPercent,

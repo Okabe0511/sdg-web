@@ -1,73 +1,121 @@
 import { reactive, ref, onMounted, onBeforeUnmount, watch } from "vue";
 import * as echarts from "echarts";
+import dataMetrics from '/@/mock/dataMetrics.json';
+import { useRoute } from 'vue-router';
+import radardata from '/@/mock/radarData.json';
+import finalTargetData from '/@/mock/targetData.json';
+import mockTargetAnalysisResponse from '/@/mock/targetAnalysisResponse.json';
 
-// 基于日志文件中的实际评估数据更新雷达图数据
-const radarDataList = [
-  // 初始评估数据
-  [40.44, 83.53, 75.17, 31.98, 92.31], // [数据量, 数据对齐, 数据重复性, 多样均衡性, 代码质量]
-  // 配置项修复算子后的评估数据
-  [40.44, 83.53, 75.14, 57.25, 92.75],
-  // 语法修复算子后的评估数据
-  [50.26, 82.03, 75.46, 59.72, 91.11],
-  // 配置项多样性增强算子后的评估数据
-  [50.26, 82.88, 76.1, 61.41, 90.3],
-  // 代码扰动算子后的评估数据
-  [100.0, 62.94, 64.5, 61.68, 93.77],
-  // 基于代码生成图像算子后的评估数据
-  [100.0, 65.11, 71.28, 61.68, 93.77],
-];
+let radarDataList = radardata.internet;
 
 export const useTargetAnalysis = () => {
   // 雷达图相关
+  const route = useRoute();
+  const taskId = route.params.id;
+  if(taskId === "1") {
+    radarDataList = radardata.internet;
+  }
+  if(taskId === "2") {
+    radarDataList = radardata.energy;
+  }
   const radarChartRef = ref<HTMLElement | null>(null);
   let radarChart: echarts.ECharts | null = null;
 
-  // 靶点相关
-  const targetData: {
-    original: Record<string, number>;
-    current: Record<string, number>;
-  } = // 使用Record类型来定义靶点数据的结构
-    reactive({
-      original: {
-        configDiversity: 70.02,
-        dataVolume: 64.63,
-        chartTypeBalance: 53.23,
-      },
-      current: {
-        configDiversity: 70.02,
-        dataVolume: 64.63,
-        chartTypeBalance: 53.23,
-      },
-    });
+  // 靶点相关，original从mock/targetAnalysisResponse.json获取
+  // 根据页面id动态获取original和current数据集
+  const getTargetData = () => {
+    let id = String(route.params.id || "internet");
+    if (id === "1") id = "internet";
+    if (id === "2") id = "energy";
+    console.log("获取靶点数据，当前ID:", id);
+    const mockData = (mockTargetAnalysisResponse as Record<string, any>)[id] || (mockTargetAnalysisResponse as Record<string, any>)["internet"];
+    if (id === "energy") {
+      // energy 返回前 4 个指标
+      return {
+        original: {
+          domainKnowledgeIntegrity: mockData.metrics?.domainKnowledgeIntegrity ?? 0,
+          temporalFeatureCompleteness: mockData.metrics?.temporalFeatureCompleteness ?? 0,
+          timeGranularityCoverage: mockData.metrics?.timeGranularityCoverage ?? 0,
+          sequenceStability: mockData.metrics?.sequenceStability ?? 0,
+        },
+        current: {
+          domainKnowledgeIntegrity: mockData.metrics?.domainKnowledgeIntegrity ?? 0,
+          temporalFeatureCompleteness: mockData.metrics?.temporalFeatureCompleteness ?? 0,
+          timeGranularityCoverage: mockData.metrics?.timeGranularityCoverage ?? 0,
+          sequenceStability: mockData.metrics?.sequenceStability ?? 0,
+        }
+      };
+    } else {
+      return {
+        original: {
+          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          dataVolume: mockData.metrics?.dataVolume ?? 0,
+          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+        },
+        current: {
+          configDiversity: mockData.metrics?.configDiversity ?? 0,
+          dataVolume: mockData.metrics?.dataVolume ?? 0,
+          chartTypeBalance: mockData.metrics?.chartTypeBalance ?? 0,
+        }
+      };
+    }
+  };
+  const targetData = reactive(getTargetData());
 
-  const selectedTargetKey = ref("configDiversity");
+  // 动态设置 selectedTargetKey，energy 默认第一个指标
+  const defaultKey = Object.keys(targetData.original)[0] || "configDiversity";
+  const selectedTargetKey = ref(defaultKey);
 
   // 选择靶点
   const selectTarget = (key: string) => {
     selectedTargetKey.value = key;
   };
 
+  // 获取所有靶点 key，供页面/组件遍历
+  const targetKeys = () => Object.keys(targetData.original);
+
   // 更新靶点数据
   const updateTargetData = (key: string, value: number) => {
     // 确保不超过100
-    targetData.current[key] = Math.min(100, value);
+    if (targetData.current && key in targetData.current) {
+      (targetData.current as any)[key] = Math.min(100, value);
+    }
   };
 
   // 获取指标点在靶图上的位置
   const getIndicatorStyle = (key: string, value: number) => {
-    // 根据三个指标的位置，设置不同的角度
-    const angles = {
-      configDiversity: 30, // 右上
-      dataVolume: 150, // 左上
-      chartTypeBalance: 270, // 下方
-    };
+    // 根据数据集类型设置不同的角度分布
+    let angles: Record<string, number>;
+    
+    const taskIdString = String(taskId);
+    if (taskIdString === "2") {
+      // energy 数据集 - 4 个指标均匀分布 (360/4 = 90度间隔)
+      angles = {
+        domainKnowledgeIntegrity: 0,         // 顶部
+        temporalFeatureCompleteness: 90,     // 右侧
+        timeGranularityCoverage: 180,        // 底部
+        sequenceStability: 270,              // 左侧
+      };
+    } else {
+      // internet 数据集 - 3 个指标分布
+      angles = {
+        configDiversity: 30,     // 右上
+        dataVolume: 150,         // 左上
+        chartTypeBalance: 270,   // 下方
+      };
+    }
 
     // 计算离靶心的距离 (100 - value) / 100 * 40 + 10
     // 分数越高越靠近靶心，最低10%，最高50%
     const distancePercent = ((100 - value) / 100) * 40 + 10;
 
     // 转换为角度和距离
-    const angle = angles[key as keyof typeof angles];
+    const angle = angles[key];
+    if (angle === undefined) {
+      console.warn(`未找到指标 ${key} 的角度配置`);
+      return { left: '50%', top: '50%' };
+    }
+    
     const radians = (angle * Math.PI) / 180;
     const x = 50 + Math.cos(radians) * distancePercent;
     const y = 50 + Math.sin(radians) * distancePercent;
@@ -90,7 +138,22 @@ export const useTargetAnalysis = () => {
   >([
     {
       name: "原始数据",
-      value: [40.44, 78.8, 70, 33.55, 89.13],
+      value: (() => {
+        const type: 'Internet' | 'energy' = taskId === "2" ? "energy" : "Internet";
+        const metrics = dataMetrics.qualityPrimaryMetrics[type];
+        // 按雷达图 indicator 顺序取值
+        // indicator: [数据量, 数据表示质量, 数据冗余, 数据上下文质量, 数据内在质量]
+        return [
+          metrics.dataVolume ?? 0,
+          metrics.dataAlignment ?? 0,
+          metrics.dataRedundancy ?? 0,
+          metrics.diversityBalance ?? 0,
+          metrics.codeQuality ?? 0,
+          
+          
+          
+        ];
+      })(),
       itemStyle: {
         color: "rgba(0, 155, 164, 1)",
       },
@@ -140,11 +203,24 @@ export const useTargetAnalysis = () => {
   };
 
   // 新增一个方法用于工作流完成后一次性更新靶点数据
-  const updateFinalTargetData = () => {
-    // 只更新靶点数据
-    updateTargetData("configDiversity", 20);
-    updateTargetData("dataVolume", 0);
-    updateTargetData("chartTypeBalance", 30);
+const updateFinalTargetData = () => {
+  // 根据任务ID选择最终数据
+  let finalData;
+  let id = String(taskId || "internet");
+  if (id === "1") id = "internet";
+  if (id === "2") id = "energy";
+  finalData = (mockTargetAnalysisResponse as Record<string, any>)[id]?.final || (mockTargetAnalysisResponse as Record<string, any>)["internet"].final;
+
+  // 更新靶点数据
+  if (id === "energy") {
+    Object.keys(finalData).forEach((key) => {
+      updateTargetData(key, finalData[key]);
+    });
+  } else {
+    updateTargetData("configDiversity", finalData.configDiversity);
+    updateTargetData("dataVolume", finalData.dataVolume);
+    updateTargetData("chartTypeBalance", finalData.chartTypeBalance);
+  }
 
     // 不再添加最终结果的数据系列
     // 仅更新图表
@@ -246,6 +322,7 @@ export const useTargetAnalysis = () => {
     addOperatorData, // 导出新添加的方法
     radarDataSeries, // 导出数据系列
     updateFinalTargetData, // 导出新增的方法
+    targetKeys, // 新增：供页面/组件遍历靶点 key
   };
 };
 

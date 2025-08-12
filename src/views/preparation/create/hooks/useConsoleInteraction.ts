@@ -1,6 +1,8 @@
 import { ref } from "vue";
 import { getFullTaskLog, getDataPreparationLog } from "/@/serve/api/aiConsole";
 import { SSEEvent, parseSSEContent } from "/@/utils/sse";
+import { useRoute } from "vue-router";
+import TaskConfigModal from "../components/TaskConfigModal.vue";
 
 export interface ConsoleMessage {
   type: "system" | "user";
@@ -10,6 +12,8 @@ export interface ConsoleMessage {
 }
 
 export const useConsoleInteraction = () => {
+  const route = useRoute();
+  const task = route.params.id; 
   // 控制台对话内容
   const consoleMessages = ref<ConsoleMessage[]>([]);
 
@@ -67,11 +71,11 @@ export const useConsoleInteraction = () => {
   };
 
   // 启动数据准备流程（一次性获取整个数据准备的流式输出）
-  const startDataPreparationStream = async () => {
+  const startDataPreparationStream = async (taskConfig: any) => {
     isLoading.value = true;
 
     try {
-      await getDataPreparationLog((event: any) => {
+      await getDataPreparationLog(task,(event: any) => {
         const content = event.data;
         if (event.type === "REQUEST") {
           addUserMessage(content);
