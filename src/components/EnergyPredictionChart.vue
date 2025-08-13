@@ -23,9 +23,9 @@ async function fetchJson(path: string) {
 
 onMounted(async () => {
   // json文件已由npy_to_json.py生成并放在public目录
-  const before = await fetchJson('/public/before.json');
-  const after = await fetchJson('/public/after.json');
-  const trueVals = await fetchJson('/public/true.json');
+  const before = await fetchJson('/@/mock/before.json');
+  const after = await fetchJson('/@/mock/after.json');
+  const trueVals = await fetchJson('/@/mock/true.json');
   const option = {
     title: { text: '电价预测任务验证', left: 'center' },
     tooltip: { trigger: 'axis' },
