@@ -77,7 +77,7 @@ export default defineComponent({
               :class="{ active: activeTab === 'unconfigured' }"
               @click="handleTabChange('unconfigured')"
             >
-              未配置
+              待运行
             </div>
           </div>
           <div class="search-container">
@@ -111,7 +111,7 @@ export default defineComponent({
                   ? "已完成"
                   : task.status === "running"
                   ? "运行中"
-                  : "未配置"
+                  : "待运行"
               }}
             </div>
             <h3 class="task-name">{{ task.name }}</h3>

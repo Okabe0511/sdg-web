@@ -4,16 +4,16 @@
       "id": 1,
       "name": "ECharts代码生成任务",
       "createTime": "2023-06-15 14:30:22",
-      "fileCount": 12,
-      "dataCount": 5834,
+      "fileCount": 1172,
+      "dataCount": 640,
       "status": "unconfigured"
     },
     {
       "id": 2,
       "name": "电价预测任务",
       "createTime": "2023-06-18 09:15:37",
-      "fileCount": 8,
-      "dataCount": 3421,
+      "fileCount": 138,
+      "dataCount": 138,
       "status": "unconfigured"
     }
   ],
