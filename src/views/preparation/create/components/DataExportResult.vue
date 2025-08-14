@@ -164,14 +164,7 @@ export default defineComponent({
       return route.params.id?.toString() || "1";
     });
 
-    // ID 映射函数：任务3对应任务2，任务4对应任务1
-    const getDataTypeId = (id: string): string => {
-      if (id === "3") return "2";
-      if (id === "4") return "1";
-      return id;
-    };
-
-    // energy 靶点指标 key（与 mock 数据一致，全部英文 key，12项）
+  
     const energyKeys = [
       "domainKnowledgeIntegrity",
       "temporalFeatureCompleteness",
@@ -189,8 +182,7 @@ export default defineComponent({
 
     // 根据任务ID选择对应的制备后指标数据（task1->internet, task2,3->energy）
     const currentMetrics = computed(() => {
-      const mappedId = getDataTypeId(taskId.value);
-      if (mappedId === '1') {
+  if (taskId.value === '1') {
         return dataMetrics.preparedMetrics['Internet'] || {};
       } else {
         const energyMetrics: Record<string, number> = {};
@@ -204,8 +196,7 @@ export default defineComponent({
 
     // energy 靶点指标为 9 项，取原始分数
     const originalMetrics = computed(() => {
-      const mappedId = getDataTypeId(taskId.value);
-      if (mappedId === '1') {
+        if (taskId.value === '1') {
         return dataMetrics.originalMetrics['Internet'] || {};
       } else {
         const energyMetrics: Record<string, number> = {};

@@ -207,14 +207,8 @@ export default defineComponent({
       // 从路由参数获取任务ID并加载数据
       const taskId = route.params.id as string;
       
-      // ID 映射函数：将 ID=3 映射到 ID=2
-      const getDataTypeId = (id: string): string => {
-        return id === "3" ? "2" : id;
-      };
-
-      const mappedId = getDataTypeId(taskId);
-      if (mappedId === '1' || mappedId === '2') {
-        await loadChartData(mappedId);
+      if (taskId === '1' || taskId === '2') {
+        await loadChartData(taskId);
       }
     });
     
