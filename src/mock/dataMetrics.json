@@ -109,7 +109,8 @@
       "missingRate": "缺失率",
       "chartTypeBalance": "图表类型均衡性",
       "configDiversity": "配置项多样性",
-      "codeRedundancy": "代码重复性"
+      "codeRedundancy": "代码重复性",
+      "imageRedundancy":"图像重复性"
     },
     "energy": {
       "timeGranularityCoverage": "时间粒度覆盖率",

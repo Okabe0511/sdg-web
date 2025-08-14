@@ -33,74 +33,74 @@
         "event": "REASONING",
         "data": "执行语法检测"
       },
-      {
-        "event": "REASONING",
-        "data": "语法检测耗时0.3秒，评估得分84.53"
-      },
+        {
+          "event": "REASONING",
+          "data": "语法检测耗时0.3秒，评估得分84.5"
+        },
       {
         "event": "REASONING",
         "data": "执行配置项完整性检测"
       },
-      {
-        "event": "REASONING",
-        "data": "配置项完整性检测耗时0.1秒，评估得分84.53"
-      },
+        {
+          "event": "REASONING",
+          "data": "配置项完整性检测耗时0.1秒，评估得分93.7"
+        },
       {
         "event": "REASONING",
         "data": "执行数据量检测"
       },
-      {
-        "event": "REASONING",
-        "data": "数据量检测耗时0.1秒，评估得分40.44"
-      },
+        {
+          "event": "REASONING",
+          "data": "数据量检测耗时0.1秒，评估得分44.44"
+        },
       {
         "event": "REASONING",
         "data": "执行图像与渲染截图匹配度检测"
       },
-      {
-        "event": "REASONING",
-        "data": "图像与渲染截图匹配度检测耗时13.2秒，评估得分82.6"
-      },
+        {
+          "event": "REASONING",
+          "data": "图像与渲染截图匹配度检测耗时13.2秒，评估得分82.6"
+        },
       {
         "event": "REASONING",
         "data": "执行缺失率检测"
       },
-      {
-        "event": "REASONING",
-        "data": "缺失率检测耗时0.3秒，评估得分75"
-      },
+        {
+          "event": "REASONING",
+          "data": "缺失率检测耗时0.3秒，评估得分75.0"
+        },
       {
         "event": "REASONING",
         "data": "执行图表类型均衡性检测"
       },
-      {
-        "event": "REASONING",
-        "data": "图表类型均衡性检测耗时1.2秒，评估得分66.65"
-      },
+        {
+          "event": "REASONING",
+          "data": "图表类型均衡性检测耗时1.2秒，评估得分66.7"
+        },
       {
         "event": "REASONING",
         "data": "执行配置项多样性检测"
       },
-      {
-        "event": "REASONING",
-        "data": "配置项多样性检测耗时3.4秒，评估得分0.44"
-      },
+        {
+          "event": "REASONING",
+          "data": "配置项多样性检测耗时3.4秒，评估得分0.4"
+        },
       {
         "event": "REASONING",
         "data": "执行代码重复性检测"
       },
-      {
-        "event": "REASONING",
-        "data": "代码重复性检测耗时0.3秒，评估得分70"
-      },
+        {
+          "event": "REASONING",
+          "data": "代码重复性检测耗时0.3秒，评估得分70.0"
+        },
       {
         "event": "REASONING",
         "data": "执行图像重复性检测"
       },
-      {
-        "event": "REASONING",
-        "data": "图像重复性检测耗时5.1秒，评估得分70"
-      },
+        {
+          "event": "REASONING",
+          "data": "图像重复性检测耗时5.1秒，评估得分70.0"
+        },
       {
         "event": "RESPONSE",
         "data": "完成数据质量评估，耗时24秒"
