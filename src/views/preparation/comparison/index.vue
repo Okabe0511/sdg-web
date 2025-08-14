@@ -117,11 +117,11 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const chartWidth = ref(window.innerWidth);
-    const chartHeight = ref(window.innerHeight - 200); // 减小图表高度，增加减去的值
+    const chartHeight = ref(window.innerHeight ); // 减小图表高度，增加减去的值
     
     window.addEventListener('resize', () => {
       chartWidth.value = window.innerWidth;
-      chartHeight.value = window.innerHeight - 200;
+      chartHeight.value = window.innerHeight ;
     });
 
     // 根据路由ID获取对应的指标数据
@@ -309,7 +309,7 @@ export default defineComponent({
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   padding: 10px 20px 20px 20px; /* 减小上内边距从20px到10px */
   width: 100%;
-  height: calc(96vh - 40px); /* 从98vh改为96vh */
+  height: 74vh; /* 从98vh改为*/
   display: flex;
   align-items: flex-start; /* 改为顶部对齐，使图表向上移动 */
   justify-content: center;
@@ -360,7 +360,7 @@ export default defineComponent({
 .chart {
   flex: 1;
   height: 360px;
-  border: 1px solid #eee;
+  border: 1px solid #ffffff;
   border-radius: 8px;
   padding: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
