@@ -62,38 +62,42 @@
           <!-- 数据对比列表 -->
           <div class="data-comparison-module">
             <h3>原始与制备后数据对比</h3>
-            <div class="comparison-table">
-              <div class="table-header">
-                <div class="header-cell">指标</div>
-                <div class="header-cell">原始数据</div>
-                <div class="header-cell">制备后数据</div>
-                <div class="header-cell">提升率</div>
-              </div>
-              <div
-                v-for="(item, key) in currentMetrics"
-                :key="key"
-                class="table-row"
-              >
-                <div class="row-cell">{{ getMetricName(key) }}</div>
-                <div class="row-cell">
-                  {{ formatPercent(originalMetrics[key] || 0) }}
+            <div class="comparison-table-scroll">
+              <div class="comparison-table">
+                <div class="table-header">
+                  <div class="header-cell">指标</div>
+                  <div class="header-cell">原始数据</div>
+                  <div class="header-cell">制备后数据</div>
+                  <div class="header-cell">提升率</div>
                 </div>
-                <div
-                  class="row-cell"
-                  :class="{
-                    'higher-value': item > (originalMetrics[key] || 0),
-                  }"
-                >
-                  {{ formatPercent(item) }}
-                </div>
-                <div
-                  class="row-cell improvement"
-                  :class="{
-                    improved: getImprovementRate(key) > 0,
-                    degraded: getImprovementRate(key) < 0,
-                  }"
-                >
-                  {{ formatImprovement(getImprovementRate(key)) }}
+                <div class="table-body">
+                  <div
+                    v-for="(item, key) in currentMetrics"
+                    :key="key"
+                    class="table-row"
+                  >
+                    <div class="row-cell">{{ getMetricName(key) }}</div>
+                    <div class="row-cell">
+                      {{ formatPercent(originalMetrics[key] || 0) }}
+                    </div>
+                    <div
+                      class="row-cell"
+                      :class="{
+                        'higher-value': item > (originalMetrics[key] || 0),
+                      }"
+                    >
+                      {{ formatPercent(item) }}
+                    </div>
+                    <div
+                      class="row-cell improvement"
+                      :class="{
+                        improved: getImprovementRate(key) > 0,
+                        degraded: getImprovementRate(key) < 0,
+                      }"
+                    >
+                      {{ formatImprovement(getImprovementRate(key)) }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -160,7 +164,14 @@ export default defineComponent({
       return route.params.id?.toString() || "1";
     });
 
-    // energy 靶点指标 key（与 mock 数据一致，全部英文 key）
+    // ID 映射函数：任务3对应任务2，任务4对应任务1
+    const getDataTypeId = (id: string): string => {
+      if (id === "3") return "2";
+      if (id === "4") return "1";
+      return id;
+    };
+
+    // energy 靶点指标 key（与 mock 数据一致，全部英文 key，12项）
     const energyKeys = [
       "domainKnowledgeIntegrity",
       "temporalFeatureCompleteness",
@@ -170,12 +181,16 @@ export default defineComponent({
       "seasonalityStrength",
       "mainFrequencyStrength",
       "featureIndependence",
-      "sampleBalance"
+      "sampleBalance",
+      "trendStrength",
+      "dataCompleteness",
+      "labelConsistency"
     ];
 
-    // 根据任务ID选择对应的制备后指标数据（task1->internet, task2->energy）
+    // 根据任务ID选择对应的制备后指标数据（task1->internet, task2,3->energy）
     const currentMetrics = computed(() => {
-      if (taskId.value === '1') {
+      const mappedId = getDataTypeId(taskId.value);
+      if (mappedId === '1') {
         return dataMetrics.preparedMetrics['Internet'] || {};
       } else {
         const energyMetrics: Record<string, number> = {};
@@ -189,7 +204,8 @@ export default defineComponent({
 
     // energy 靶点指标为 9 项，取原始分数
     const originalMetrics = computed(() => {
-      if (taskId.value === '1') {
+      const mappedId = getDataTypeId(taskId.value);
+      if (mappedId === '1') {
         return dataMetrics.originalMetrics['Internet'] || {};
       } else {
         const energyMetrics: Record<string, number> = {};
@@ -356,49 +372,49 @@ export default defineComponent({
           }
         }
 
+        .comparison-table-scroll {
+          max-height: 600px;
+          overflow-y: auto;
+        }
         .comparison-table {
           flex: 1;
           display: flex;
           flex-direction: column;
-
-          .table-header {
-            display: flex;
-            background-color: #eee;
-            font-weight: bold;
-
-            .header-cell {
-              flex: 1;
-              padding: 18px 12px;
-              text-align: center;
+        }
+        .table-header {
+          display: flex;
+          background-color: #eee;
+          font-weight: bold;
+          flex-shrink: 0;
+        }
+        .header-cell {
+          flex: 1;
+          padding: 18px 12px;
+          text-align: center;
+        }
+        .table-body {
+          width: 100%;
+        }
+        .table-row {
+          display: flex;
+          border-bottom: 1px solid #eee;
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+          }
+        }
+        .row-cell {
+          flex: 1;
+          padding: 18px 12px;
+          text-align: center;
+          &.improvement-rate {
+            color: #f5222d;
+            &.positive {
+              color: #52c41a;
             }
           }
-
-          .table-row {
-            display: flex;
-            border-bottom: 1px solid #eee;
-
-            &:hover {
-              background-color: rgba(0, 0, 0, 0.02);
-            }
-
-            .row-cell {
-              flex: 1;
-              padding: 18px 12px;
-              text-align: center;
-
-              &.improvement-rate {
-                color: #f5222d;
-
-                &.positive {
-                  color: #52c41a;
-                }
-              }
-
-              &.higher-value {
-                color: #f56c6c;
-                font-weight: 500;
-              }
-            }
+          &.higher-value {
+            color: #f56c6c;
+            font-weight: 500;
           }
         }
       }

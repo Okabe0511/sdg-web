@@ -1,6 +1,31 @@
 <template>
   <div class="training-comparison-container">
-    <template v-if="$route.params.id === '2'">
+    <template v-if="$route.params.id === '2' || $route.params.id === '3'">
+      <!-- 制备前后对比表格 -->
+      <div class="comparison-table-container">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>相似度指标</th>
+              <th>数据制备前</th>
+              <th>数据制备后</th>
+              <th>变化幅度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="metric in metricsData" :key="metric.key">
+              <td>{{ metric.label }}</td>
+              <td>{{ typeof metric.previousValue === 'number' && metric.previousValue < 10 ? metric.previousValue.toFixed(4) : metric.previousValue }}</td>
+              <td>{{ typeof metric.value === 'number' && metric.value < 10 ? metric.value.toFixed(4) : metric.value }}</td>
+              <td :class="{ 'positive': metric.changePercent > 0, 'negative': metric.changePercent < 0 }">
+                {{ metric.changePercent > 0 ? '+' : '' }}{{ metric.changePercent.toFixed(2) }}%
+                <span class="arrow">{{ metric.changePercent > 0 ? '↑' : '↓' }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
       <div class="energy-chart-container">
         <div class="energy-chart-content">
           <EnergyPredictionChart :width="chartWidth" :height="chartHeight" />
@@ -77,7 +102,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import LineChart from "/@/components/charts/LineChart.vue";
 import { useComparisonCharts } from "./hooks/useComparisonCharts";
@@ -92,11 +117,71 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const chartWidth = ref(window.innerWidth);
-    const chartHeight = ref(window.innerHeight - 80);
+    const chartHeight = ref(window.innerHeight - 200); // 减小图表高度，增加减去的值
+    
     window.addEventListener('resize', () => {
       chartWidth.value = window.innerWidth;
-      chartHeight.value = window.innerHeight - 80;
+      chartHeight.value = window.innerHeight - 200;
     });
+
+    // 根据路由ID获取对应的指标数据
+    const metricsData = computed(() => {
+      const routeId = route.params.id as string;
+      const dataTypeId = routeId === "3" ? "2" : routeId;
+      
+      if (dataTypeId === "2") {
+        // Energy 数据集的相似度指标 - 制备前后对比
+        return [
+          {
+            label: "余弦相似度",
+            key: "cosine_similarity",
+            value: 0.8286, // 数据制备后
+            previousValue: 0.8096, // 数据制备前
+            changePercent: ((0.8286 - 0.8096) / 0.8096) * 100
+          },
+          {
+            label: "皮尔逊相关系数", 
+            key: "pearson_correlation",
+            value: 0.6600, // 数据制备后
+            previousValue: 0.6222, // 数据制备前
+            changePercent: ((0.6600 - 0.6222) / 0.6222) * 100
+          },
+          {
+            label: "平均绝对误差",
+            key: "mean_absolute_error", 
+            value: 76.1520, // 数据制备后
+            previousValue: 86.9353, // 数据制备前
+            changePercent: ((76.1520 - 86.9353) / 86.9353) * 100
+          }
+        ];
+      } else {
+        // Internet 数据集的指标 (ID=1的情况下)
+        return [
+          {
+            label: "数据对数量",
+            key: "dataPairs", 
+            value: 1305,
+            previousValue: 640,
+            changePercent: ((1305 - 640) / 640) * 100
+          },
+          {
+            label: "图像数量",
+            key: "imageCount",
+            value: 1302,
+            previousValue: 580,
+            changePercent: ((1302 - 580) / 580) * 100
+          },
+          {
+            label: "程序代码数量", 
+            key: "codeCount",
+            value: 1300,
+            previousValue: 592,
+            changePercent: ((1300 - 592) / 592) * 100
+          }
+        ];
+      }
+    });
+
     // 使用我们创建的钩子函数
     const {
       task1Chart1Data,
@@ -117,16 +202,26 @@ export default defineComponent({
       task2Chart4Options,
       loadChartData,
     } = useComparisonCharts();
+    
     onMounted(async () => {
       // 从路由参数获取任务ID并加载数据
       const taskId = route.params.id as string;
-      if (taskId === '1' || taskId === '2') {
-        await loadChartData(taskId);
+      
+      // ID 映射函数：将 ID=3 映射到 ID=2
+      const getDataTypeId = (id: string): string => {
+        return id === "3" ? "2" : id;
+      };
+
+      const mappedId = getDataTypeId(taskId);
+      if (mappedId === '1' || mappedId === '2') {
+        await loadChartData(mappedId);
       }
     });
+    
     return {
       chartWidth,
       chartHeight,
+      metricsData,
       // 返回所有需要在模板中使用的数据和方法
       task1Chart1Data,
       task1Chart1Options,
@@ -153,18 +248,70 @@ export default defineComponent({
 .training-comparison-container {
   padding: 20px;
   width: 100%;
-  
+}
+
+/* 对比表格样式 */
+.comparison-table-container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 20px; /* 从16px调大到20px */
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 12px 16px;
+  text-align: center;
+  border: 1px solid #e8e8e8;
+}
+
+.comparison-table th {
+  background-color: #f5f7fa;
+  color: #333;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+}
+
+.comparison-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.comparison-table tbody tr:hover {
+  background-color: #f0f9ff;
+}
+
+.comparison-table td.positive {
+  color: #67c23a;
+  font-weight: 600;
+}
+
+.comparison-table td.negative {
+  color: #f56c6c;
+  font-weight: 600;
+}
+
+.arrow {
+  font-size: 16px;
+  font-weight: bold;
+  margin-left: 4px;
 }
 
 .energy-chart-container {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 10px 20px 20px 20px; /* 减小上内边距从20px到10px */
   width: 100%;
-  height: calc(90vh - 0px);
+  height: calc(96vh - 40px); /* 从98vh改为96vh */
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* 改为顶部对齐，使图表向上移动 */
   justify-content: center;
 }
 
