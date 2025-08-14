@@ -7,6 +7,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import * as echarts from 'echarts';
+import before from "/@/mock/before.json";
+import after from "/@/mock/after.json";
+import trueVals from "/@/mock/true.json";
 
 const props = defineProps({
   width: { type: Number, default: 900 },
@@ -22,10 +25,6 @@ async function fetchJson(path: string) {
 }
 
 onMounted(async () => {
-  // json文件已由npy_to_json.py生成并放在public目录
-  const before = await fetchJson('/@/mock/before.json');
-  const after = await fetchJson('/@/mock/after.json');
-  const trueVals = await fetchJson('/@/mock/true.json');
   const option = {
     title: { text: '电价预测任务验证', left: 'center' },
     tooltip: { trigger: 'axis' },
