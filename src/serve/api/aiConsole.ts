@@ -68,7 +68,7 @@ const simulateStream = (
               data: word[wordIndex],
             });
             wordIndex++;
-            setTimeout(() => typedWord(word), 30); // 加快打字速度到30毫秒
+            setTimeout(() => typedWord(word), 32); // 加快打字速度到30毫秒
           } else {
             wordIndex = 0;
             index++;

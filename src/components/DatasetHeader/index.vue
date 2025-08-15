@@ -15,14 +15,14 @@
               {{ metrics.dataPairs }}
               <span
                 class="growth-rate"
-                :class="{ positive: metrics.dataPairs > getPreviousValue('dataPairs') }"
+                :class="{ positive: metrics.dataPairsGrowth > 0 }"
               >
-                {{ formatGrowth(metrics.dataPairs, 'dataPairs') }}
+                {{ formatGrowth(metrics.dataPairsGrowth) }}
                 <Icon
-                  v-if="metrics.dataPairs !== getPreviousValue('dataPairs')"
-                  :name="metrics.dataPairs > getPreviousValue('dataPairs') ? 'arrow-up' : 'arrow-down'"
+                  v-if="metrics.dataPairsGrowth !== 0"
+                  :name="metrics.dataPairsGrowth > 0 ? 'arrow-up' : 'arrow-down'"
                 />
-                <span v-if="metrics.dataPairs === getPreviousValue('dataPairs')">-</span>
+                <span v-if="metrics.dataPairsGrowth === 0">-</span>
               </span>
             </div>
           </div>
@@ -37,14 +37,14 @@
               {{ metrics.imageCount }}
               <span
                 class="growth-rate"
-                :class="{ positive: metrics.imageCount > getPreviousValue('imageCount') }"
+                :class="{ positive: metrics.imageCountGrowth > 0 }"
               >
-                {{ formatGrowth(metrics.imageCount, 'imageCount') }}
+                {{ formatGrowth(metrics.imageCountGrowth) }}
                 <Icon
-                  v-if="metrics.imageCount !== getPreviousValue('imageCount')"
-                  :name="metrics.imageCount > getPreviousValue('imageCount') ? 'arrow-up' : 'arrow-down'"
+                  v-if="metrics.imageCountGrowth !== 0"
+                  :name="metrics.imageCountGrowth > 0 ? 'arrow-up' : 'arrow-down'"
                 />
-                <span v-if="metrics.imageCount === getPreviousValue('imageCount')">-</span>
+                <span v-if="metrics.imageCountGrowth === 0">-</span>
               </span>
             </div>
           </div>
@@ -59,14 +59,14 @@
               {{ metrics.codeCount }}
               <span
                 class="growth-rate"
-                :class="{ positive: metrics.codeCount > getPreviousValue('codeCount') }"
+                :class="{ positive: metrics.codeCountGrowth > 0 }"
               >
-                {{ formatGrowth(metrics.codeCount, 'codeCount') }}
+                {{ formatGrowth(metrics.codeCountGrowth) }}
                 <Icon
-                  v-if="metrics.codeCount !== getPreviousValue('codeCount')"
-                  :name="metrics.codeCount > getPreviousValue('codeCount') ? 'arrow-up' : 'arrow-down'"
+                  v-if="metrics.codeCountGrowth !== 0"
+                  :name="metrics.codeCountGrowth > 0 ? 'arrow-up' : 'arrow-down'"
                 />
-                <span v-if="metrics.codeCount === getPreviousValue('codeCount')">-</span>
+                <span v-if="metrics.codeCountGrowth === 0">-</span>
               </span>
             </div>
           </div>
@@ -83,14 +83,14 @@
               {{ metrics.codeCount }}
               <span
                 class="growth-rate"
-                :class="{ positive: metrics.codeCount > getPreviousValue('codeCount') }"
+                :class="{ positive: metrics.codeCountGrowth > 0 }"
               >
-                {{ formatGrowth(metrics.codeCount, 'codeCount') }}
+                {{ formatGrowth(metrics.codeCountGrowth) }}
                 <Icon
-                  v-if="metrics.codeCount !== getPreviousValue('codeCount')"
-                  :name="metrics.codeCount > getPreviousValue('codeCount') ? 'arrow-up' : 'arrow-down'"
+                  v-if="metrics.codeCountGrowth !== 0"
+                  :name="metrics.codeCountGrowth > 0 ? 'arrow-up' : 'arrow-down'"
                 />
-                <span v-if="metrics.codeCount === getPreviousValue('codeCount')">-</span>
+                <span v-if="metrics.codeCountGrowth === 0">-</span>
               </span>
             </div>
           </div>
@@ -108,13 +108,10 @@ import Icon from "/@/components/Icon/index.vue";
 export interface DatasetMetrics {
   dataPairs: number;
   dataPairsGrowth: number;
-  dataPairsPrevious: number;
   imageCount: number;
   imageCountGrowth: number;
-  imageCountPrevious: number;
   codeCount: number;
   codeCountGrowth: number;
-  codeCountPrevious: number;
 }
 
 export default defineComponent({
@@ -133,38 +130,14 @@ export default defineComponent({
     const pageId = computed(() => {
       return route.params.id?.toString() || '1';
     });
-    
-    // 获取原始数据（previousValue）
-    const getPreviousValue = (key: string): number => {
-      const metricsAny = props.metrics as any;
-      // 如果有 Previous 字段就用，否则根据当前值和增长率反推
-      if (metricsAny[key + 'Previous'] !== undefined) {
-        return metricsAny[key + 'Previous'];
-      }
-      
-      // 根据增长率反推原始值：current = previous * (1 + growth/100)
-      // 所以 previous = current / (1 + growth/100)
-      const current = metricsAny[key];
-      const growth = metricsAny[key + 'Growth'];
-      if (growth === 0) return current;
-      return Math.round(current / (1 + growth / 100));
-    };
-    
-    // 格式化增长率：与原始数据比较
-    const formatGrowth = (current: number, key: string): string => {
-      const previous = getPreviousValue(key);
-      if (previous === 0) return '-';
-      
-      // 计算相对于原始数据的增长率
-      const growth = ((current - previous) / previous) * 100;
+    // 格式化增长率
+    const formatGrowth = (growth: number): string => {
       const absGrowth = Math.abs(growth);
-      return `${growth >= 0 ? '+' : '-'}${absGrowth.toFixed(1)}%`;
+      return `${absGrowth.toFixed(1)}%`;
     };
-    
     return {
       formatGrowth,
       pageId,
-      getPreviousValue,
     };
   },
 });
