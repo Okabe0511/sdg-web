@@ -150,7 +150,7 @@
 
       {
         "event": "RESPONSE",
-        "data": "完成数据原料召回，用时1.1秒"
+        "data": "完成数据原料召回，用时1秒"
       },
       {
         "event": "REQUEST",
