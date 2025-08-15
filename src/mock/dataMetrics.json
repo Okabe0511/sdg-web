@@ -32,11 +32,11 @@
   },
   "qualityPrimaryMetrics": {
     "Internet": {
-      "codeQuality": 89.13,
-      "dataVolume": 44.44,
-      "dataAlignment": 78.8,
+      "codeQuality": 89.14,
+      "dataVolume": 40.44,
+      "dataAlignment": 78.80,
       "diversityBalance": 33.55,
-      "dataRedundancy": 70
+      "dataRedundancy": 70.0
     },
     "energy": {
       "codeQuality": 95.20,
@@ -48,13 +48,13 @@
   },
   "originalMetrics": {
     "Internet": {
-      "syntaxDetection": 84.5,
-      "configCompleteness": 93.7,
-      "sampleCount": 44.44,
-      "imageRenderMatch": 82.6,
+      "syntaxDetection": 84.53,
+      "configCompleteness": 93.74,
+      "sampleCount": 40.44,
+      "imageRenderMatch": 82.60,
       "missingRate": 75.0,
-      "chartTypeBalance": 66.7,
-      "configDiversity": 0.4,
+      "chartTypeBalance": 66.65,
+      "configDiversity": 0.44,
       "codeRedundancy": 70.0,
       "imageRedundancy": 70.0
     },
@@ -76,13 +76,14 @@
   "preparedMetrics": {
     "Internet": {
       "syntaxDetection": 100.0,
-      "configCompleteness": 98.5,
+      "configCompleteness": 94.66,
       "sampleCount": 100.0,
-      "imageRenderMatch": 95.2,
-      "missingRate": 80.1,
-      "chartTypeBalance": 80.5,
-      "configDiversity": 60.0,
-      "codeRedundancy": 100.0
+      "imageRenderMatch": 88.12,
+      "missingRate": 99.77,
+      "chartTypeBalance": 66.58,
+      "configDiversity": 58.05,
+      "codeRedundancy": 91.73,
+      "imageRedundancy": 85.28
     },
     "energy": {
       "timeGranularityCoverage": 60.0,
@@ -131,7 +132,7 @@
     "Internet": [
       {
         "name": "原始数据",
-        "value": [44.44, 78.8, 70, 33.55, 89.13],
+        "value": [40.44, 78.80, 70.0, 33.55, 89.14],
         "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
         "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
         "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
