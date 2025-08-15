@@ -40,7 +40,9 @@ export const useDatasetMetrics = () => {
     if (oldValue === 0) return 0;
     return ((newValue - oldValue) / oldValue) * 100;
   }
-  const previousMetrics = reactive({
+  
+  // 保存原始数据作为基准值
+  const originalMetrics = reactive({
     dataPairs: metrics.dataPairs,
     imageCount: metrics.imageCount,
     codeCount: metrics.codeCount
@@ -52,23 +54,18 @@ export const useDatasetMetrics = () => {
     imageCount: number;
     codeCount: number;
   }) => {
-    // 保存当前值作为前一次值
-    previousMetrics.dataPairs = metrics.dataPairs;
-    previousMetrics.imageCount = metrics.imageCount;
-    previousMetrics.codeCount = metrics.codeCount;
-
     // 更新当前值
     metrics.dataPairs = operatorDatasetSize.dataPairs;
     metrics.imageCount = operatorDatasetSize.imageCount;
     metrics.codeCount = operatorDatasetSize.codeCount;
 
-    // 计算增长率
-    metrics.dataPairsGrowth = calculateGrowthRate(previousMetrics.dataPairs, metrics.dataPairs);
-    metrics.imageCountGrowth = calculateGrowthRate(previousMetrics.imageCount, metrics.imageCount);
-    metrics.codeCountGrowth = calculateGrowthRate(previousMetrics.codeCount, metrics.codeCount);
+    // 计算相对于原始数据的增长率
+    metrics.dataPairsGrowth = calculateGrowthRate(originalMetrics.dataPairs, metrics.dataPairs);
+    metrics.imageCountGrowth = calculateGrowthRate(originalMetrics.imageCount, metrics.imageCount);
+    metrics.codeCountGrowth = calculateGrowthRate(originalMetrics.codeCount, metrics.codeCount);
   };
 
-  // 可在组件中直接使用 dataPairsGrowth、imageCountGrowth、codeCountGrowth 展示增长率
+  // 可在组件中直接使用 dataPairsGrowth、imageCountGrowth、codeCountGrowth 展示相对于原始数据的增长率
 
   return {
     metrics,
