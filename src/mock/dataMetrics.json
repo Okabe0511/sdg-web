@@ -132,36 +132,23 @@
     "Internet": [
       {
         "name": "原始数据",
-        "value": [40.44, 78.80, 70.0, 33.55, 89.14],
-        "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
-        "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
-        "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
+        "value": [40.44, 78.80, 70.0, 33.55, 89.14]
       },
       {
         "name": "制备后数据",
-        "value": [100.0, 65.11, 71.28, 61.68, 93.77],
-        "itemStyle": { "color": "#f56c6c" },
-        "lineStyle": { "color": "#f56c6c" },
-        "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
+        "value": [100.0, 65.11, 71.28, 61.68, 93.77]
       }
     ],
     "energy": [
       {
         "name": "原始数据",
-        "value": [51.19, 0.00, 63.19, 42.36, 95.20],
-        "itemStyle": { "color": "rgba(0, 155, 164, 0.8)" },
-        "lineStyle": { "color": "rgba(0, 155, 164, 0.8)" },
-        "areaStyle": { "color": "rgba(0, 155, 164, 0.2)" }
+        "value": [51.19, 0.00, 63.19, 42.36, 95.20]
       },
       {
         "name": "制备后数据",
-        "value": [60.39, 62.27, 77.35, 71.52, 95.36],
-        "itemStyle": { "color": "#f56c6c" },
-        "lineStyle": { "color": "#f56c6c" },
-        "areaStyle": { "color": "rgba(245, 108, 108, 0.2)" }
+        "value": [60.39, 62.27, 77.35, 71.52, 95.36]
       }
     ]
-    
   },
   "explanations": {
     "Internet": {

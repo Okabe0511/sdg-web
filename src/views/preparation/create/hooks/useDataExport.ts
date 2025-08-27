@@ -46,7 +46,20 @@ export const useDataExport = () => {
 
   // 获取图表数据
   const getChartSeriesData = (id: string) => {
-    return dataMetrics.chartSeriesData[id as keyof typeof dataMetrics.chartSeriesData];
+    const seriesData = dataMetrics.chartSeriesData[id as keyof typeof dataMetrics.chartSeriesData];
+    // 硬编码颜色设置
+    return seriesData.map((item: any, index: number) => ({
+      ...item,
+      itemStyle: index === 0 
+        ? { color: "rgba(0, 155, 164, 0.8)" }
+        : { color: "#f56c6c" },
+      lineStyle: index === 0 
+        ? { color: "rgba(0, 155, 164, 0.8)" }
+        : { color: "#f56c6c" },
+      areaStyle: index === 0 
+        ? { color: "rgba(0, 155, 164, 0.2)" }
+        : { color: "rgba(245, 108, 108, 0.2)" }
+    }));
   };
 
   // 原始指标数据
