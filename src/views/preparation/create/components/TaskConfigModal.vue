@@ -407,7 +407,7 @@ export default defineComponent({
           }, 1000);
         })
         .catch((error: any) => {
-          console.log("表单验证失败", error);
+          // 表单验证失败
         });
     };
 

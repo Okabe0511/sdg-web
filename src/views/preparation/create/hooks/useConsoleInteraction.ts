@@ -13,7 +13,7 @@ export interface ConsoleMessage {
 
 export const useConsoleInteraction = () => {
   const route = useRoute();
-  const task = route.params.id; 
+  const task = route.params.key as string; 
   // 控制台对话内容
   const consoleMessages = ref<ConsoleMessage[]>([]);
 

@@ -11,16 +11,16 @@ import {
  * @param taskId 任务ID
  * @returns 质量评估指标
  */
-export const getQualityMetrics = async (taskId: number) => {
+export const getQualityMetrics = async (taskId: string) => {
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
-    if (taskId === 1) {
+    if (taskId === 'internet') {
       const data = {
         primaryMetrics: mockDataMetrics.qualityPrimaryMetrics["Internet"],
         secondaryMetrics: mockDataMetrics.originalMetrics["Internet"],
       };
       return Promise.resolve({ data });
-    } else if (taskId === 2) {
+    } else if (taskId === 'energy') {
       const data = {
         primaryMetrics: mockDataMetrics.qualityPrimaryMetrics["energy"],
         secondaryMetrics: mockDataMetrics.originalMetrics["energy"],

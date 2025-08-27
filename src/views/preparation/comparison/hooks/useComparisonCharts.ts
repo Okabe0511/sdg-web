@@ -149,11 +149,11 @@ export const useComparisonCharts = () => {
   try {
   const response = await getData();
   const data = response.data;
-  console.log("加载数据", taskId, data);
+  // 加载数据
 
   // 根据taskId选择数据集
   const selectedData = (() => {
-    if (taskId === "1") {
+    if (taskId === "internet") {
       return data.internet; // 只支持id为1时返回internet数据集
     } else {
       return undefined; // 其他情况返回undefined或空
@@ -162,7 +162,7 @@ export const useComparisonCharts = () => {
 
   // 解构选中的数据
   const { epochs, A, B, C } = selectedData;
-    console.log("对照训练数据", A);
+    // 对照训练数据
       updateChartData(task1Chart1Data, {
         labels: epochs,
         datasets: [

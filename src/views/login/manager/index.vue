@@ -45,7 +45,7 @@ export default defineComponent({
         // 跳转到首页
         router.push("/home/list");
       } catch (error: any) {
-        console.log(error);
+        // 错误处理
 
         // 错误提示
         message.error(error?.data?.message || "登录失败");

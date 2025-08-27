@@ -19,7 +19,7 @@ export interface OperatorParam {
 
 export const useOperators = () => {
   const route = useRoute();
-  const taskId = route.params.id; // 获取路由参数
+  const taskId = route.params.key as string; // 获取路由参数
 
   // 算子库数据
   const operators = reactive<Operator[]>([]);

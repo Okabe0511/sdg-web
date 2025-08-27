@@ -11,11 +11,11 @@ let radarDataList = radardata.internet;
 export const useTargetAnalysis = () => {
   // 雷达图相关
   const route = useRoute();
-  const taskId = route.params.id;
-  if(taskId === "1") {
+  const taskId = route.params.key;
+  if(taskId === "internet") {
     radarDataList = radardata.internet;
   }
-  if(taskId === "2") {
+  if(taskId === "energy") {
     radarDataList = radardata.energy;
   }
   const radarChartRef = ref<HTMLElement | null>(null);
@@ -24,10 +24,9 @@ export const useTargetAnalysis = () => {
   // 靶点相关，original从mock/targetAnalysisResponse.json获取
   // 根据页面id动态获取original和current数据集
   const getTargetData = () => {
-    let id = String(route.params.id || "internet");
-    if (id === "1") id = "internet";
-    if (id === "2") id = "energy";
-    console.log("获取靶点数据，当前ID:", id);
+    let id = String(route.params.key || "internet");
+    if (id === "internet") id = "internet";
+    if (id === "energy") id = "energy";
     const mockData = (mockTargetAnalysisResponse as Record<string, any>)[id] || (mockTargetAnalysisResponse as Record<string, any>)["internet"];
     if (id === "energy") {
       // energy 返回前 4 个指标
@@ -88,7 +87,7 @@ export const useTargetAnalysis = () => {
     let angles: Record<string, number>;
     
     const taskIdString = String(taskId);
-    if (taskIdString === "2") {
+    if (taskIdString === "energy") {
       // energy 数据集 - 4 个指标均匀分布 (360/4 = 90度间隔)
       angles = {
         domainKnowledgeIntegrity: 0,         // 顶部
@@ -139,7 +138,7 @@ export const useTargetAnalysis = () => {
     {
       name: "原始数据",
       value: (() => {
-        const type: 'Internet' | 'energy' = taskId === "2" ? "energy" : "Internet";
+        const type: 'Internet' | 'energy' = taskId === "energy" ? "energy" : "Internet";
         const metrics = dataMetrics.qualityPrimaryMetrics[type];
         // 按雷达图 indicator 顺序取值
         // indicator: [数据量, 数据表示质量, 数据冗余, 数据上下文质量, 数据内在质量]
@@ -207,8 +206,8 @@ const updateFinalTargetData = () => {
   // 根据任务ID选择最终数据
   let finalData;
   let id = String(taskId || "internet");
-  if (id === "1") id = "internet";
-  if (id === "2") id = "energy";
+  if (id === "internet") id = "internet";
+  if (id === "energy") id = "energy";
   finalData = (mockTargetAnalysisResponse as Record<string, any>)[id]?.final || (mockTargetAnalysisResponse as Record<string, any>)["internet"].final;
 
   // 更新靶点数据

@@ -15,13 +15,13 @@ export interface DatasetMetrics {
 
 export const useDatasetMetrics = () => {
   const route = useRoute();
-  const taskId = ref(route.params.id as string);
+  const taskId = ref(route.params.key as string);
 
   // 只从 mock 文件读取基础数据，增长率本地动态计算
   const getInitialData = (): DatasetMetrics => {
     let baseData;
     let type = "Internet";
-    if (taskId.value === "2") type = "energy";
+    if (taskId.value === "energy") type = "energy";
     baseData = (dataMetrics.volumeMetrics as Record<string, any[]>)[type];
     return {
       dataPairs: baseData.find((item: any) => item.key === "dataPairs")?.previousValue ?? 0,

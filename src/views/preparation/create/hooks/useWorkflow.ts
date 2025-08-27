@@ -5,7 +5,7 @@ import type { Operator } from "/@/serve/api/operators";
 import { useRoute } from 'vue-router';
 export const useWorkflow = () => {
   const route = useRoute();
-  const taskId = route.params.id;
+  const taskId = route.params.key as string;
   // 工作流数据
   const workflow = reactive<{
     steps: Array<any>;

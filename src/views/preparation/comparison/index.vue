@@ -1,6 +1,6 @@
 <template>
   <div class="training-comparison-container">
-    <template v-if="$route.params.id === '2' || $route.params.id === '3'">
+    <template v-if="$route.params.key === 'energy' || $route.params.key === '3'">
       <!-- 制备前后对比表格 -->
       <div class="comparison-table-container">
         <table class="comparison-table">
@@ -126,10 +126,10 @@ export default defineComponent({
 
     // 根据路由ID获取对应的指标数据
     const metricsData = computed(() => {
-      const routeId = route.params.id as string;
-      const dataTypeId = routeId === "3" ? "2" : routeId;
+      const routeId = route.params.key as string;
+      const dataTypeId = routeId === "3" ? "energy" : routeId;
       
-      if (dataTypeId === "2") {
+      if (dataTypeId === "energy") {
         // Energy 数据集的相似度指标 - 制备前后对比
         return [
           {
@@ -205,9 +205,9 @@ export default defineComponent({
     
     onMounted(async () => {
       // 从路由参数获取任务ID并加载数据
-      const taskId = route.params.id as string;
+      const taskId = route.params.key as string;
       
-      if (taskId === '1' || taskId === '2') {
+      if (taskId === 'internet' || taskId === 'energy') {
         await loadChartData(taskId);
       }
     });

@@ -108,7 +108,7 @@
             v-model:value="chartType"
             button-style="solid"
             size="small"
-            v-if="routeId === '1'"
+            v-if="routeId === 'internet'"
           >
             <a-radio-button value="heatmap">微观</a-radio-button>
             <a-radio-button value="analysis">聚合</a-radio-button>
@@ -117,7 +117,7 @@
         </div>
 
         <!-- 热力图和柱状图容器 - 仅routeId为1时显示 -->
-        <template v-if="routeId === '1'">
+        <template v-if="routeId === 'internet'">
           <div
             v-show="chartType === 'heatmap'"
             id="main"
@@ -148,7 +148,7 @@
 
         <!-- 艾森豪威尔矩阵容器 - 仅routeId为2时显示 -->
         <div
-          v-if="routeId === '2' && chartType === 'eisenhower'"
+          v-if="routeId === 'energy' && chartType === 'eisenhower'"
           id="eisenhower-matrix"
           style="width: 100%; height: 410px"
         ></div>
@@ -280,9 +280,9 @@ export default defineComponent({
   emits: ["next-step"],
   setup(props, { emit }) {
     const route = useRoute();
-    const routeId = ref(route.params.id as string);
+    const routeId = ref(route.params.key as string);
     const chartType = ref(
-      routeId.value === '1' ? "heatmap" : "eisenhower"
+      routeId.value === 'internet' ? "heatmap" : "eisenhower"
     );  
     const histogramChartRefs = ref<HTMLElement[]>([]);
     const isAnalysisEnd = ref(false);
@@ -386,9 +386,9 @@ export default defineComponent({
     // 计算当前页面应显示的靶点key
     const displayedTargetKeys = computed(() => {
       let baseKeys: string[] = [];
-      if (routeId.value === "1") {
+      if (routeId.value === "internet") {
         baseKeys = mainTargetKeys;
-      } else if (routeId.value === "2") {
+      } else if (routeId.value === "energy") {
         baseKeys = energyTargetKeys;
       }
       
@@ -533,13 +533,13 @@ export default defineComponent({
 
     // 处理窗口大小变化
     const handleWindowResize = () => {
-      if (routeId.value === '1') {
+      if (routeId.value === 'internet') {
         if (chartType.value === "heatmap") {
           resizeHeatmapHandler();
         } else if (chartType.value === "analysis") {
           resizeHistograms();
         }
-      } else if (routeId.value === '2') {
+      } else if (routeId.value === 'energy') {
         resizeEisenhower();
       }
     };
@@ -607,7 +607,7 @@ export default defineComponent({
 
     // 初始化图表
     const initCharts = async () => {
-      if (routeId.value === '1') {
+      if (routeId.value === 'internet') {
         if (chartType.value === "heatmap") {
           initHeatmap();
         } else if (chartType.value === "analysis") {
@@ -619,7 +619,7 @@ export default defineComponent({
             }
           });
         }
-      } else if (routeId.value === '2') {
+      } else if (routeId.value === 'energy') {
         // 确保艾森豪威尔矩阵正确初始化
         if (chartType.value === "eisenhower") {
           await initEisenhowerMatrix();
@@ -649,11 +649,11 @@ export default defineComponent({
 
     // 监听路由参数变化
     watch(
-      () => route.params.id,
-      (newId) => {
-        routeId.value = newId as string;
+      () => route.params.key,
+      (newKey) => {
+        routeId.value = newKey as string;
         // 根据新的routeId设置默认的chartType
-        chartType.value = routeId.value === '1' ? "heatmap" : "eisenhower";
+        chartType.value = routeId.value === 'internet' ? "heatmap" : "eisenhower";
         // 重新初始化图表
         initCharts();
       }
@@ -677,7 +677,7 @@ export default defineComponent({
       async (newType) => {
         if (!props.visible) return;
 
-        if (routeId.value === '1') {
+        if (routeId.value === 'internet') {
           if (newType === "heatmap") {
             setTimeout(() => {
               if (heatmapLoaded.value) {
@@ -700,7 +700,7 @@ export default defineComponent({
               }
             });
           }
-        } else if (routeId.value === '2') {
+        } else if (routeId.value === 'energy') {
           if (newType === "eisenhower") {
             setTimeout(() => {
               if (eisenhowerLoaded.value) {
@@ -722,7 +722,7 @@ export default defineComponent({
           refs.length > 0 &&
           chartType.value === "analysis" &&
           props.visible &&
-          routeId.value === '1'
+          routeId.value === 'internet'
         ) {
           setChartRefs(refs);
           initHistogramCharts();
@@ -1223,5 +1223,12 @@ export default defineComponent({
 :global(.edit-button) {
   padding: 0 !important;
   background-color: transparent !important;
+}
+
+#eisenhower-matrix {
+  width: 100%;
+  height: 410px;
+  min-height: 410px;
+  background-color: #fff;
 }
 </style>

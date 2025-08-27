@@ -22,7 +22,7 @@ export const getMonitorData = () => {
 };
 
 // 删除任务
-export const deleteTask = (taskId: number) => {
+export const deleteTask = (taskId: string) => {
   // 在开发环境中模拟成功响应
   if (import.meta.env.DEV) {
     return Promise.resolve({ data: { success: true } });
@@ -32,7 +32,7 @@ export const deleteTask = (taskId: number) => {
 };
 
 // 查看任务详情
-export const getTaskDetail = (taskId: number) => {
+export const getTaskDetail = (taskId: string) => {
   // 在开发环境中找到对应的任务
   if (import.meta.env.DEV) {
     const task = mockData.tasks.find((t) => t.id === taskId);

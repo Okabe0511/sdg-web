@@ -43,7 +43,8 @@ export const useEisenhowerMatrix = () => {
   
   // 获取数据函数（根据环境返回mock数据或真实数据）
   const getData = async (): Promise<DataItem[]> => {
-    const taskId = route.params.id; // 直接从路由获取taskId
+    const taskId = route.params.key as string; // 直接从路由获取taskId
+    
     if (import.meta.env.DEV) {
       // 开发环境使用mock数据
       await new Promise(resolve => setTimeout(resolve, 500)); // 模拟延迟
@@ -51,8 +52,8 @@ export const useEisenhowerMatrix = () => {
       const eisenhowerData = mockData as EisenhowerData;
       
       // 根据taskId返回对应的数据集
-      if (eisenhowerData.main[taskId as string]) {
-        return eisenhowerData.main[taskId as string];
+      if (eisenhowerData.main[taskId]) {
+        return eisenhowerData.main[taskId];
       }
       return eisenhowerData.main.default;
     } else {
@@ -69,12 +70,18 @@ export const useEisenhowerMatrix = () => {
   // 初始化函数（接受容器ID作为参数）
   const initEisenhowerMatrix = async (containerId: string = "eisenhower-matrix") => {
     const chartDom = document.getElementById(containerId);
-    if (!chartDom) return;
+    if (!chartDom) {
+      return;
+    }
 
     chartInstance = echarts.init(chartDom);
     
     // 获取数据
     const data = await getData();
+
+    if (!data || data.length === 0) {
+      return;
+    }
 
     const option = {
       grid: {
@@ -102,14 +109,14 @@ export const useEisenhowerMatrix = () => {
           '季节性强度',
           '主频强度',
           '趋势强度',
-          '样本均衡性',
           '标签一致性',
           '数据完整性',
           '时间特征完备度',
           '时序平稳性',
           '领域知识完整性',
           '领域知识多样性',
-          '特征独立性'
+          '特征独立性',
+          '样本均衡性'
         ],
         orient: 'vertical',
         left: '5%',
@@ -167,10 +174,6 @@ export const useEisenhowerMatrix = () => {
           data: data.filter(item => item.secondary === '趋势强度').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#0082c8' }
         },
         {
-          name: '样本均衡性', type: 'scatter',
-          data: data.filter(item => item.secondary === '样本均衡性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#911eb4' }
-        },
-        {
           name: '标签一致性', type: 'scatter',
           data: data.filter(item => item.secondary === '标签一致性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#006010ff' }
         },
@@ -197,6 +200,10 @@ export const useEisenhowerMatrix = () => {
         {
           name: '特征独立性', type: 'scatter',
           data: data.filter(item => item.secondary === '特征独立性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#070009ff' }
+        },
+        {
+          name: '样本均衡性', type: 'scatter',
+          data: data.filter(item => item.secondary === '样本均衡性').map(item => ({ value: [item.importance * 2 - 1, item.problem * 2 - 1], name: item.secondary, importance: item.importance, problem: item.problem, urgency: item.urgency, symbolSize: item.urgency * 80 + 6 })), itemStyle: { color: '#911eb4' }
         }
       ] 
     };

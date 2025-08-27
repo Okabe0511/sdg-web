@@ -8,9 +8,9 @@ import { useRoute } from 'vue-router';
  */
 export const getTargetAnalysis = async () => {
   const route = useRoute();
-  let id = String(route.params.id || "internet");
-  if (id === "1") id = "internet";
-  if (id === "2") id = "energy";
+  let id = String(route.params.key || "internet");
+  if (id === "internet") id = "internet";
+  if (id === "energy") id = "energy";
 
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {

@@ -1,10 +1,10 @@
 <template>
   <div class="dataset-header">
     <div class="dataset-title">
-      <h1>{{ pageId === '2' ? '电价数据集（关系表）' : 'ECharts多模态数据集（图像+程序代码）' }}</h1>
+      <h1>{{ pageId === 'energy' ? '电价数据集（关系表）' : 'ECharts多模态数据集（图像+程序代码）' }}</h1>
     </div>
     <div class="dataset-metrics">
-      <div v-if="pageId === '1'" class="metrics-row">
+      <div v-if="pageId === 'internet'" class="metrics-row">
         <div class="metric-item">
           <div class="metric-icon">
             <Icon name="data" />
@@ -72,7 +72,7 @@
           </div>
         </div>
       </div>
-      <div v-else-if="pageId === '2'">
+      <div v-else-if="pageId === 'energy'">
         <div class="metric-item">
           <div class="metric-icon">
             <Icon name="data" />
@@ -128,7 +128,7 @@ export default defineComponent({
     const route = useRoute();
     // 获取页面id，优先用路由参数
     const pageId = computed(() => {
-      return route.params.id?.toString() || '1';
+      return route.params.key?.toString() || 'internet';
     });
     // 格式化增长率
     const formatGrowth = (growth: number): string => {

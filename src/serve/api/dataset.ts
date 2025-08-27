@@ -10,8 +10,8 @@ import { DatasetInfo } from "/@/views/preparation/create/hooks/useDatasets";
 export const getDatasetInfo = async (taskId: any) => {
   if (import.meta.env.DEV) {
     let key = taskId.id;
-    if (key === 1 || key === '1') key = 'Internet';
-    else if (key === 2 || key === '2') key = 'energy';
+    if (key === 'internet' || key === 'internet') key = 'Internet';
+    else if (key === 'energy' || key === 'energy') key = 'energy';
     const data = (mockDataMetrics.datasets as any)[key];
     return Promise.resolve({ data });
   }

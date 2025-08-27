@@ -87,7 +87,7 @@ export const useQualityAssessment = () => {
   });
 
   // 加载质量评估指标
-  const loadQualityMetrics = async (taskId: number) => {
+  const loadQualityMetrics = async (taskId: string) => {
     try {
       const response = await getQualityMetrics(taskId);
       const metrics = response.data;

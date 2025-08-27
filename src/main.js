@@ -27,7 +27,7 @@ window.addEventListener("load", function () {
 });
 
 window.addEventListener("resize", function () {
-  console.log("resize", window.innerWidth, window.innerWidth / 1920);
+  // 窗口大小调整处理
 
   const width = 1920;
   this.document.getElementsByTagName("body")[0].style.transform = `scale(${

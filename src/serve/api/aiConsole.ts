@@ -125,10 +125,10 @@ export const getFullTaskLog = async (
   try {
     // 在开发环境中使用mock数据
     if (import.meta.env.DEV) {
-      if (task.taskId == "1") {
+      if (task.taskId == "internet") {
         return simulateStream(mockData.responses["Internet"], streamHandler);
       }
-      else if (task.taskId == "2") {
+      else if (task.taskId == "energy") {
         return simulateStream(mockData.responses["energy"], streamHandler);
       }
     }
@@ -156,10 +156,9 @@ export const getDataPreparationLog = async (
   try {
     // 在开发环境中使用mock数据
     if (import.meta.env.DEV) {
-      console.log("控制台2",task);
-      if (task === "1") {
+      if (task === "internet") {
         return simulateStream(mockData.preparation.internet, streamHandler);
-      } else if (task === "2") {
+      } else if (task === "energy") {
         return simulateStream(mockData.preparation.energy, streamHandler);
       }
       else  {

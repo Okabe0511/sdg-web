@@ -25,9 +25,9 @@ export const useDataExport = () => {
   const qualityChartRef = ref<HTMLElement | null>(null);
   let qualityChart: echarts.ECharts | null = null;
   const route = useRoute();
-  let taskId = route.params.id as string;
-  if (taskId === '1') taskId = 'Internet';
-  else if (taskId === '2') taskId = 'energy';
+  let taskId = route.params.key as string;
+  if (taskId === 'internet') taskId = 'Internet';
+  else if (taskId === 'energy') taskId = 'energy';
   
   // 获取数据指标
   const getMetrics = (id: string) => {

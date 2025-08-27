@@ -28,9 +28,8 @@ export interface Operator {
 
 // 根据任务ID获取数据集类型（仅支持字符串或数字）
 const getDatasetType = (taskId: string | number): 'Internet' | 'energy' => {
-  console.log('当前数据集ID:', taskId);
-  if (String(taskId) === '1') return 'Internet';
-  if (String(taskId) === '2') return 'energy';
+  if (String(taskId) === 'internet') return 'Internet';
+  if (String(taskId) === 'energy') return 'energy';
   return 'Internet'; // 默认返回Internet
 };
 
@@ -130,7 +129,6 @@ export const getRecommendWorkflow = async (
     const workflowIds = (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows[datasetType]) || (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows["Internet"]) || [];
     const operators = getOperatorsByDataset();
     const recommendedOperators = (workflowIds as number[]).map((id: number) => operators.find((op) => op.id === id)).filter(Boolean) as Operator[];
-    console.log('推荐的算子列表:', recommendedOperators);
     return Promise.resolve({ data: recommendedOperators });
   }
   // 实际环境中调用真实接口

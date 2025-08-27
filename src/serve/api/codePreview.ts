@@ -27,7 +27,7 @@ export const getOperatorPreviewCode = async (operatorName: string) => {
     let isNewImage = false;
     let oldImageSrc = "";
     let newImageSrc = "";
-    console.log(`获取算子 ${operatorName} 的预览代码`);
+    // 获取算子预览代码
 
     switch (operatorName) {
       case "配置项修复算子":

@@ -48,7 +48,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const route = useRoute();
-    const taskId = ref<number | null>(null);
+    const taskId = ref<string | null>(null);
     const isDetailMode = ref(false);
     const configModalVisible = ref(false);
 
@@ -95,7 +95,6 @@ export default defineComponent({
 
     // 处理任务配置提交
     const handleTaskConfigSubmit = async (config: any) => {
-      console.log("任务配置:", config);
       const taskId = Date.now();
       startTaskStream(config);
       const datasetResult = await submitDatasetConfig(config);
@@ -111,8 +110,8 @@ export default defineComponent({
     onMounted(async () => {
       const routeMode = route.meta.mode as string;
 
-      if (routeMode === "detail" || route.params.id) {
-        const id = Number(route.params.id || route.query.taskId);
+      if (routeMode === "detail" || route.params.key) {
+        const id = route.params.key?.toString() || route.query.taskId?.toString();
         if (!id) {
           message.error("缺少任务ID参数");
           router.push("/home/list");
@@ -129,7 +128,7 @@ export default defineComponent({
     });
 
     // 加载任务详情数据
-    const loadTaskDetail = async (id: number) => {
+    const loadTaskDetail = async (id: string) => {
       try {
         const response = await getTaskDetail(id);
         const taskData = response.data;
@@ -166,8 +165,8 @@ export default defineComponent({
     // 计算当前页面 id
     const getMetricNameMap = () => {
       let id = '';
-      if (String(taskId.value) === '1') id = 'Internet';
-      else if (String(taskId.value) === '2') id = 'energy';
+      if (String(taskId.value) === 'internet') id = 'Internet';
+      else if (String(taskId.value) === 'energy') id = 'energy';
       else id = 'Internet';
       return (dataMetrics.metricNameMap as Record<string, Record<string, string>>)[id] || {};
     };
@@ -196,12 +195,12 @@ export default defineComponent({
 
     const handleStartDataDescription = () => {
       modulesVisible.datasetDescription = true;
-      loadQualityMetrics(taskId.value || 0);
+      loadQualityMetrics(taskId.value || "internet");
       
       // 根据taskId确定任务类型并加载对应的explanations
       let taskType: "Internet" | "energy" = "Internet";
-      if (String(taskId.value) === '1') taskType = 'Internet';
-      else if (String(taskId.value) === '2') taskType = 'energy';
+      if (String(taskId.value) === 'internet') taskType = 'Internet';
+      else if (String(taskId.value) === 'energy') taskType = 'energy';
       loadQualityExplanations(taskType);
       
       setCurrentStep(1);

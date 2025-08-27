@@ -1,7 +1,7 @@
 {
   "tasks": [
     {
-      "id": 1,
+      "id": "internet",
       "name": "ECharts代码生成任务",
       "createTime": "2023-06-15 14:30:22",
       "fileCount": 1172,
@@ -9,7 +9,7 @@
       "status": "unconfigured"
     },
     {
-      "id": 2,
+      "id": "energy",
       "name": "电价预测任务",
       "createTime": "2023-06-18 09:15:37",
       "fileCount": 138,

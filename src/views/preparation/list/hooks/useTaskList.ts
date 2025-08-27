@@ -12,7 +12,7 @@ export type TabType = "all" | TaskStatus;
 
 // 定义任务接口
 export interface Task {
-  id: number;
+  id: string;
   name: string;
   createTime: string;
   fileCount: number;
@@ -72,12 +72,12 @@ export const useTaskList = () => {
   };
 
   // 查看任务详情
-  const viewTaskDetail = (id: number) => {
+  const viewTaskDetail = (id: string) => {
     router.push(`/home/detail/${id}`);
   };
 
   // 删除任务
-  const deleteTask = async (id: number) => {
+  const deleteTask = async (id: string) => {
     try {
       await deleteTaskApi(id);
       message.success("删除任务成功");

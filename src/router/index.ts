@@ -36,7 +36,7 @@ export const routes: RouteRecordRaw[] = [
             },
           },
           {
-            path: "detail/:id",
+            path: "detail/:key",
             name: "数据制备任务详情",
             component: () => import("/@/views/preparation/create/index.vue"),
             meta: {
@@ -45,7 +45,7 @@ export const routes: RouteRecordRaw[] = [
             },
           },
           {
-            path: "comparison/:id",
+            path: "comparison/:key",
             name: "对比训练",
             component: () =>
               import("/@/views/preparation/comparison/index.vue"),

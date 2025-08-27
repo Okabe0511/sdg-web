@@ -1,6 +1,6 @@
 {
   "main":{
-    "2": [
+    "energy": [
         { "primary": "数据量", "secondary": "时间粒度覆盖率", "importance": 0.300, "problem": 0.800, "urgency": 0.240, "score": 20.000 },
         { "primary": "数据量", "secondary": "季节性强度", "importance": 0.300, "problem": 0.426, "urgency": 0.128, "score": 57.376 },
         { "primary": "数据量", "secondary": "主频强度", "importance": 0.250, "problem": 0.256, "urgency": 0.064, "score": 74.384 },
