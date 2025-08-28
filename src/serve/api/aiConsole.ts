@@ -126,7 +126,7 @@ export const getFullTaskLog = async (
     // 在开发环境中使用mock数据
     if (import.meta.env.DEV) {
       if (task.taskId == "internet") {
-        return simulateStream(mockData.responses["Internet"], streamHandler);
+        return simulateStream(mockData.responses["internet"], streamHandler);
       }
       else if (task.taskId == "energy") {
         return simulateStream(mockData.responses["energy"], streamHandler);

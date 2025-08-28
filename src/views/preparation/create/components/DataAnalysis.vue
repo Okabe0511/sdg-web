@@ -203,7 +203,7 @@
             :max="100"
             :step="1"
             :tooltip-visible="true"
-            :getTooltipPopupContainer="(node) => node"
+            :getTooltipPopupContainer="(node: any) => node"
           />
         </a-form-item>
         <a-form-item>

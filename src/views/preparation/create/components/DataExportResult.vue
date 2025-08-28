@@ -183,7 +183,7 @@ export default defineComponent({
     // 根据任务ID选择对应的制备后指标数据（task1->internet, task2,3->energy）
     const currentMetrics = computed(() => {
   if (taskId.value === 'internet') {
-        return dataMetrics.preparedMetrics['Internet'] || {};
+        return dataMetrics.preparedMetrics['internet'] || {};
       } else {
         const energyMetrics: Record<string, number> = {};
         const energyData = dataMetrics.preparedMetrics['energy'];
@@ -197,7 +197,7 @@ export default defineComponent({
     // energy 靶点指标为 9 项，取原始分数
     const originalMetrics = computed(() => {
         if (taskId.value === 'internet') {
-        return dataMetrics.originalMetrics['Internet'] || {};
+        return dataMetrics.originalMetrics['internet'] || {};
       } else {
         const energyMetrics: Record<string, number> = {};
         const energyData = dataMetrics.originalMetrics['energy'];

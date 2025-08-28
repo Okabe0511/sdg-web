@@ -112,7 +112,7 @@ export const useQualityAssessment = () => {
   };
 
   // 加载质量评估说明
-  const loadQualityExplanations = async (taskType: "Internet" | "energy" = "Internet") => {
+  const loadQualityExplanations = async (taskType: "internet" | "energy" = "internet") => {
     try {
       const response = await getQualityExplanations(taskType);
       Object.assign(qualityExplanations, response.data);

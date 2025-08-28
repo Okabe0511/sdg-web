@@ -182,7 +182,7 @@ export default defineComponent({
     // 获取当前数据集类型
     const getType = () => {
       const id = route.params.key?.toString() ?? route.query.taskId?.toString();
-      return id === 'energy' ? "energy" : "Internet";
+      return id === 'energy' ? "energy" : "internet";
     };
     // 获取当前一级指标对应的二级指标数组
     const secondaryMetricMap = mockDataMetrics.secondaryMetricMap as Record<string, Record<string, string[]>>;

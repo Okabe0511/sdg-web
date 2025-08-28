@@ -138,7 +138,7 @@ export const useTargetAnalysis = () => {
     {
       name: "原始数据",
       value: (() => {
-        const type: 'Internet' | 'energy' = taskId === "energy" ? "energy" : "Internet";
+        const type: 'internet' | 'energy' = taskId === "energy" ? "energy" : "internet";
         const metrics = dataMetrics.qualityPrimaryMetrics[type];
         // 按雷达图 indicator 顺序取值
         // indicator: [数据量, 数据表示质量, 数据冗余, 数据上下文质量, 数据内在质量]

@@ -16,8 +16,8 @@ export const getQualityMetrics = async (taskId: string) => {
   if (import.meta.env.DEV) {
     if (taskId === 'internet') {
       const data = {
-        primaryMetrics: mockDataMetrics.qualityPrimaryMetrics["Internet"],
-        secondaryMetrics: mockDataMetrics.originalMetrics["Internet"],
+        primaryMetrics: mockDataMetrics.qualityPrimaryMetrics["internet"],
+        secondaryMetrics: mockDataMetrics.originalMetrics["internet"],
       };
       return Promise.resolve({ data });
     } else if (taskId === 'energy') {
@@ -28,8 +28,8 @@ export const getQualityMetrics = async (taskId: string) => {
       return Promise.resolve({ data });
     } else {
       const data = {
-        primaryMetrics: mockDataMetrics.qualityPrimaryMetrics["Internet"],
-        secondaryMetrics: mockDataMetrics.originalMetrics["Internet"],
+        primaryMetrics: mockDataMetrics.qualityPrimaryMetrics["internet"],
+        secondaryMetrics: mockDataMetrics.originalMetrics["internet"],
       };
       return Promise.resolve({ data });
     }
@@ -43,7 +43,7 @@ export const getQualityMetrics = async (taskId: string) => {
  * @param taskType 任务类型，默认为"Internet"
  * @returns 质量评估说明
  */
-export const getQualityExplanations = async (taskType: "Internet" | "energy" = "Internet") => {
+export const getQualityExplanations = async (taskType: "internet" | "energy" = "internet") => {
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
     return Promise.resolve({ data: mockDataMetrics.explanations[taskType] });

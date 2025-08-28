@@ -1,6 +1,6 @@
 {
   "volumeMetrics": {
-    "Internet": [
+    "internet": [
       {
         "label": "数据对数量",
         "key": "dataPairs",
@@ -31,7 +31,7 @@
     
   },
   "qualityPrimaryMetrics": {
-    "Internet": {
+    "internet": {
       "codeQuality": 89.14,
       "dataVolume": 40.44,
       "dataAlignment": 78.80,
@@ -47,7 +47,7 @@
     }
   },
   "originalMetrics": {
-    "Internet": {
+    "internet": {
       "syntaxDetection": 84.53,
       "configCompleteness": 93.74,
       "sampleCount": 40.44,
@@ -74,7 +74,7 @@
     }
   },
   "preparedMetrics": {
-    "Internet": {
+    "internet": {
       "syntaxDetection": 100.0,
       "configCompleteness": 94.66,
       "sampleCount": 100.0,
@@ -101,7 +101,7 @@
     }
   },
   "metricNameMap": {
-    "Internet": {
+    "internet": {
       "syntaxDetection": "语法检测通过率",
       "configCompleteness": "配置项完整性",
       "sampleCount": "样本数量",
@@ -129,7 +129,7 @@
     }
   },
   "chartSeriesData": {
-    "Internet": [
+    "internet": [
       {
         "name": "原始数据",
         "value": [40.44, 78.80, 70.0, 33.55, 89.14]
@@ -151,7 +151,7 @@
     ]
   },
   "explanations": {
-    "Internet": {
+    "internet": {
       "codeQuality": "用于衡量数据集中代码样本的正确性、规范性与可读性。低质量代码会干扰模型学习，导致生成结果不准确或结构混乱。",
       "dataVolume": "用于衡量训练数据量的丰富程度，规模不足会限制模型对模式的学习与泛化，影响生成质量与鲁棒性。",
       "dataAlignment": "用于衡量多模态数据集中不同模态之间样本对应关系准确性与一致性。对齐错误会直接影响多模态模型的学习效果，导致性能下降甚至产生误导性的预测结果。",
@@ -168,7 +168,7 @@
   },
   
   "datasets": {
-    "Internet": [
+    "internet": [
       {
         "dataType": "图像",
         "dataAmount": 580,
@@ -189,7 +189,7 @@
     ]
   },
   "secondaryMetricMap": {
-    "Internet": {
+    "internet": {
       "dataVolume": ["sampleCount"],
       "dataAlignment": ["imageRenderMatch", "missingRate"],
       "dataRedundancy": ["codeRedundancy", "imageRedundancy"],

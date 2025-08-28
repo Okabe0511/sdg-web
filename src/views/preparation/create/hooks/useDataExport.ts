@@ -25,9 +25,7 @@ export const useDataExport = () => {
   const qualityChartRef = ref<HTMLElement | null>(null);
   let qualityChart: echarts.ECharts | null = null;
   const route = useRoute();
-  let taskId = route.params.key as string;
-  if (taskId === 'internet') taskId = 'Internet';
-  else if (taskId === 'energy') taskId = 'energy';
+  const taskId = route.params.key as string;
   
   // 获取数据指标
   const getMetrics = (id: string) => {
@@ -114,9 +112,7 @@ export const useDataExport = () => {
 
   // 获取指标名称（根据页面id动态获取）
   const getMetricName = (key: string): string => {
-    // 只允许 'Internet' 或 'energy'，否则 fallback
-    const id = (taskId === 'Internet' || taskId === 'energy') ? taskId : 'Internet';
-    const metricNameMap = (dataMetrics.metricNameMap as Record<string, Record<string, string>>)[id] || {};
+    const metricNameMap = (dataMetrics.metricNameMap as Record<string, Record<string, string>>)[taskId] || {};
     return metricNameMap[key] || key;
   };
 

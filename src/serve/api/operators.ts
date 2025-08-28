@@ -27,10 +27,10 @@ export interface Operator {
 }
 
 // 根据任务ID获取数据集类型（仅支持字符串或数字）
-const getDatasetType = (taskId: string | number): 'Internet' | 'energy' => {
-  if (String(taskId) === 'internet') return 'Internet';
+const getDatasetType = (taskId: string | number): string => {
+  if (String(taskId) === 'internet') return 'internet';
   if (String(taskId) === 'energy') return 'energy';
-  return 'Internet'; // 默认返回Internet
+  return 'internet'; // 默认为internet
 };
 
 // 获取算子列表（不区分数据集类型）
@@ -126,7 +126,7 @@ export const getRecommendWorkflow = async (
 ): Promise<{ data: Operator[] }> => {
   if (import.meta.env.DEV) {
     const datasetType = getDatasetType(taskId);
-    const workflowIds = (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows[datasetType]) || (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows["Internet"]) || [];
+    const workflowIds = (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows[datasetType]) || (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows["internet"]) || [];
     const operators = getOperatorsByDataset();
     const recommendedOperators = (workflowIds as number[]).map((id: number) => operators.find((op) => op.id === id)).filter(Boolean) as Operator[];
     return Promise.resolve({ data: recommendedOperators });

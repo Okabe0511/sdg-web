@@ -1,6 +1,6 @@
 {
   "responses": {
-    "Internet":[
+    "internet":[
       {
         "event": "REQUEST",
         "data": "加载图像数据集路径/data/echarts-image, 加载代码数据集路径/data/echarts-code, 加载元数据路径/metadata/echarts-task.metadata"

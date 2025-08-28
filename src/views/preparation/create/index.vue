@@ -164,10 +164,7 @@ export default defineComponent({
 
     // 计算当前页面 id
     const getMetricNameMap = () => {
-      let id = '';
-      if (String(taskId.value) === 'internet') id = 'Internet';
-      else if (String(taskId.value) === 'energy') id = 'energy';
-      else id = 'Internet';
+      const id = String(taskId.value);
       return (dataMetrics.metricNameMap as Record<string, Record<string, string>>)[id] || {};
     };
 
@@ -198,9 +195,7 @@ export default defineComponent({
       loadQualityMetrics(taskId.value || "internet");
       
       // 根据taskId确定任务类型并加载对应的explanations
-      let taskType: "Internet" | "energy" = "Internet";
-      if (String(taskId.value) === 'internet') taskType = 'Internet';
-      else if (String(taskId.value) === 'energy') taskType = 'energy';
+      const taskType: "internet" | "energy" = String(taskId.value) === 'energy' ? 'energy' : 'internet';
       loadQualityExplanations(taskType);
       
       setCurrentStep(1);
