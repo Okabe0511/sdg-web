@@ -1,26 +1,25 @@
 {
-    "internet":[
-        [40.44, 83.53, 75.17, 31.98, 92.31], 
-        [40.44, 83.53, 75.14, 57.25, 92.75],
-        [50.26, 82.03, 75.46, 59.72, 91.11],
-        [50.26, 82.88, 76.1, 61.41, 90.3],
-        [100.0, 62.94, 64.5, 61.68, 93.77],
-        [100.0, 65.11, 71.28, 61.68, 93.77]
+    "internet_primary": [
+        {"dataVolume": 40.44, "dataAlignment": 83.53, "dataRedundancy": 75.17, "diversityBalance": 31.98, "codeQuality": 92.31}, 
+        {"dataVolume": 40.44, "dataAlignment": 83.53, "dataRedundancy": 75.14, "diversityBalance": 57.25, "codeQuality": 92.75},
+        {"dataVolume": 50.26, "dataAlignment": 82.03, "dataRedundancy": 75.46, "diversityBalance": 59.72, "codeQuality": 91.11},
+        {"dataVolume": 50.26, "dataAlignment": 82.88, "dataRedundancy": 76.1, "diversityBalance": 61.41, "codeQuality": 90.3},
+        {"dataVolume": 100.0, "dataAlignment": 62.94, "dataRedundancy": 64.5, "diversityBalance": 61.68, "codeQuality": 93.77},
+        {"dataVolume": 100.0, "dataAlignment": 65.11, "dataRedundancy": 71.28, "diversityBalance": 61.68, "codeQuality": 93.77}
     ],
-  "energy": [
-    [48.82, 0.00, 65.83, 36.81, 96.08],
-    [48.69, 0.00, 65.83, 52.08, 96.08],
-    [46.73, 0.00, 65.83, 57.64, 96.08],
-    [47.95, 28.81, 65.83, 63.89, 96.08],
-    [47.96, 28.17, 69.30, 71.53, 100.00],
-    [58.64, 28.66, 70.69, 63.89, 99.94],
-    [60.58, 32.10, 83.14, 63.89, 99.40],
-    [61.35, 33.25, 81.49, 69.44, 99.04],
-    [60.24, 32.75, 82.04, 63.89, 98.74],
-    [60.21, 32.52, 81.33, 63.89, 95.20],
-    [60.39, 32.43, 81.70, 71.53, 95.36],
-    [60.39, 32.43, 81.70, 63.89, 95.36],
-    [60.39, 62.27, 77.35, 71.53, 95.36]
-  ]
-    
+    "energy_primary": [
+        {"dataVolume": 48.82, "dataAlignment": 0.00, "dataRedundancy": 65.83, "diversityBalance": 36.81, "codeQuality": 96.08},
+        {"dataVolume": 48.69, "dataAlignment": 0.00, "dataRedundancy": 65.83, "diversityBalance": 52.08, "codeQuality": 96.08},
+        {"dataVolume": 46.73, "dataAlignment": 0.00, "dataRedundancy": 65.83, "diversityBalance": 57.64, "codeQuality": 96.08},
+        {"dataVolume": 47.95, "dataAlignment": 28.81, "dataRedundancy": 65.83, "diversityBalance": 63.89, "codeQuality": 96.08},
+        {"dataVolume": 47.96, "dataAlignment": 28.17, "dataRedundancy": 69.30, "diversityBalance": 71.53, "codeQuality": 100.00},
+        {"dataVolume": 58.64, "dataAlignment": 28.66, "dataRedundancy": 70.69, "diversityBalance": 63.89, "codeQuality": 99.94},
+        {"dataVolume": 60.58, "dataAlignment": 32.10, "dataRedundancy": 83.14, "diversityBalance": 63.89, "codeQuality": 99.40},
+        {"dataVolume": 61.35, "dataAlignment": 33.25, "dataRedundancy": 81.49, "diversityBalance": 69.44, "codeQuality": 99.04},
+        {"dataVolume": 60.24, "dataAlignment": 32.75, "dataRedundancy": 82.04, "diversityBalance": 63.89, "codeQuality": 98.74},
+        {"dataVolume": 60.21, "dataAlignment": 32.52, "dataRedundancy": 81.33, "diversityBalance": 63.89, "codeQuality": 95.20},
+        {"dataVolume": 60.39, "dataAlignment": 32.43, "dataRedundancy": 81.70, "diversityBalance": 71.53, "codeQuality": 95.36},
+        {"dataVolume": 60.39, "dataAlignment": 32.43, "dataRedundancy": 81.70, "diversityBalance": 63.89, "codeQuality": 95.36},
+        {"dataVolume": 60.39, "dataAlignment": 62.27, "dataRedundancy": 77.35, "diversityBalance": 71.53, "codeQuality": 95.36}
+    ]
 }

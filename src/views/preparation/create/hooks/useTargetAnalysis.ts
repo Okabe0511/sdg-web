@@ -6,17 +6,17 @@ import radardata from '/@/mock/radarData.json';
 import finalTargetData from '/@/mock/targetData.json';
 import mockTargetAnalysisResponse from '/@/mock/targetAnalysisResponse.json';
 
-let radarDataList = radardata.internet;
+let radarDataList = radardata.internet_primary;
 
 export const useTargetAnalysis = () => {
   // 雷达图相关
   const route = useRoute();
   const taskId = route.params.key;
   if(taskId === "internet") {
-    radarDataList = radardata.internet;
+    radarDataList = radardata.internet_primary;
   }
   if(taskId === "energy") {
-    radarDataList = radardata.energy;
+    radarDataList = radardata.energy_primary;
   }
   const radarChartRef = ref<HTMLElement | null>(null);
   let radarChart: echarts.ECharts | null = null;
@@ -169,7 +169,17 @@ export const useTargetAnalysis = () => {
   const addOperatorData = (operatorName: string, stepIndex: number = 0) => {
     // 使用预定义的评估数据，而不是随机生成
     const currentStepIndex = Math.min(stepIndex, radarDataList.length - 1);
-    const newData = radarDataList[currentStepIndex];
+    const dataObj = radarDataList[currentStepIndex];
+    
+    // 将对象转换为数组格式，按照雷达图 indicator 顺序
+    // indicator: [数据量, 数据表示质量, 数据冗余, 数据上下文质量, 数据内在质量]
+    const newData = [
+      dataObj.dataVolume ?? 0,
+      dataObj.dataAlignment ?? 0,
+      dataObj.dataRedundancy ?? 0,
+      dataObj.diversityBalance ?? 0,
+      dataObj.codeQuality ?? 0
+    ];
 
     // 基于步骤索引生成不同的颜色
     // 使用偏暗色系的颜色

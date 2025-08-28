@@ -1,16 +1,5 @@
 {
   "main":{
-    "internet": [
-        { "primary": "数据量", "secondary": "样本数量", "importance": 1.000, "problem": 0.596, "urgency": 0.596, "score": 40.440 },
-        { "primary": "数据内在质量", "secondary": "语法检测通过率", "importance": 0.500, "problem": 0.155, "urgency": 0.077, "score": 84.530 },
-        { "primary": "数据内在质量", "secondary": "配置项完整性", "importance": 0.500, "problem": 0.063, "urgency": 0.031, "score": 93.740 },
-        { "primary": "数据表示质量", "secondary": "图像与渲染截图匹配度", "importance": 0.333, "problem": 0.174, "urgency": 0.058, "score": 82.600 },
-        { "primary": "数据表示质量", "secondary": "缺失率", "importance": 0.667, "problem": 0.250, "urgency": 0.167, "score": 75.000 },
-        { "primary": "数据上下文质量", "secondary": "图表类型均衡性", "importance": 0.500, "problem": 0.334, "urgency": 0.167, "score": 66.650 },
-        { "primary": "数据上下文质量", "secondary": "配置项多样性", "importance": 0.500, "problem": 0.996, "urgency": 0.498, "score": 0.440 },
-        { "primary": "数据冗余", "secondary": "代码重复性", "importance": 0.500, "problem": 0.300, "urgency": 0.150, "score": 70.000 },
-        { "primary": "数据冗余", "secondary": "图像重复性", "importance": 0.500, "problem": 0.300, "urgency": 0.150, "score": 70.000 }
-    ],
     "energy": [
         { "primary": "数据量", "secondary": "时间粒度覆盖率", "importance": 0.300, "problem": 0.800, "urgency": 0.240, "score": 20.000 },
         { "primary": "数据量", "secondary": "季节性强度", "importance": 0.300, "problem": 0.426, "urgency": 0.128, "score": 57.376 },
