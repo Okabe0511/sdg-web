@@ -17,84 +17,56 @@
   },
   "originalMetrics": {
     "internet": {
-      "syntaxDetection": 84.53,
-      "configCompleteness": 93.74,
-      "sampleCount": 40.44,
-      "imageRenderMatch": 82.60,
-      "missingRate": 75.0,
-      "chartTypeBalance": 66.65,
-      "configDiversity": 0.44,
-      "codeRedundancy": 70.0,
-      "imageRedundancy": 70.0
+      "语法检测通过率": 84.53,
+      "配置项完整性": 93.74,
+      "样本数量": 40.44,
+      "图像与渲染截图匹配度": 82.60,
+      "缺失率": 75.0,
+      "图表类型均衡性": 66.65,
+      "配置项多样性": 0.44,
+      "代码重复性": 70.0,
+      "图像重复性": 70.0
     },
     "energy": {
-      "timeGranularityCoverage": 20.0,
-      "seasonalityStrength": 57.37,
-      "trendStrength": 57.37,
-      "mainFrequencyStrength": 70.01,
-      "sampleBalance": 88.15,
-      "dataCompleteness": 98.25,
-      "labelConsistency": 92.16,
-      "sequenceStability": 0.00,
-      "temporalFeatureCompleteness": 0.00,
-      "domainKnowledgeDiversity": 55.55,
-      "domainKnowledgeIntegrity": 29.16,
-      "featureIndependence": 38.23
+      "时间粒度覆盖率": 20.0,
+      "季节性强度": 57.37,
+      "趋势强度": 57.37,
+      "主频强度": 70.01,
+      "样本均衡性": 88.15,
+      "数据完整性": 98.25,
+      "标签一致性": 92.16,
+      "时序平稳性": 0.00,
+      "时间特征完备度": 0.00,
+      "领域知识多样性": 55.55,
+      "领域知识完整性": 29.16,
+      "特征独立性": 38.23
     }
   },
   "preparedMetrics": {
     "internet": {
-      "syntaxDetection": 100.0,
-      "configCompleteness": 94.66,
-      "sampleCount": 100.0,
-      "imageRenderMatch": 88.12,
-      "missingRate": 99.77,
-      "chartTypeBalance": 66.58,
-      "configDiversity": 58.05,
-      "codeRedundancy": 91.73,
-      "imageRedundancy": 85.28
+      "语法检测通过率": 100.0,
+      "配置项完整性": 94.66,
+      "样本数量": 100.0,
+      "图像与渲染截图匹配度": 88.12,
+      "缺失率": 99.77,
+      "图表类型均衡性": 66.58,
+      "配置项多样性": 58.05,
+      "代码重复性": 91.73,
+      "图像重复性": 85.28
     },
     "energy": {
-      "timeGranularityCoverage": 60.0,
-      "seasonalityStrength": 56.49,
-      "trendStrength": 51.13,
-      "mainFrequencyStrength": 73.95,
-      "sampleBalance": 94.78,
-      "dataCompleteness": 100.0,
-      "labelConsistency": 90.72,
-      "sequenceStability": 59.68,
-      "temporalFeatureCompleteness": 64.85,
-      "domainKnowledgeDiversity": 88.88,
-      "domainKnowledgeIntegrity": 54.16,
-      "featureIndependence": 59.92
-    }
-  },
-  "metricNameMap": {
-    "internet": {
-      "syntaxDetection": "语法检测通过率",
-      "configCompleteness": "配置项完整性",
-      "sampleCount": "样本数量",
-      "imageCount": "图像数量",
-      "imageRenderMatch": "图像与渲染截图匹配度",
-      "missingRate": "缺失率",
-      "chartTypeBalance": "图表类型均衡性",
-      "configDiversity": "配置项多样性",
-      "codeRedundancy": "代码重复性",
-      "imageRedundancy":"图像重复性"
-    },
-    "energy": {
-      "timeGranularityCoverage": "时间粒度覆盖率",
-      "seasonalityStrength": "季节性强度",
-      "trendStrength": "趋势强度",
-      "mainFrequencyStrength": "主频强度",
-      "sampleBalance": "样本均衡性",
-      "dataCompleteness": "数据完整性",
-      "labelConsistency": "标签一致性",
-      "sequenceStability": "时序平稳性",
-      "temporalFeatureCompleteness": "时间特征完备度",
-      "domainKnowledgeDiversity": "领域知识多样性",
-      "domainKnowledgeIntegrity": "领域知识完整性",
-      "featureIndependence": "特征独立性"
+      "时间粒度覆盖率": 60.0,
+      "季节性强度": 56.49,
+      "趋势强度": 51.13,
+      "主频强度": 73.95,
+      "样本均衡性": 94.78,
+      "数据完整性": 100.0,
+      "标签一致性": 90.72,
+      "时序平稳性": 59.68,
+      "时间特征完备度": 64.85,
+      "领域知识多样性": 88.88,
+      "领域知识完整性": 54.16,
+      "特征独立性": 59.92
     }
   },
   "chartSeriesData": {
@@ -138,34 +110,34 @@
   
   "secondaryMetricMap": {
     "internet": {
-      "dataVolume": ["sampleCount"],
-      "dataAlignment": ["imageRenderMatch", "missingRate"],
-      "dataRedundancy": ["codeRedundancy", "imageRedundancy"],
-      "diversityBalance": ["chartTypeBalance", "configDiversity"],
-      "codeQuality": ["syntaxDetection", "configCompleteness"]
+      "dataVolume": ["样本数量"],
+      "dataAlignment": ["图像与渲染截图匹配度", "缺失率"],
+      "dataRedundancy": ["代码重复性", "图像重复性"],
+      "diversityBalance": ["图表类型均衡性", "配置项多样性"],
+      "codeQuality": ["语法检测通过率", "配置项完整性"]
     },
     "energy": {
       "dataVolume": [
-        "timeGranularityCoverage",
-        "seasonalityStrength",
-        "trendStrength",
-        "mainFrequencyStrength"
+        "时间粒度覆盖率",
+        "季节性强度",
+        "趋势强度",
+        "主频强度"
       ],
       "codeQuality": [
-        "dataCompleteness",
-        "labelConsistency"
+        "数据完整性",
+        "标签一致性"
       ],
       "dataAlignment": [
-        "sequenceStability",
-        "temporalFeatureCompleteness"
+        "时序平稳性",
+        "时间特征完备度"
       ],
       "diversityBalance": [
-        "domainKnowledgeDiversity",
-        "domainKnowledgeIntegrity"
+        "领域知识多样性",
+        "领域知识完整性"
       ],
       "dataRedundancy": [
-        "sampleBalance",
-        "featureIndependence"
+        "样本均衡性",
+        "特征独立性"
       ]
     }
   }

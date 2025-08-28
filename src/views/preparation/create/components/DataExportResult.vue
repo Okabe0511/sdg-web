@@ -166,21 +166,19 @@ export default defineComponent({
 
   
     const energyKeys = [
-      "domainKnowledgeIntegrity",
-      "temporalFeatureCompleteness",
-      "timeGranularityCoverage",
-      "sequenceStability",
-      "domainKnowledgeDiversity",
-      "seasonalityStrength",
-      "mainFrequencyStrength",
-      "featureIndependence",
-      "sampleBalance",
-      "trendStrength",
-      "dataCompleteness",
-      "labelConsistency"
-    ];
-
-    // 根据任务ID选择对应的制备后指标数据（task1->internet, task2,3->energy）
+      "时间粒度覆盖率",
+      "季节性强度",
+      "时序平稳性",
+      "时间特征完备度",
+      "领域知识多样性",
+      "领域知识完整性",
+      "主频强度",
+      "特征独立性",
+      "样本均衡性",
+      "趋势强度",
+      "数据完整性",
+      "标签一致性"
+    ];    // 根据任务ID选择对应的制备后指标数据（task1->internet, task2,3->energy）
     const currentMetrics = computed(() => {
   if (taskId.value === 'internet') {
         return dataMetrics.preparedMetrics['internet'] || {};

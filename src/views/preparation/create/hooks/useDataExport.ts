@@ -131,10 +131,9 @@ export const useDataExport = () => {
     return `${prefix}${value.toFixed(1)}%`;
   };
 
-  // 获取指标名称（根据页面id动态获取）
+  // 获取指标名称（现在直接使用中文名称）
   const getMetricName = (key: string): string => {
-    const metricNameMap = (dataMetrics.metricNameMap as Record<string, Record<string, string>>)[taskId] || {};
-    return metricNameMap[key] || key;
+    return key; // 直接返回键名，因为现在使用中文
   };
 
   // 初始化雷达图

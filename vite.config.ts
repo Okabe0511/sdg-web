@@ -50,6 +50,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     },
     optimizeDeps: {
       include: ['lodash', 'ant-design-vue/es/locale/zh_CN', '@ant-design/icons-vue', 'echarts'],
+      force: true,
     },
     css: {
       preprocessorOptions: {

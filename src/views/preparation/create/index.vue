@@ -162,10 +162,9 @@ export default defineComponent({
       }
     };
 
-    // 计算当前页面 id
+    // 获取指标名称映射（现在直接使用中文）
     const getMetricNameMap = () => {
-      const id = String(taskId.value);
-      return (dataMetrics.metricNameMap as Record<string, Record<string, string>>)[id] || {};
+      return {}; // 返回空对象，因为不再需要映射
     };
 
     // 处理下一步的函数
