@@ -1,0 +1,32 @@
+{
+  "internet": [
+    {
+      "label": "数据对数量",
+      "key": "dataPairs",
+      "previousValue": 640
+    },
+    {
+      "label": "图像数量",
+      "dataType": "图像",
+      "key": "imageCount",
+      "dataSize": "19.2MB",
+      "previousValue": 580
+    },
+    {
+      "label": "程序代码数量",
+      "dataType": "程序代码",
+      "key": "codeCount",
+      "dataSize": "2.6MB",
+      "previousValue": 592
+    }
+  ],
+  "energy": [
+    {
+      "label": "关系表数量",
+      "dataType": "关系表",
+      "key": "codeCount",
+      "dataSize": "5.52MB",
+      "previousValue": 138
+    }
+  ]
+}

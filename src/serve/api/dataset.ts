@@ -1,5 +1,5 @@
 import http from "..";
-import mockDataMetrics from "/@/mock/dataMetrics.json";
+import datasetInfo from "/@/mock/datasetInfo.json";
 import { DatasetInfo } from "/@/views/preparation/create/hooks/useDatasets";
 
 /**
@@ -10,7 +10,7 @@ import { DatasetInfo } from "/@/views/preparation/create/hooks/useDatasets";
 export const getDatasetInfo = async (taskId: any) => {
   if (import.meta.env.DEV) {
     const key = taskId.id;
-    const data = (mockDataMetrics.datasets as any)[key];
+    const data = (datasetInfo as any)[key];
     return Promise.resolve({ data });
   }
   return http.get(`/dataset/info/${taskId}`);
@@ -29,7 +29,7 @@ export const createDataset = async (config: any) => {
     return Promise.resolve({
       data: {
         success: true,
-        datasets: mockDataMetrics.datasets,
+        datasets: datasetInfo,
       },
     });
   }

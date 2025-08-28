@@ -3,6 +3,8 @@ import * as echarts from "echarts";
 import { message } from "ant-design-vue";
 import { useRoute } from 'vue-router';
 import dataMetrics from '/@/mock/dataMetrics.json';
+import datasetInfo from '/@/mock/datasetInfo.json';
+import operatorsData from '/@/mock/operatorsData.json';
 
 export interface DataMetrics {
   [key: string]: number;
@@ -29,8 +31,27 @@ export const useDataExport = () => {
   
   // 获取数据指标
   const getMetrics = (id: string) => {
-    const metrics = dataMetrics.volumeMetrics[id as keyof typeof dataMetrics.volumeMetrics];
-    return JSON.parse(JSON.stringify(metrics)); // 深拷贝避免污染原始数据
+    const baseMetrics = datasetInfo[id as keyof typeof datasetInfo];
+    if (!baseMetrics) return [];
+    
+    // 获取推荐算子最后一个的数据作为当前value
+    const recommendWorkflows = operatorsData.recommendWorkflows[id as keyof typeof operatorsData.recommendWorkflows];
+    const getValueFromLastOperator = (key: string): number => {
+      if (recommendWorkflows && recommendWorkflows.length > 0) {
+        const lastOperatorId = recommendWorkflows[recommendWorkflows.length - 1];
+        const lastOperator = operatorsData.operators.find(op => op.id === lastOperatorId);
+        if (lastOperator && lastOperator.datasetSize) {
+          return (lastOperator.datasetSize as any)[key] || 0;
+        }
+      }
+      return 0;
+    };
+    
+    // 为每个指标添加value字段
+    return baseMetrics.map((metric: any) => ({
+      ...metric,
+      value: getValueFromLastOperator(metric.key)
+    }));
   };
 
   // 获取原始指标

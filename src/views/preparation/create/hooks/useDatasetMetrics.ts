@@ -1,7 +1,7 @@
-import dataMetrics from '/@/mock/dataMetrics.json';
+import datasetInfo from '/@/mock/datasetInfo.json';
+import operatorsData from '/@/mock/operatorsData.json';
 import { ref, reactive } from "vue";
 import { useRoute } from "vue-router";
-import datasetMetricsData from '/@/mock/datasetMetrics.json';
 
 // 定义数据集指标接口
 export interface DatasetMetrics {
@@ -19,9 +19,8 @@ export const useDatasetMetrics = () => {
 
   // 只从 mock 文件读取基础数据，增长率本地动态计算
   const getInitialData = (): DatasetMetrics => {
-    let baseData;
     const type = taskId.value === "energy" ? "energy" : "internet";
-    baseData = (dataMetrics.volumeMetrics as Record<string, any[]>)[type];
+    const baseData = (datasetInfo as Record<string, any[]>)[type];
     return {
       dataPairs: baseData.find((item: any) => item.key === "dataPairs")?.previousValue ?? 0,
       imageCount: baseData.find((item: any) => item.key === "imageCount")?.previousValue ?? 0,
@@ -33,6 +32,20 @@ export const useDatasetMetrics = () => {
   };
 
   const metrics = reactive<DatasetMetrics>(getInitialData());
+
+  // 获取推荐算子最后一个的codeCount作为当前value
+  const getCurrentValue = (key: string): number => {
+    const type = taskId.value === "energy" ? "energy" : "internet";
+    const recommendWorkflows = operatorsData.recommendWorkflows[type];
+    if (recommendWorkflows && recommendWorkflows.length > 0) {
+      const lastOperatorId = recommendWorkflows[recommendWorkflows.length - 1];
+      const lastOperator = operatorsData.operators.find(op => op.id === lastOperatorId);
+      if (lastOperator && lastOperator.datasetSize) {
+        return (lastOperator.datasetSize as any)[key] || 0;
+      }
+    }
+    return 0;
+  };
 
   // 计算增长率方法
   function calculateGrowthRate(oldValue: number, newValue: number): number {
@@ -69,5 +82,6 @@ export const useDatasetMetrics = () => {
   return {
     metrics,
     updateMetrics,
+    getCurrentValue,
   };
 };

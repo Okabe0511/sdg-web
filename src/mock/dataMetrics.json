@@ -1,35 +1,4 @@
 {
-  "volumeMetrics": {
-    "internet": [
-      {
-        "label": "数据对数量",
-        "key": "dataPairs",
-        "value": 1305,
-        "previousValue": 640
-      },
-      {
-        "label": "图像数量",
-        "key": "imageCount",
-        "value": 1302,
-        "previousValue": 580
-      },
-      {
-        "label": "程序代码数量",
-        "key": "codeCount",
-        "value": 1300,
-        "previousValue": 592
-      }
-    ],
-    "energy": [
-      {
-        "label": "关系表数量",
-        "key": "codeCount",
-        "value": 507,
-        "previousValue": 138
-      }
-    ]
-    
-  },
   "qualityPrimaryMetrics": {
     "internet": {
       "codeQuality": 89.14,
@@ -167,27 +136,6 @@
     }
   },
   
-  "datasets": {
-    "internet": [
-      {
-        "dataType": "图像",
-        "dataAmount": 580,
-        "dataSize": "19.2MB"
-      },
-      {
-        "dataType": "代码",
-        "dataAmount": 592,
-        "dataSize": "2.6MB"
-      }
-    ],
-    "energy": [
-      {
-        "dataType": "关系表",
-        "dataAmount": 138,
-        "dataSize": "5.52MB"
-      }
-    ]
-  },
   "secondaryMetricMap": {
     "internet": {
       "dataVolume": ["sampleCount"],
