@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import dataMetrics from '/@/mock/dataMetrics.json';
 import datasetInfo from '/@/mock/datasetInfo.json';
 import operatorsData from '/@/mock/operatorsData.json';
+import radarData from '/@/mock/radarData.json';
 
 export interface DataMetrics {
   [key: string]: number;
@@ -58,14 +59,50 @@ export const useDataExport = () => {
   const getOriginalMetrics = (id: string) => {
     return dataMetrics.originalMetrics[id as keyof typeof dataMetrics.originalMetrics];
   };
-  // 获取制备后指标
+  // 获取制备后指标（从 radarData.json 获取每个任务的最后一组数据）
   const getPreparedMetrics = (id: string) => {
-    return dataMetrics.preparedMetrics[id as keyof typeof dataMetrics.preparedMetrics];
+    const secondaryData = radarData[`${id}_secondary` as keyof typeof radarData];
+    if (!secondaryData || !Array.isArray(secondaryData) || secondaryData.length === 0) {
+      return {};
+    }
+    // 返回最后一组数据
+    return secondaryData[secondaryData.length - 1];
   };
 
   // 获取图表数据
   const getChartSeriesData = (id: string) => {
-    const seriesData = dataMetrics.chartSeriesData[id as keyof typeof dataMetrics.chartSeriesData];
+    const primaryKey = `${id}_primary` as keyof typeof radarData;
+    const primaryData = radarData[primaryKey];
+    
+    if (!primaryData || !Array.isArray(primaryData) || primaryData.length === 0) {
+      return [];
+    }
+    
+    // 原始数据（第一组）
+    const originalData = primaryData[0];
+    // 制备后数据（最后一组）
+    const preparedData = primaryData[primaryData.length - 1];
+    
+    // 转换对象数据为数组格式 [dataVolume, dataAlignment, dataRedundancy, diversityBalance, codeQuality]
+    const convertToArray = (dataObj: any) => [
+      dataObj.dataVolume ?? 0,
+      dataObj.dataAlignment ?? 0, 
+      dataObj.dataRedundancy ?? 0,
+      dataObj.diversityBalance ?? 0,
+      dataObj.codeQuality ?? 0
+    ];
+    
+    const seriesData = [
+      {
+        name: "原始数据",
+        value: convertToArray(originalData)
+      },
+      {
+        name: "制备后数据", 
+        value: convertToArray(preparedData)
+      }
+    ];
+    
     // 硬编码颜色设置
     return seriesData.map((item: any, index: number) => ({
       ...item,

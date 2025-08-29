@@ -129,6 +129,7 @@ import DatasetHeader from "/@/components/DatasetHeader/index.vue";
 import { useDataExport } from "../hooks/useDataExport";
 import { useRoute, useRouter } from "vue-router";
 import dataMetrics from  "/@/mock/dataMetrics.json"
+import radarData from "/@/mock/radarData.json";
 import targetAnalysisResponse from '/@/mock/targetAnalysisResponse.json';
 export interface SecondaryMetrics {
   [key: string]: number;
@@ -152,7 +153,7 @@ export default defineComponent({
     },
     secondaryMetrics: {
       type: Object,
-      default: () => (dataMetrics.preparedMetrics),
+      default: () => ({}),
     },
   },
   setup(props) {
@@ -178,13 +179,23 @@ export default defineComponent({
       "趋势强度",
       "数据完整性",
       "标签一致性"
-    ];    // 根据任务ID选择对应的制备后指标数据（task1->internet, task2,3->energy）
+    ];    // 获取制备后指标（从 radarData.json 获取每个任务的最后一组数据）
+    const getPreparedMetrics = (id: string) => {
+      const secondaryData = radarData[`${id}_secondary` as keyof typeof radarData];
+      if (!secondaryData || !Array.isArray(secondaryData) || secondaryData.length === 0) {
+        return {};
+      }
+      // 返回最后一组数据
+      return secondaryData[secondaryData.length - 1];
+    };
+
+    // 根据任务ID选择对应的制备后指标数据（task1->internet, task2,3->energy）
     const currentMetrics = computed(() => {
-  if (taskId.value === 'internet') {
-        return dataMetrics.preparedMetrics['internet'] || {};
+      if (taskId.value === 'internet') {
+        return getPreparedMetrics('Internet') || {};
       } else {
         const energyMetrics: Record<string, number> = {};
-        const energyData = dataMetrics.preparedMetrics['energy'];
+        const energyData = getPreparedMetrics('energy');
         for (const k of energyKeys) {
           energyMetrics[k] = energyData[k as keyof typeof energyData] ?? 0;
         }
