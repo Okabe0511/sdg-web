@@ -143,6 +143,7 @@ import { defineComponent, ref, onMounted, watch, PropType, computed } from "vue"
 import { useRoute } from "vue-router";
 import * as echarts from "echarts";
 import mockDataMetrics from "/@/mock/dataMetrics.json";
+import mockMetricsConfig from "/@/mock/metricsConfig.json";
 import {
   QualityMetrics,
   SecondaryMetrics,
@@ -185,7 +186,7 @@ export default defineComponent({
       return id === 'energy' ? "energy" : "internet";
     };
     // 获取当前一级指标对应的二级指标数组
-    const secondaryMetricMap = mockDataMetrics.secondaryMetricMap as Record<string, Record<string, string[]>>;
+    const secondaryMetricMap = mockMetricsConfig.secondaryMetricMap as Record<string, Record<string, string[]>>;
     const currentSecondaryMetrics = computed<string[]>(() => {
       const type = getType();
       const metric = props.selectedQualityMetric;

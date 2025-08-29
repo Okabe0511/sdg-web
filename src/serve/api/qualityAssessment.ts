@@ -1,6 +1,7 @@
 import http from "..";
 import mockQualityResponse from "/@/mock/qualityResponse.json";
 import mockDataMetrics from "/@/mock/dataMetrics.json";
+import mockMetricsConfig from "/@/mock/metricsConfig.json";
 import {
   QualityMetrics,
   SecondaryMetrics,
@@ -46,7 +47,7 @@ export const getQualityMetrics = async (taskId: string) => {
 export const getQualityExplanations = async (taskType: "internet" | "energy" = "internet") => {
   // 在开发环境中使用mock数据
   if (import.meta.env.DEV) {
-    return Promise.resolve({ data: mockDataMetrics.explanations[taskType] });
+    return Promise.resolve({ data: mockMetricsConfig.explanations[taskType] });
   }
   // 实际环境中调用真实接口
   return http.get(`/quality/explanations/${taskType}`);
