@@ -1,13 +1,19 @@
 import { identity } from "lodash";
 import http from "..";
 import mockOperatorsDataRaw from "/@/mock/operatorsData.json";
+import mockRadarDataRaw from "/@/mock/radarData.json";
 
 // 明确 mock 数据类型
 interface MockOperatorsData {
   operators: Operator[];
+}
+
+interface MockRadarData {
   recommendWorkflows: Record<string, number[]>;
 }
+
 const mockOperatorsData = mockOperatorsDataRaw as unknown as MockOperatorsData;
+const mockRadarData = mockRadarDataRaw as unknown as MockRadarData;
 
 export interface Operator {
   id: number;
@@ -126,7 +132,7 @@ export const getRecommendWorkflow = async (
 ): Promise<{ data: Operator[] }> => {
   if (import.meta.env.DEV) {
     const datasetType = getDatasetType(taskId);
-    const workflowIds = (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows[datasetType]) || (mockOperatorsData.recommendWorkflows && mockOperatorsData.recommendWorkflows["internet"]) || [];
+    const workflowIds = (mockRadarData.recommendWorkflows && mockRadarData.recommendWorkflows[datasetType]) || (mockRadarData.recommendWorkflows && mockRadarData.recommendWorkflows["internet"]) || [];
     const operators = getOperatorsByDataset();
     const recommendedOperators = (workflowIds as number[]).map((id: number) => operators.find((op) => op.id === id)).filter(Boolean) as Operator[];
     return Promise.resolve({ data: recommendedOperators });

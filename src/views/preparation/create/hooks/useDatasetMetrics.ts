@@ -1,5 +1,6 @@
 import datasetInfo from '/@/mock/datasetInfo.json';
 import operatorsData from '/@/mock/operatorsData.json';
+import radarData from '/@/mock/radarData.json';
 import { ref, reactive } from "vue";
 import { useRoute } from "vue-router";
 
@@ -36,7 +37,7 @@ export const useDatasetMetrics = () => {
   // 获取推荐算子最后一个的codeCount作为当前value
   const getCurrentValue = (key: string): number => {
     const type = taskId.value === "energy" ? "energy" : "internet";
-    const recommendWorkflows = operatorsData.recommendWorkflows[type];
+    const recommendWorkflows = (radarData as any).recommendWorkflows[type];
     if (recommendWorkflows && recommendWorkflows.length > 0) {
       const lastOperatorId = recommendWorkflows[recommendWorkflows.length - 1];
       const lastOperator = operatorsData.operators.find(op => op.id === lastOperatorId);

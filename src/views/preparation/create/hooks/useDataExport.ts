@@ -36,7 +36,7 @@ export const useDataExport = () => {
     if (!baseMetrics) return [];
     
     // 获取推荐算子最后一个的数据作为当前value
-    const recommendWorkflows = operatorsData.recommendWorkflows[id as keyof typeof operatorsData.recommendWorkflows];
+    const recommendWorkflows = (radarData as any).recommendWorkflows[id as keyof typeof radarData.recommendWorkflows];
     const getValueFromLastOperator = (key: string): number => {
       if (recommendWorkflows && recommendWorkflows.length > 0) {
         const lastOperatorId = recommendWorkflows[recommendWorkflows.length - 1];
