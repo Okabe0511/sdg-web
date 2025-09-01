@@ -1,7 +1,7 @@
 <template>
   <div class="dataset-header">
     <div class="dataset-title">
-      <h1>{{ pageId === 'energy' ? '电价数据集（关系表）' : 'ECharts多模态数据集（图像+程序代码）' }}</h1>
+      <h1>{{ getTaskTitle() }}</h1>
     </div>
     <div class="dataset-metrics">
       <div v-if="pageId === 'internet'" class="metrics-row">
@@ -104,6 +104,8 @@
 import { defineComponent, reactive, PropType, watch, computed } from "vue";
 import { useRoute } from 'vue-router';
 import Icon from "/@/components/Icon/index.vue";
+import preparationData from "/@/mock/preparationData.json";
+import datasetInfo from "/@/mock/datasetInfo.json";
 
 export interface DatasetMetrics {
   dataPairs: number;
@@ -130,6 +132,25 @@ export default defineComponent({
     const pageId = computed(() => {
       return route.params.key?.toString() || 'internet';
     });
+
+    // 获取任务标题
+    const getTaskTitle = (): string => {
+      const task = preparationData.tasks.find(t => t.id === pageId.value);
+      if (!task) return '未知任务';
+      
+      // 获取数据类型信息
+      const dataTypes = datasetInfo[pageId.value as keyof typeof datasetInfo]
+        ?.filter(item => item.dataType)
+        .map(item => item.dataType);
+      
+      if (dataTypes && dataTypes.length > 0) {
+        const uniqueDataTypes = [...new Set(dataTypes)]; // 去重
+        return `${task.name}（${uniqueDataTypes.join('+')}）`;
+      }
+      
+      return task.name;
+    };
+    
     // 格式化增长率
     const formatGrowth = (growth: number): string => {
       const absGrowth = Math.abs(growth);
@@ -138,6 +159,7 @@ export default defineComponent({
     return {
       formatGrowth,
       pageId,
+      getTaskTitle,
     };
   },
 });
