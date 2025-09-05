@@ -114,6 +114,16 @@ export interface DatasetMetrics {
   imageCountGrowth: number;
   codeCount: number;
   codeCountGrowth: number;
+  textCount: number;
+  textCountGrowth: number;
+  audioCount: number;
+  audioCountGrowth: number;
+  relationCount: number;
+  relationCountGrowth: number;
+  adaptiveCount: number;
+  adaptiveCountGrowth: number;
+  graphCount: number;
+  graphCountGrowth: number;
 }
 
 export default defineComponent({

@@ -9,9 +9,19 @@ export interface DatasetMetrics {
   dataPairs: number;
   imageCount: number;
   codeCount: number;
+  textCount: number;
+  audioCount: number;
+  relationCount: number;
+  adaptiveCount: number;
+  graphCount: number;
   dataPairsGrowth?: number;
   imageCountGrowth?: number;
   codeCountGrowth?: number;
+  textCountGrowth?: number;
+  audioCountGrowth?: number;
+  relationCountGrowth?: number;
+  adaptiveCountGrowth?: number;
+  graphCountGrowth?: number;
 }
 
 export const useDatasetMetrics = () => {
@@ -26,9 +36,19 @@ export const useDatasetMetrics = () => {
       dataPairs: baseData.find((item: any) => item.key === "dataPairs")?.previousValue ?? 0,
       imageCount: baseData.find((item: any) => item.key === "imageCount")?.previousValue ?? 0,
       codeCount: baseData.find((item: any) => item.key === "codeCount")?.previousValue ?? 0,
+      textCount: baseData.find((item: any) => item.key === "textCount")?.previousValue ?? 0,
+      audioCount: baseData.find((item: any) => item.key === "audioCount")?.previousValue ?? 0,
+      relationCount: baseData.find((item: any) => item.key === "relationCount")?.previousValue ?? 0,
+      adaptiveCount: baseData.find((item: any) => item.key === "adaptiveCount")?.previousValue ?? 0,
+      graphCount: baseData.find((item: any) => item.key === "graphCount")?.previousValue ?? 0,
       dataPairsGrowth: 0,
       imageCountGrowth: 0,
-      codeCountGrowth: 0
+      codeCountGrowth: 0,
+      textCountGrowth: 0,
+      audioCountGrowth: 0,
+      relationCountGrowth: 0,
+      adaptiveCountGrowth: 0,
+      graphCountGrowth: 0
     };
   };
 
@@ -58,24 +78,44 @@ export const useDatasetMetrics = () => {
   const originalMetrics = reactive({
     dataPairs: metrics.dataPairs,
     imageCount: metrics.imageCount,
-    codeCount: metrics.codeCount
+    codeCount: metrics.codeCount,
+    textCount: metrics.textCount,
+    audioCount: metrics.audioCount,
+    relationCount: metrics.relationCount,
+    adaptiveCount: metrics.adaptiveCount,
+    graphCount: metrics.graphCount
   });
 
   // 更新指标数据
   const updateMetrics = (operatorDatasetSize: {
-    dataPairs: number;
-    imageCount: number;
-    codeCount: number;
+    dataPairs?: number;
+    imageCount?: number;
+    codeCount?: number;
+    textCount?: number;
+    audioCount?: number;
+    relationCount?: number;
+    adaptiveCount?: number;
+    graphCount?: number;
   }) => {
     // 更新当前值
-    metrics.dataPairs = operatorDatasetSize.dataPairs;
-    metrics.imageCount = operatorDatasetSize.imageCount;
-    metrics.codeCount = operatorDatasetSize.codeCount;
+    if (operatorDatasetSize.dataPairs !== undefined) metrics.dataPairs = operatorDatasetSize.dataPairs;
+    if (operatorDatasetSize.imageCount !== undefined) metrics.imageCount = operatorDatasetSize.imageCount;
+    if (operatorDatasetSize.codeCount !== undefined) metrics.codeCount = operatorDatasetSize.codeCount;
+    if (operatorDatasetSize.textCount !== undefined) metrics.textCount = operatorDatasetSize.textCount;
+    if (operatorDatasetSize.audioCount !== undefined) metrics.audioCount = operatorDatasetSize.audioCount;
+    if (operatorDatasetSize.relationCount !== undefined) metrics.relationCount = operatorDatasetSize.relationCount;
+    if (operatorDatasetSize.adaptiveCount !== undefined) metrics.adaptiveCount = operatorDatasetSize.adaptiveCount;
+    if (operatorDatasetSize.graphCount !== undefined) metrics.graphCount = operatorDatasetSize.graphCount;
 
     // 计算相对于原始数据的增长率
     metrics.dataPairsGrowth = calculateGrowthRate(originalMetrics.dataPairs, metrics.dataPairs);
     metrics.imageCountGrowth = calculateGrowthRate(originalMetrics.imageCount, metrics.imageCount);
     metrics.codeCountGrowth = calculateGrowthRate(originalMetrics.codeCount, metrics.codeCount);
+    metrics.textCountGrowth = calculateGrowthRate(originalMetrics.textCount, metrics.textCount);
+    metrics.audioCountGrowth = calculateGrowthRate(originalMetrics.audioCount, metrics.audioCount);
+    metrics.relationCountGrowth = calculateGrowthRate(originalMetrics.relationCount, metrics.relationCount);
+    metrics.adaptiveCountGrowth = calculateGrowthRate(originalMetrics.adaptiveCount, metrics.adaptiveCount);
+    metrics.graphCountGrowth = calculateGrowthRate(originalMetrics.graphCount, metrics.graphCount);
   };
 
   // 可在组件中直接使用 dataPairsGrowth、imageCountGrowth、codeCountGrowth 展示相对于原始数据的增长率
