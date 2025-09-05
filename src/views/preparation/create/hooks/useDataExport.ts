@@ -12,8 +12,8 @@ export interface DataMetrics {
 }
 
 export interface VolumeMetric {
-  label: string;
   key: string;
+  dataType?: string;
   value: number;
   previousValue: number;
   growthRate: number;

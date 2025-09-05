@@ -29,7 +29,7 @@
                 class="volume-metric-item"
               >
                 <div class="metric-content">
-                  <div class="metric-label">{{ metric.label }}</div>
+                  <div class="metric-label">{{ metric.dataType ? metric.dataType + '数量' : '数据对数量' }}</div>
                   <div class="metric-value">
                     {{ metric.value }}
                     <span

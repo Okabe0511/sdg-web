@@ -14,7 +14,7 @@
           </thead>
           <tbody>
             <tr v-for="metric in metricsData" :key="metric.key">
-              <td>{{ metric.label }}</td>
+              <td>{{ metric.dataType ? metric.dataType + '数量' : '数据对数量' }}</td>
               <td>{{ typeof metric.previousValue === 'number' && metric.previousValue < 10 ? metric.previousValue.toFixed(4) : metric.previousValue }}</td>
               <td>{{ typeof metric.value === 'number' && metric.value < 10 ? metric.value.toFixed(4) : metric.value }}</td>
               <td :class="{ 'positive': metric.changePercent > 0, 'negative': metric.changePercent < 0 }">
@@ -107,6 +107,7 @@ import { useRoute } from "vue-router";
 import LineChart from "/@/components/charts/LineChart.vue";
 import { useComparisonCharts } from "./hooks/useComparisonCharts";
 import EnergyPredictionChart from '/@/components/EnergyPredictionChart.vue';
+import datasetInfo from "/@/mock/datasetInfo.json";
 
 export default defineComponent({
   name: "TrainingComparison",
@@ -155,30 +156,24 @@ export default defineComponent({
           }
         ];
       } else {
-        // Internet 数据集的指标 (ID=1的情况下)
-        return [
-          {
-            label: "数据对数量",
-            key: "dataPairs", 
-            value: 1305,
-            previousValue: 640,
-            changePercent: ((1305 - 640) / 640) * 100
-          },
-          {
-            label: "图像数量",
-            key: "imageCount",
-            value: 1302,
-            previousValue: 580,
-            changePercent: ((1302 - 580) / 580) * 100
-          },
-          {
-            label: "程序代码数量", 
-            key: "codeCount",
-            value: 1300,
-            previousValue: 592,
-            changePercent: ((1300 - 592) / 592) * 100
-          }
-        ];
+        // Internet 数据集的指标 - 从 datasetInfo 动态获取
+        const datasetItems = datasetInfo[dataTypeId as keyof typeof datasetInfo] || [];
+        
+        // 为了比较表格，我们需要数值数据，这里使用硬编码的数值
+        const valueMap: { [key: string]: number } = {
+          'dataPairs': 1305,
+          'imageCount': 1302,
+          'codeCount': 1300
+        };
+        
+        return datasetItems.map(item => ({
+          label: item.dataType ? item.dataType + '数量' : '数据对数量',
+          key: item.key,
+          value: valueMap[item.key] || 0,
+          previousValue: item.previousValue || 0,
+          changePercent: item.previousValue ? ((valueMap[item.key] || 0) - item.previousValue) / item.previousValue * 100 : 0,
+          dataType: item.dataType
+        }));
       }
     });
 

@@ -4,93 +4,29 @@
       <h1>{{ getTaskTitle() }}</h1>
     </div>
     <div class="dataset-metrics">
-      <div v-if="pageId === 'internet'" class="metrics-row">
-        <div class="metric-item">
+      <div class="metrics-row">
+        <div 
+          v-for="(item, index) in getDatasetItems()" 
+          :key="index"
+          class="metric-item"
+        >
           <div class="metric-icon">
-            <Icon name="data" />
+            <Icon :name="getIconName(item.dataType)" />
           </div>
           <div class="metric-content">
-            <div class="metric-label">数据对数量</div>
+            <div class="metric-label">{{ item.dataType ? item.dataType + '数量' : '数据对数量' }}</div>
             <div class="metric-value">
-              {{ metrics.dataPairs }}
+              {{ getMetricValue(item.key) }}
               <span
                 class="growth-rate"
-                :class="{ positive: metrics.dataPairsGrowth > 0 }"
+                :class="{ positive: getGrowthValue(item.key) > 0 }"
               >
-                {{ formatGrowth(metrics.dataPairsGrowth) }}
+                {{ formatGrowth(getGrowthValue(item.key)) }}
                 <Icon
-                  v-if="metrics.dataPairsGrowth !== 0"
-                  :name="metrics.dataPairsGrowth > 0 ? 'arrow-up' : 'arrow-down'"
+                  v-if="getGrowthValue(item.key) !== 0"
+                  :name="getGrowthValue(item.key) > 0 ? 'arrow-up' : 'arrow-down'"
                 />
-                <span v-if="metrics.dataPairsGrowth === 0">-</span>
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-icon">
-            <Icon name="image" />
-          </div>
-          <div class="metric-content">
-            <div class="metric-label">图像数量</div>
-            <div class="metric-value">
-              {{ metrics.imageCount }}
-              <span
-                class="growth-rate"
-                :class="{ positive: metrics.imageCountGrowth > 0 }"
-              >
-                {{ formatGrowth(metrics.imageCountGrowth) }}
-                <Icon
-                  v-if="metrics.imageCountGrowth !== 0"
-                  :name="metrics.imageCountGrowth > 0 ? 'arrow-up' : 'arrow-down'"
-                />
-                <span v-if="metrics.imageCountGrowth === 0">-</span>
-              </span>
-            </div>
-          </div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-icon">
-            <Icon name="code" />
-          </div>
-          <div class="metric-content">
-            <div class="metric-label">程序代码数量</div>
-            <div class="metric-value">
-              {{ metrics.codeCount }}
-              <span
-                class="growth-rate"
-                :class="{ positive: metrics.codeCountGrowth > 0 }"
-              >
-                {{ formatGrowth(metrics.codeCountGrowth) }}
-                <Icon
-                  v-if="metrics.codeCountGrowth !== 0"
-                  :name="metrics.codeCountGrowth > 0 ? 'arrow-up' : 'arrow-down'"
-                />
-                <span v-if="metrics.codeCountGrowth === 0">-</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-else-if="pageId === 'energy'">
-        <div class="metric-item">
-          <div class="metric-icon">
-            <Icon name="data" />
-          </div>
-          <div class="metric-content">
-            <div class="metric-label">关系表数量</div>
-            <div class="metric-value">
-              {{ metrics.codeCount }}
-              <span
-                class="growth-rate"
-                :class="{ positive: metrics.codeCountGrowth > 0 }"
-              >
-                {{ formatGrowth(metrics.codeCountGrowth) }}
-                <Icon
-                  v-if="metrics.codeCountGrowth !== 0"
-                  :name="metrics.codeCountGrowth > 0 ? 'arrow-up' : 'arrow-down'"
-                />
-                <span v-if="metrics.codeCountGrowth === 0">-</span>
+                <span v-if="getGrowthValue(item.key) === 0">-</span>
               </span>
             </div>
           </div>
@@ -161,6 +97,58 @@ export default defineComponent({
       return task.name;
     };
     
+    // 获取数据集项目
+    const getDatasetItems = () => {
+      const items = datasetInfo[pageId.value as keyof typeof datasetInfo];
+      return items || [];
+    };
+
+    // 获取图标名称
+    const getIconName = (dataType?: string): string => {
+      const iconMap: { [key: string]: string } = {
+        '图像': 'image',
+        '程序代码': 'code',
+        '关系表': 'data',
+        '文本': 'text',
+        '语音': 'audio',
+        '适配': 'adaptive',
+        '图数据': 'graph'
+      };
+      return iconMap[dataType || ''] || 'data';
+    };
+
+    // 获取指标值
+    const getMetricValue = (key: string): number => {
+      const metricMap: { [key: string]: keyof DatasetMetrics } = {
+        'dataPairs': 'dataPairs',
+        'imageCount': 'imageCount',
+        'codeCount': 'codeCount',
+        'textCount': 'textCount',
+        'audioCount': 'audioCount',
+        'relationCount': 'relationCount',
+        'adaptiveCount': 'adaptiveCount',
+        'graphCount': 'graphCount'
+      };
+      const metricKey = metricMap[key];
+      return metricKey ? props.metrics[metricKey] : 0;
+    };
+
+    // 获取增长值
+    const getGrowthValue = (key: string): number => {
+      const growthMap: { [key: string]: keyof DatasetMetrics } = {
+        'dataPairs': 'dataPairsGrowth',
+        'imageCount': 'imageCountGrowth',
+        'codeCount': 'codeCountGrowth',
+        'textCount': 'textCountGrowth',
+        'audioCount': 'audioCountGrowth',
+        'relationCount': 'relationCountGrowth',
+        'adaptiveCount': 'adaptiveCountGrowth',
+        'graphCount': 'graphCountGrowth'
+      };
+      const growthKey = growthMap[key];
+      return growthKey ? props.metrics[growthKey] : 0;
+    };
+    
     // 格式化增长率
     const formatGrowth = (growth: number): string => {
       const absGrowth = Math.abs(growth);
@@ -170,6 +158,10 @@ export default defineComponent({
       formatGrowth,
       pageId,
       getTaskTitle,
+      getDatasetItems,
+      getIconName,
+      getMetricValue,
+      getGrowthValue,
     };
   },
 });
