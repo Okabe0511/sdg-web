@@ -17,6 +17,30 @@ export interface OperatorParam {
   defaultValue: string;
 }
 
+// 前端写死的算子参数配置
+const OPERATOR_PARAMETERS: Record<number, string> = {
+  1: "", // 基于图像生成代码算子
+  2: "mutation_prob: 1, mutation_range: 0.5", // 代码扰动算子
+  3: "add_watermark: True, water_count: 25, add_noise: True, add_text: True, text_count: 15", // 图像加噪算子
+  4: "", // 配置项修复算子
+  5: "probability: 0.5", // 配置多样性增强算子
+  6: "", // 基于代码生成图像算子
+  7: "", // 语法修复算子
+  8: "sampling_rates: 15min,30min,1h", // 样本多粒度采样算子
+  9: "period_type: seasonal", // 周期性增强算子
+  10: "trend_type: linear", // 趋势性增强算子
+  11: "frequency_count: 5", // 主频提取增强算子
+  12: "model_type: SAITS", // 数据缺失值填充算子
+  13: "vote_method: majority", // 标签冲突校准算子
+  14: "normalize_method: standard", // 时序平稳化算子
+  15: "balance_ratio: 0.8", // 稀缺样本生成算子
+  16: "transfer_method: similarity", // 领域知识迁移算子
+  17: "feature_type: temporal", // 领域知识引入算子
+  18: "time_features: month,day,hour,holiday", // 时间特征增强算子
+  19: "cluster_method: kmeans", // 冗余样本消除算子
+  20: "correlation_threshold: 0.9" // 冗余特征消除算子
+};
+
 export const useOperators = () => {
   const route = useRoute();
   const taskId = route.params.key as string; // 获取路由参数
@@ -67,9 +91,15 @@ export const useOperators = () => {
         }
       );
 
+      // 使用前端配置的参数替换服务器返回的参数
+      const operatorsWithParameters = response.data.map(operator => ({
+        ...operator,
+        parameters: OPERATOR_PARAMETERS[operator.id] || ""
+      }));
+
       // 保存原始算子列表用于搜索
       originalOperators.length = 0;
-      originalOperators.push(...response.data);
+      originalOperators.push(...operatorsWithParameters);
 
       // 如果有搜索关键词，过滤算子列表
       if (searchKeyword.value) {
@@ -121,6 +151,11 @@ export const useOperators = () => {
   // 添加切换管理模式的方法
   const toggleManageMode = () => {
     isManageMode.value = !isManageMode.value;
+  };
+
+  // 获取算子的前端配置参数
+  const getOperatorParameters = (operatorId: number): string => {
+    return OPERATOR_PARAMETERS[operatorId] || "";
   };
 
   // 解析参数字符串为结构化数据
@@ -189,8 +224,13 @@ export const useOperators = () => {
 
   // 编辑算子
   const editOperator = (operator: Operator) => {
-    currentOperator.value = { ...operator };
-    parsedParams.value = parseParameters(operator.parameters || "");
+    // 使用前端配置的参数而不是服务器的参数
+    const operatorWithParams = {
+      ...operator,
+      parameters: OPERATOR_PARAMETERS[operator.id] || ""
+    };
+    currentOperator.value = { ...operatorWithParams };
+    parsedParams.value = parseParameters(operatorWithParams.parameters || "");
     operatorEditModalVisible.value = true;
   };
 
@@ -404,6 +444,7 @@ export const useOperators = () => {
     prepareAddOperator,
     saveAndAddToWorkflow,
     parseParameters,
+    getOperatorParameters,
     searchKeyword,
     handleSearch,
     isManageMode,
